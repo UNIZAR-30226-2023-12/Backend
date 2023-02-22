@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  audios:
+    image: bitnami/redis:latest
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=ps
+      - ALLOW_EMPTY_PASSWORD=no
+    volumes:
+      - audios_data:/var/lib/redis/data/audios
+  usuarios:
+    image: bitnami/redis:latest
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=ps
+      - ALLOW_EMPTY_PASSWORD=no
+    volumes:
+      - usuarios_data:/var/lib/redis/data/usuarios
+  general:
+    image: bitnami/redis:latest
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=ps
+      - ALLOW_EMPTY_PASSWORD=no
+    volumes:
+      - general_data:/var/lib/redis/data/general
+
+volumes:
+  audio_data:
+    driver: local
+  usuarios_data:
+    driver: local
+  general_data:
+    driver: local
