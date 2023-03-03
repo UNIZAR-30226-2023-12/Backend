@@ -8,6 +8,7 @@ import redis
 #
 #
 #########################################################################################
+
 # Funcion para guardar una cancion en la base de datos
 def guardarCancion(r, id, nombre, artista, calidad, nVeces, val, genero):
     r.hmset(id, {'nombre': nombre, 'artista': artista, 'calidad': calidad, 'nVeces': nVeces, 'val': val, 'generos': genero})
@@ -107,3 +108,39 @@ def cambiarValPodcast(r, id, val):
 # Funcion para cambiar la descripcion de un podcast
 def cambiarDescPodcast(r, id, desc):
     r.hset(id, 'desc', desc)
+
+#########################################################################################
+#
+#
+# FUNCIONES PARA OBTENER PODCASTS Y SUS ATRIBUTOS POR SEPARADO
+#
+#
+#########################################################################################
+
+# Funcion para obtener un podcast
+def obtenerPodcast(r, id):
+    return r.hgetall(id)
+
+# Funcion para obtener el nombre de un podcast
+def obtenerNombrePodcast(r, id):
+    return r.hget(id, 'nombre')
+
+# Funcion para obtener el artista de un podcast
+def obtenerArtistaPodcast(r, id):
+    return r.hget(id, 'artista')
+
+# Funcion para obtener la calidad de un podcast
+def obtenerCalidadPodcast(r, id):
+    return r.hget(id, 'calidad')
+
+# Funcion para obtener el num de veces que se ha escuchado un podcast
+def obtenerVecesreproducidasPodcast(r, id):
+    return r.hget(id, 'nVeces')
+
+# Funcion para obtener la valoracion de un podcast
+def obtenerValPodcast(r, id):
+    return r.hget(id, 'val')
+
+# Funcion para obtener la descripcion de un podcast
+def obtenerDescPodcast(r, id):
+    return r.hget(id, 'desc')
