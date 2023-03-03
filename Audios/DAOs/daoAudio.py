@@ -36,6 +36,14 @@ def cambiarValCancion(r, id, val):
 def cambiarGeneroCancion(r, id, genero):
     r.hset(id, 'generos', genero)
 
+#########################################################################################
+#
+#
+# FUNCIONES PARA OBTENER CANCIONES Y SUS ATRIBUTOS POR SEPARADO
+#
+#
+#########################################################################################
+
 # Funcion para obtener una cancion
 def obtenerCancion(r, id):
     return r.hgetall(id)
@@ -63,3 +71,39 @@ def obtenerArtistaCancion(r, id):
 # Funcion para obtener la calidad de una cancion
 def obtenerCalidad(r, id):
     return r.hget(id, 'calidad')
+
+#########################################################################################
+#
+#
+# FUNCIONES PARA ALMACENAR/ACTUALIZAR PODCASTS
+#
+#
+#########################################################################################
+
+# Funcion para guardar un podcast en la base de datos
+def guardarPodcast(r, id, nombre, artista, calidad, nVeces, val, desc):
+    r.hmset(id, {'nombre': nombre, 'artista': artista, 'calidad': calidad, 'nVeces': nVeces, 'val': val, 'desc': desc})
+
+# Funcion para cambiar el nombre de un podcast
+def cambiarNombrePodcast(r, id, nombre):
+    r.hset(id, 'nombre', nombre)
+
+# Funcion para cambiar el artista de un podcast
+def cambiarArtistaPodcast(r, id, artista):
+    r.hset(id, 'artista', artista)
+
+# Funcion para cambiar la calidad de un podcast
+def cambiarCalidadPodcast(r, id, calidad):
+    r.hset(id, 'calidad', calidad)
+
+# Funcion para cambiar el num de veces que se ha escuchado un podcast
+def cambiarVecesreproducidasPodcast(r, id, nVeces):
+    r.hset(id, 'nVeces', nVeces)
+
+# Funcion para cambiar la valoracion de un podcast
+def cambiarValPodcast(r, id, val):
+    r.hset(id, 'val', val)
+
+# Funcion para cambiar la descripcion de un podcast
+def cambiarDescPodcast(r, id, desc):
+    r.hset(id, 'desc', desc)
