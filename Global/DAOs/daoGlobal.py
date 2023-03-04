@@ -171,3 +171,39 @@ def eliminarCarpeta(r, id):
 
     # Elimino la lista de playlists de la carpeta
     r.delete(idListaPlay)
+
+#########################################################################################
+#
+#
+# FUNCIONES PARA OBTENER DATOS DE CARPETAS
+#
+#
+#########################################################################################
+
+# Funcion para obtener una carpeta
+def obtenerCarpeta(r, id):
+    return r.hgetall(id)
+
+# Funcion para obtener el nombre de una carpeta
+def obtenerNombreCarpeta(r, id):
+    return r.hget(id, 'nombre')
+
+# Funcion para obtener el usuario de una carpeta
+def obtenerUsuarioCarpeta(r, id):
+    return r.hget(id, 'usuario')
+
+# Funcion para obtener el tipo de carpeta (publica o privada)
+def obtenerPublicaCarpeta(r, id):
+    return r.hget(id, 'publica')
+
+# Funcion para obtener las playlists de una carpeta
+def obtenerPlaylistsCarpeta(r, id):
+    # Primero obtengo la lista de playlists de la carpeta
+    idListaPlay = r.hget(id, 'idListaIDsPlaylist')
+
+    # Devuelvo los miembros de la lista
+    return r.smembers(idListaPlay)
+
+# Funcion para obtener el id de la lista de playlists de una carpeta
+def obtenerIDListaPlaylistsCarpeta(r, id):
+    return r.hget(id, 'idListaIDsPlaylist')
