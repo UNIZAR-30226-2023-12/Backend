@@ -116,3 +116,58 @@ def obtenerPodcastsPlaylist(r, id):
 # Funcion para obtener el id de la lista de canciones de una playlist
 def obtenerIDListaCancionesPlaylist(r, id):
     return r.hget(id, 'idListaIDsCanciones')
+
+#########################################################################################
+#
+#
+# FUNCIONES PARA CREAR/MODIFICAR CARPETAS
+#
+#
+#########################################################################################
+
+# Funcion para crear una carpeta
+def crearCarpeta(r, id, nombre, usuario, idListaIDsPlaylist, playlists, publica):
+    # Primero creo la carpeta con sus datos
+    r.hmset(id, {'nombre': nombre, 'usuario': usuario, 'idListaIDsPlaylist': idListaIDsPlaylist, 'publica': publica})
+
+    # Creo la lista de playlists
+    r.sadd(idListaIDsPlaylist, *playlists)
+
+# Funcion para cambiar el nombre de una carpeta
+def cambiarNombreCarpeta(r, id, nombre):
+    r.hset(id, 'nombre', nombre)
+
+# Funcion para cambiar el usuario de una carpeta
+def cambiarUsuarioCarpeta(r, id, usuario):
+    r.hset(id, 'usuario', usuario)
+
+# Funcion para cambiar el tipo de carpeta (publica o privada)
+def cambiarPublicaCarpeta(r, id, publica):
+    r.hset(id, 'publica', publica)
+
+# Funcion para añadir una o más playlists a una carpeta
+def anadirPlaylistCarpeta(r, idCarpeta, idPlaylists):
+    # Primero obtengo la lista de playlists de la carpeta
+    idListaPlay = r.hget(idCarpeta, 'idListaIDsPlaylist')
+
+    # Añado las playlists a la lista
+    r.sadd(idListaPlay, *idPlaylists)
+
+# Funcion para eliminar una o más playlists de una carpeta
+def eliminarPlaylistCarpeta(r, idCarpeta, idPlaylists):
+    # Primero obtengo la lista de playlists de la carpeta
+    idListaPlay = r.hget(idCarpeta, 'idListaIDsPlaylist')
+
+    # Elimino las playlists de la lista
+    r.srem(idListaPlay, *idPlaylists)
+
+# Funcion para eliminar una carpeta
+def eliminarCarpeta(r, id):
+    # Primero obtengo la lista de playlists de la carpeta
+    idListaPlay = r.hget(id, 'idListaIDsPlaylist')
+
+    # Elimino la carpeta
+    r.delete(id)
+
+    # Elimino la lista de playlists de la carpeta
+    r.delete(idListaPlay)
