@@ -45,3 +45,74 @@ def anadirPodcastPlaylist(r, idLista, idPodcasts):
 
     # Añado los podcasts a la lista
     r.sadd(idListaPod, *idPodcasts)
+
+# Funcion para eliminar una o más canciones de una playlist
+def eliminarCancionPlaylist(r, idLista, idCanciones):
+    # Primero obtengo la lista de canciones de la playlist
+    idListaCan = r.hget(idLista, 'idListaIDsCanciones')
+
+    # Elimino las canciones de la lista
+    r.srem(idListaCan, *idCanciones)
+
+# Funcion para eliminar un o más podcasts de una playlist
+def eliminarPodcastPlaylist(r, idLista, idPodcasts):
+    # Primero obtengo la lista de podcasts de la playlist
+    idListaPod = r.hget(idLista, 'idListaIDsCanciones')
+
+    # Elimino los podcasts de la lista
+    r.srem(idListaPod, *idPodcasts)
+
+# Funcion para eliminar una playlist
+def eliminarPlaylist(r, id):
+    # Primero obtengo la lista de canciones de la playlist
+    idListaCan = r.hget(id, 'idListaIDsCanciones')
+
+    # Elimino la playlist
+    r.delete(id)
+
+    # Elimino la lista de canciones de la playlist
+    r.delete(idListaCan)
+
+#########################################################################################
+#
+#
+# FUNCIONES PARA OBTENER DATOS DE PLAYLISTS
+#
+#
+#########################################################################################
+
+# Funcion para obtener una playlist
+def obtenerPlaylist(r, id):
+    return r.hgetall(id)
+
+# Funcion para obtener el nombre de una playlist
+def obtenerNombrePlaylist(r, id):
+    return r.hget(id, 'nombre')
+
+# Funcion para obtener el usuario de una playlist
+def obtenerUsuarioPlaylist(r, id):
+    return r.hget(id, 'usuario')
+
+# Funcion para obtener el tipo de playlist (publica o privada)
+def obtenerPublicaPlaylist(r, id):
+    return r.hget(id, 'publica')
+
+# Funcion para obtener las canciones de una playlist
+def obtenerCancionesPlaylist(r, id):
+    # Primero obtengo la lista de canciones de la playlist
+    idListaCan = r.hget(id, 'idListaIDsCanciones')
+
+    # Devuelvo los miembros de la lista
+    return r.smembers(idListaCan)
+
+# Funcion para obtener los podcasts de una playlist
+def obtenerPodcastsPlaylist(r, id):
+    # Primero obtengo la lista de podcasts de la playlist
+    idListaPod = r.hget(id, 'idListaIDsCanciones')
+
+    # Devuelvo los miembros de la lista
+    return r.smembers(idListaPod)
+
+# Funcion para obtener el id de la lista de canciones de una playlist
+def obtenerIDListaCancionesPlaylist(r, id):
+    return r.hget(id, 'idListaIDsCanciones')
