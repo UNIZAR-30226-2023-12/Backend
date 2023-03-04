@@ -37,6 +37,10 @@ def cambiarValCancion(r, id, val):
 def cambiarGeneroCancion(r, id, genero):
     r.hset(id, 'generos', genero)
 
+# Funcion para eliminar una cancion
+def eliminarCancion(r, id):
+    r.delete(id)
+
 #########################################################################################
 #
 #
@@ -108,6 +112,10 @@ def cambiarValPodcast(r, id, val):
 # Funcion para cambiar la descripcion de un podcast
 def cambiarDescPodcast(r, id, desc):
     r.hset(id, 'desc', desc)
+
+# Funcion para eliminar un podcast
+def eliminarPodcast(r, id):
+    r.delete(id)
 
 #########################################################################################
 #
