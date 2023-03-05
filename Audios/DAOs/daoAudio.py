@@ -5,13 +5,26 @@ import redis
 #
 #
 # FUNCIONES PARA ALMACENAR/ACTUALIZAR CANCIONES
+# Una cancion tiene los siguientes posibles atributos:
+#   - id (clave para el hash)
+#   - nombre
+#   - artista
+#   - calidad
+#   - nVeces
+#   - val
+#   - generos
+#   - ficheroAltaCalidad
+#   - ficheroBajaCalidad
 #
 #
 #########################################################################################
 
-# Funcion para guardar una cancion en la base de datos
-def guardarCancion(r, id, nombre, artista, calidad, nVeces, val, genero):
-    r.hmset(id, {'nombre': nombre, 'artista': artista, 'calidad': calidad, 'nVeces': nVeces, 'val': val, 'generos': genero})
+# Funcion para guardar una cancion en la base de datos, modificada para trabajar con diccionarios
+def guardarCancion(r, cancionDic):
+    id = cancionDic['id']
+    # Ahora quito el id del diccionario para que no se guarde en el hash
+    del cancionDic['id']
+    r.hmset(id, cancionDic)
 
 # Funcion para cambiar el nombre de una cancion
 def cambiarNombreCancion(r, id, nombre):
@@ -36,6 +49,14 @@ def cambiarValCancion(r, id, val):
 # Funcion para cambiar el genero de una cancion
 def cambiarGeneroCancion(r, id, genero):
     r.hset(id, 'generos', genero)
+
+# Funcion para cambiar el fichero de alta calidad de una cancion
+def cambiarFicheroAltaCalidad(r, id, ficheroAltaCalidad):
+    r.hset(id, 'ficheroAltaCalidad', ficheroAltaCalidad)
+
+# Funcion para cambiar el fichero de baja calidad de una cancion
+def cambiarFicheroBajaCalidad(r, id, ficheroBajaCalidad):
+    r.hset(id, 'ficheroBajaCalidad', ficheroBajaCalidad)
 
 # Funcion para eliminar una cancion
 def eliminarCancion(r, id):
@@ -77,17 +98,39 @@ def obtenerArtistaCancion(r, id):
 def obtenerCalidad(r, id):
     return r.hget(id, 'calidad')
 
+# Funcion para obtener el fichero de alta calidad de una cancion
+def obtenerFicheroAltaCalidad(r, id):
+    return r.hget(id, 'ficheroAltaCalidad')
+
+# Funcion para obtener el fichero de baja calidad de una cancion
+def obtenerFicheroBajaCalidad(r, id):
+    return r.hget(id, 'ficheroBajaCalidad')
+
 #########################################################################################
 #
 #
 # FUNCIONES PARA ALMACENAR/ACTUALIZAR PODCASTS
+# Un podcast tiene los siguientes posibles atributos:
+#   - id (clave para el hash)
+#   - nombre
+#   - artista
+#   - calidad
+#   - nVeces
+#   - val
+#   - desc
+#  - ficheroAltaCalidad
+#  - ficheroBajaCalidad
 #
 #
 #########################################################################################
 
 # Funcion para guardar un podcast en la base de datos
-def guardarPodcast(r, id, nombre, artista, calidad, nVeces, val, desc):
-    r.hmset(id, {'nombre': nombre, 'artista': artista, 'calidad': calidad, 'nVeces': nVeces, 'val': val, 'desc': desc})
+def guardarPodcast(r, podcastDic):
+    id = podcastDic['id']
+    # Ahora quito el id del diccionario para que no se guarde en el hash
+    del podcastDic['id']
+
+    r.hmset(id, podcastDic)
 
 # Funcion para cambiar el nombre de un podcast
 def cambiarNombrePodcast(r, id, nombre):
@@ -112,6 +155,14 @@ def cambiarValPodcast(r, id, val):
 # Funcion para cambiar la descripcion de un podcast
 def cambiarDescPodcast(r, id, desc):
     r.hset(id, 'desc', desc)
+
+# Funcion para cambiar el fichero de alta calidad de un podcast
+def cambiarFicheroAltaCalidadPodcast(r, id, ficheroAltaCalidad):
+    r.hset(id, 'ficheroAltaCalidad', ficheroAltaCalidad)
+
+# Funcion para cambiar el fichero de baja calidad de un podcast
+def cambiarFicheroBajaCalidadPodcast(r, id, ficheroBajaCalidad):
+    r.hset(id, 'ficheroBajaCalidad', ficheroBajaCalidad)
 
 # Funcion para eliminar un podcast
 def eliminarPodcast(r, id):
@@ -152,3 +203,11 @@ def obtenerValPodcast(r, id):
 # Funcion para obtener la descripcion de un podcast
 def obtenerDescPodcast(r, id):
     return r.hget(id, 'desc')
+
+# Funcion para obtener el fichero de alta calidad de un podcast
+def obtenerFicheroAltaCalidadPodcast(r, id):
+    return r.hget(id, 'ficheroAltaCalidad')
+
+# Funcion para obtener el fichero de baja calidad de un podcast
+def obtenerFicheroBajaCalidadPodcast(r, id):
+    return r.hget(id, 'ficheroBajaCalidad')

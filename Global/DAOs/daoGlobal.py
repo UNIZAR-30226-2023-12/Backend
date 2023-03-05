@@ -5,18 +5,27 @@ import redis
 #
 #
 # FUNCIONES PARA GESTIONAR EL CREADO/MODIFICACION DE PLAYLISTS
+# Una playlist tiene los siguientes posibles atributos:
+#   - id (clave para el hash)
+#   - nombre
+#   - usuario
+#   - idListaIDsCanciones
+#   - publica
 #
 #
 #########################################################################################
 
 # Funcion para crear una playlist
-def crearPlaylist(r, id, nombre, usuario, idListaIDsCanciones, canciones, podcasts, publica):
+def crearPlaylist(r, playlistDic, canciones, podcasts):
     # Primero creo la playlist con sus datos
-    r.hmset(id, {'nombre': nombre, 'usuario': usuario, 'idListaIDsCanciones': idListaIDsCanciones, 'publica': publica})
+    id = playlistDic['id']
+    del playlistDic['id']
+
+    r.hmset(id, playlistDic)
 
     # Creo la lista de canciones y podcasts
-    r.sadd(idListaIDsCanciones, *canciones)
-    r.sadd(idListaIDsCanciones, *podcasts)
+    r.sadd(playlistDic['idListaIDsCanciones'], *canciones)
+    r.sadd(playlistDic['idListaIDsCanciones'], *podcasts)
 
 # Funcion para cambiar el nombre de una playlist
 def cambiarNombrePlaylist(r, id, nombre):
@@ -121,17 +130,26 @@ def obtenerIDListaCancionesPlaylist(r, id):
 #
 #
 # FUNCIONES PARA CREAR/MODIFICAR CARPETAS
+# Una carpeta tiene los siguientes posibles atributos:
+#   - id (clave para el hash)
+#   - nombre
+#   - usuario
+#   - idListaIDsPlaylist
+#   - publica
 #
 #
 #########################################################################################
 
 # Funcion para crear una carpeta
-def crearCarpeta(r, id, nombre, usuario, idListaIDsPlaylist, playlists, publica):
+def crearCarpeta(r, carpetaDic, playlists):
+    id = carpetaDic['id']
+    del carpetaDic['id']
+
     # Primero creo la carpeta con sus datos
-    r.hmset(id, {'nombre': nombre, 'usuario': usuario, 'idListaIDsPlaylist': idListaIDsPlaylist, 'publica': publica})
+    r.hmset(id, carpetaDic)
 
     # Creo la lista de playlists
-    r.sadd(idListaIDsPlaylist, *playlists)
+    r.sadd(carpetaDic['idListaIDsPlaylist'], *playlists)
 
 # Funcion para cambiar el nombre de una carpeta
 def cambiarNombreCarpeta(r, id, nombre):
