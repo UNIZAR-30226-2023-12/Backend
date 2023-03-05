@@ -194,39 +194,75 @@ def eliminarCancion(r, id):
 
 # Funcion para obtener una cancion
 def obtenerCancion(r, id):
-    return r.hgetall(id)
+    if id == '':
+        print('ERROR: No se ha podido obtener la cancion, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hgetall(id)
 
 # Funcion para obtener el num de veces que se ha escuchado una cancion
 def obtenerVecesreproducidasCancion(r, id):
-    return r.hget(id, 'nVeces')
+    if id == '':
+        print('ERROR: No se ha podido obtener el num de veces que se ha escuchado la cancion, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'nVeces')
 
 # Funcion para obtener la valoracion de una cancion
 def obtenerValCancion(r, id):
-    return r.hget(id, 'val')
+    if id == '':
+        print('ERROR: No se ha podido obtener la valoracion de la cancion, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'val')
 
 # Funcion para obtener el genero de una cancion
 def obtenerGeneroCancion(r, id):
-    return r.hget(id, 'generos')
+    if id == '':
+        print('ERROR: No se ha podido obtener el genero de la cancion, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'generos')
 
 # Funcion para obtener el nombre de una cancion
 def obtenerNombreCancion(r, id):
-    return r.hget(id, 'nombre')
+    if id == '':
+        print('ERROR: No se ha podido obtener el nombre de la cancion, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'nombre')
 
 # Funcion para obtener el artista de una cancion
 def obtenerArtistaCancion(r, id):
-    return r.hget(id, 'artista')
+    if id == '':
+        print('ERROR: No se ha podido obtener el artista de la cancion, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'artista')
 
 # Funcion para obtener la calidad de una cancion
 def obtenerCalidad(r, id):
-    return r.hget(id, 'calidad')
+    if id == '':
+        print('ERROR: No se ha podido obtener la calidad de la cancion, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'calidad')
 
 # Funcion para obtener el fichero de alta calidad de una cancion
 def obtenerFicheroAltaCalidad(r, id):
-    return r.hget(id, 'ficheroAltaCalidad')
+    if id == '':
+        print('ERROR: No se ha podido obtener el fichero de alta calidad de la cancion, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'ficheroAltaCalidad')
 
 # Funcion para obtener el fichero de baja calidad de una cancion
 def obtenerFicheroBajaCalidad(r, id):
-    return r.hget(id, 'ficheroBajaCalidad')
+    if id == '':
+        print('ERROR: No se ha podido obtener el fichero de baja calidad de la cancion, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'ficheroBajaCalidad')
 
 #########################################################################################
 #
