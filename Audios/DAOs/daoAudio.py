@@ -1,3 +1,15 @@
+#########################################################################################
+#
+#
+# MODULO DAO PARA LA GESTION DE AUDIOS
+# Este modulo contiene las funciones necesarias para la gestion de los audios
+# con el tratamiento de errores correspondiente
+# Si se ha podido realizar la operación correctamente se devuelve 0, en caso contrario
+# se devuelve -1
+#
+#
+#########################################################################################
+
 import redis
 
 
@@ -21,46 +33,156 @@ import redis
 
 # Funcion para guardar una cancion en la base de datos, modificada para trabajar con diccionarios
 def guardarCancion(r, cancionDic):
-    id = cancionDic['id']
-    # Ahora quito el id del diccionario para que no se guarde en el hash
-    del cancionDic['id']
-    r.hmset(id, cancionDic)
+    # Antes de guardar compruebo si el diccionario contiene todas las claves necesarias
+    if 'id' not in cancionDic or 'nombre' not in cancionDic or 'artista' not in cancionDic or 'calidad' not in cancionDic or 'nVeces' not in cancionDic or 'val' not in cancionDic or 'generos' not in cancionDic or 'ficheroAltaCalidad' not in cancionDic or 'ficheroBajaCalidad' not in cancionDic:
+        print('ERROR: No se ha podido guardar la cancion, falta el algunas de las claves necesarias o tienen el nombre incorrecto')
+        return -1
+    else:
+        if id == '':
+            print('ERROR: No se ha podido guardar la cancion, el id no puede estar vacio')
+            return -1
+        else:
+            id = cancionDic['id']
+            # Ahora quito el id del diccionario para que no se guarde en el hash
+            del cancionDic['id']
+            r.hmset(id, cancionDic)
+    
+    return 0
 
 # Funcion para cambiar el nombre de una cancion
 def cambiarNombreCancion(r, id, nombre):
-    r.hset(id, 'nombre', nombre)
+    if nombre == '':
+        print('ERROR: No se ha podido cambiar el nombre de la cancion, el nombre no puede estar vacio')
+        return -1
+    else:
+        # Compruebo si existe una cancion con ese id
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar el nombre de la cancion, no existe ninguna cancion con ese id')
+            return -1
+        else:
+            r.hset(id, 'nombre', nombre)
+
+    return 0
 
 # Funcion para cambiar el artista de una cancion
 def cambiarArtistaCancion(r, id, artista):
-    r.hset(id, 'artista', artista)
+    if artista == '':
+        print('ERROR: No se ha podido cambiar el artista de la cancion, el artista no puede estar vacio')
+        return -1
+    else:
+        # Compruebo si existe una cancion con ese id
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar el artista de la cancion, no existe ninguna cancion con ese id')
+            return -1
+        else:
+            r.hset(id, 'artista', artista)
+
+    return 0
 
 # Funcion para cambiar la calidad de una cancion
 def cambiarCalidadCancion(r, id, calidad):
-    r.hset(id, 'calidad', calidad)
+    if calidad == '':
+        print('ERROR: No se ha podido cambiar la calidad de la cancion, la calidad no puede estar vacia')
+        return -1
+    else:
+        # Compruebo si existe una cancion con ese id
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar la calidad de la cancion, no existe ninguna cancion con ese id')
+            return -1
+        else:
+            r.hset(id, 'calidad', calidad)
+    
+    return 0
 
 # Funcion para cambiar el num de veces que se ha escuchado una cancion
 def cambiarVecesreproducidasCancion(r, id, nVeces):
-    r.hset(id, 'nVeces', nVeces)
+    if nVeces == '':
+        print('ERROR: No se ha podido cambiar el num de veces que se ha escuchado la cancion, el num no puede estar vacio')
+        return -1
+    else:
+        # Compruebo si existe una cancion con ese id
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar el num de veces que se ha escuchado la cancion, no existe ninguna cancion con ese id')
+            return -1
+        else:
+            r.hset(id, 'nVeces', nVeces)
+    
+    return 0
 
 # Funcion para cambiar la valoracion de una cancion
 def cambiarValCancion(r, id, val):
-    r.hset(id, 'val', val)
+    if val == '':
+        print('ERROR: No se ha podido cambiar la valoracion de la cancion, la valoracion no puede estar vacia')
+        return -1
+    else:
+        # Compruebo si existe una cancion con ese id
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar la valoracion de la cancion, no existe ninguna cancion con ese id')
+            return -1
+        else:
+            r.hset(id, 'val', val)
+
+    return 0
 
 # Funcion para cambiar el genero de una cancion
 def cambiarGeneroCancion(r, id, genero):
-    r.hset(id, 'generos', genero)
+    if genero == '':
+        print('ERROR: No se ha podido cambiar el genero de la cancion, el genero no puede estar vacio')
+        return -1
+    else:
+        # Compruebo si existe una cancion con ese id
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar el genero de la cancion, no existe ninguna cancion con ese id')
+            return -1
+        else:
+            r.hset(id, 'generos', genero)
+
+    return 0
 
 # Funcion para cambiar el fichero de alta calidad de una cancion
 def cambiarFicheroAltaCalidad(r, id, ficheroAltaCalidad):
-    r.hset(id, 'ficheroAltaCalidad', ficheroAltaCalidad)
+    if ficheroAltaCalidad == '':
+        print('ERROR: No se ha podido cambiar el fichero de alta calidad de la cancion, el fichero no puede estar vacio')
+        return -1
+    else:
+        # Compruebo si existe una cancion con ese id
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar el fichero de alta calidad de la cancion, no existe ninguna cancion con ese id')
+            return -1
+        else:
+            r.hset(id, 'ficheroAltaCalidad', ficheroAltaCalidad)
+
+    return 0
 
 # Funcion para cambiar el fichero de baja calidad de una cancion
 def cambiarFicheroBajaCalidad(r, id, ficheroBajaCalidad):
-    r.hset(id, 'ficheroBajaCalidad', ficheroBajaCalidad)
+    if ficheroBajaCalidad == '':
+        print('ERROR: No se ha podido cambiar el fichero de baja calidad de la cancion, el fichero no puede estar vacio')
+        return -1
+    else:
+        # Compruebo si existe una cancion con ese id
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar el fichero de baja calidad de la cancion, no existe ninguna cancion con ese id')
+            return -1
+        else:
+            r.hset(id, 'ficheroBajaCalidad', ficheroBajaCalidad)
+        
+    return 0
 
 # Funcion para eliminar una cancion
 def eliminarCancion(r, id):
-    r.delete(id)
+    if id == '':
+        print('ERROR: No se ha podido eliminar la cancion, el id no puede estar vacio')
+        return -1
+    else:
+        # Compruebo si existe una cancion con ese id
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido eliminar la cancion, no existe ninguna cancion con ese id')
+            return -1
+        else:
+            r.delete(id)
+        
+    return 0
 
 #########################################################################################
 #
