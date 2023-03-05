@@ -5,13 +5,26 @@ import redis
 #
 #
 # FUNCIONES PARA ALMACENAR/ACTUALIZAR CANCIONES
+# Una cancion tiene los siguientes posibles atributos:
+#   - id (clave para el hash)
+#   - nombre
+#   - artista
+#   - calidad
+#   - nVeces
+#   - val
+#   - generos
+#   - ficheroAltaCalidad
+#   - ficheroBajaCalidad
 #
 #
 #########################################################################################
 
-# Funcion para guardar una cancion en la base de datos
-def guardarCancion(r, id, nombre, artista, calidad, nVeces, val, genero):
-    r.hmset(id, {'nombre': nombre, 'artista': artista, 'calidad': calidad, 'nVeces': nVeces, 'val': val, 'generos': genero})
+# Funcion para guardar una cancion en la base de datos, modificada para trabajar con diccionarios
+def guardarCancion(r, cancionDic):
+    id = cancionDic['id']
+    # Ahora quito el id del diccionario para que no se guarde en el hash
+    del cancionDic['id']
+    r.hmset(id, cancionDic)
 
 # Funcion para cambiar el nombre de una cancion
 def cambiarNombreCancion(r, id, nombre):
@@ -81,13 +94,27 @@ def obtenerCalidad(r, id):
 #
 #
 # FUNCIONES PARA ALMACENAR/ACTUALIZAR PODCASTS
+# Un podcast tiene los siguientes posibles atributos:
+#   - id (clave para el hash)
+#   - nombre
+#   - artista
+#   - calidad
+#   - nVeces
+#   - val
+#   - desc
+#  - ficheroAltaCalidad
+#  - ficheroBajaCalidad
 #
 #
 #########################################################################################
 
 # Funcion para guardar un podcast en la base de datos
-def guardarPodcast(r, id, nombre, artista, calidad, nVeces, val, desc):
-    r.hmset(id, {'nombre': nombre, 'artista': artista, 'calidad': calidad, 'nVeces': nVeces, 'val': val, 'desc': desc})
+def guardarPodcast(r, podcastDic):
+    id = podcastDic['id']
+    # Ahora quito el id del diccionario para que no se guarde en el hash
+    del podcastDic['id']
+
+    r.hmset(id, podcastDic)
 
 # Funcion para cambiar el nombre de un podcast
 def cambiarNombrePodcast(r, id, nombre):
