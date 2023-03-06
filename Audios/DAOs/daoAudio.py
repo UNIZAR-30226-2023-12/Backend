@@ -284,47 +284,149 @@ def obtenerFicheroBajaCalidad(r, id):
 
 # Funcion para guardar un podcast en la base de datos
 def guardarPodcast(r, podcastDic):
-    id = podcastDic['id']
-    # Ahora quito el id del diccionario para que no se guarde en el hash
-    del podcastDic['id']
-
-    r.hmset(id, podcastDic)
+    # Compruebo que el diccionario tenga todos los atributos necesarios
+    if 'id' not in podcastDic or 'nombre' not in podcastDic or 'artista' not in podcastDic or 'calidad' not in podcastDic or 'nVeces' not in podcastDic or 'val' not in podcastDic or 'desc' not in podcastDic or 'ficheroAltaCalidad' not in podcastDic or 'ficheroBajaCalidad' not in podcastDic:
+        print('ERROR: No se ha podido guardar el podcast, el diccionario no tiene todos los atributos necesarios')
+        return -1
+    else:
+        # Compruebo que el id no este vacio
+        if podcastDic['id'] == '':
+            print('ERROR: No se ha podido guardar el podcast, el id no puede estar vacio')
+            return -1
+        else:
+            id = podcastDic['id']
+            # Ahora quito el id del diccionario para que no se guarde en el hash
+            del podcastDic['id']
+        
+            r.hmset(id, podcastDic)
+    
+    return 0
 
 # Funcion para cambiar el nombre de un podcast
 def cambiarNombrePodcast(r, id, nombre):
-    r.hset(id, 'nombre', nombre)
+    # Compruebo que exista el podcast y no sea id vacio
+    if id == '':
+        print('ERROR: No se ha podido cambiar el nombre del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar el nombre del podcast, el podcast no existe')
+            return -1
+        else:
+            r.hset(id, 'nombre', nombre)
+    return 0
 
 # Funcion para cambiar el artista de un podcast
 def cambiarArtistaPodcast(r, id, artista):
-    r.hset(id, 'artista', artista)
+    # Compruebo que exista el podcast y no sea id vacio
+    if id == '':
+        print('ERROR: No se ha podido cambiar el artista del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar el artista del podcast, el podcast no existe')
+            return -1
+        else:
+            r.hset(id, 'artista', artista)
+    return 0
 
 # Funcion para cambiar la calidad de un podcast
 def cambiarCalidadPodcast(r, id, calidad):
-    r.hset(id, 'calidad', calidad)
+    # Compruebo que exista el podcast y no sea id vacio
+    if id == '':
+        print('ERROR: No se ha podido cambiar la calidad del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar la calidad del podcast, el podcast no existe')
+            return -1
+        else:
+            r.hset(id, 'calidad', calidad)
+    return 0
 
 # Funcion para cambiar el num de veces que se ha escuchado un podcast
 def cambiarVecesreproducidasPodcast(r, id, nVeces):
-    r.hset(id, 'nVeces', nVeces)
+    # Compruebo que exista el podcast y no sea id vacio
+    if id == '':
+        print('ERROR: No se ha podido cambiar el num de veces que se ha escuchado el podcast, el id no puede estar vacio')
+        return -1
+    else:
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar el num de veces que se ha escuchado el podcast, el podcast no existe')
+            return -1
+        else:
+            r.hset(id, 'nVeces', nVeces)
+    return 0
 
 # Funcion para cambiar la valoracion de un podcast
 def cambiarValPodcast(r, id, val):
-    r.hset(id, 'val', val)
+    # Compruebo que exista el podcast y no sea id vacio
+    if id == '':
+        print('ERROR: No se ha podido cambiar la valoracion del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar la valoracion del podcast, el podcast no existe')
+            return -1
+        else:
+            r.hset(id, 'val', val)
+    return 0
 
 # Funcion para cambiar la descripcion de un podcast
 def cambiarDescPodcast(r, id, desc):
-    r.hset(id, 'desc', desc)
+    # Compruebo que exista el podcast y no sea id vacio
+    if id == '':
+        print('ERROR: No se ha podido cambiar la descripcion del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar la descripcion del podcast, el podcast no existe')
+            return -1
+        else:
+            r.hset(id, 'desc', desc)
+    return 0
 
 # Funcion para cambiar el fichero de alta calidad de un podcast
 def cambiarFicheroAltaCalidadPodcast(r, id, ficheroAltaCalidad):
-    r.hset(id, 'ficheroAltaCalidad', ficheroAltaCalidad)
+    # Compruebo que exista el podcast y no sea id vacio
+    if id == '':
+        print('ERROR: No se ha podido cambiar el fichero de alta calidad del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar el fichero de alta calidad del podcast, el podcast no existe')
+            return -1
+        else:
+            r.hset(id, 'ficheroAltaCalidad', ficheroAltaCalidad)
+    return 0
 
 # Funcion para cambiar el fichero de baja calidad de un podcast
 def cambiarFicheroBajaCalidadPodcast(r, id, ficheroBajaCalidad):
-    r.hset(id, 'ficheroBajaCalidad', ficheroBajaCalidad)
+    # Compruebo que exista el podcast y no sea id vacio
+    if id == '':
+        print('ERROR: No se ha podido cambiar el fichero de baja calidad del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar el fichero de baja calidad del podcast, el podcast no existe')
+            return -1
+        else:
+            r.hset(id, 'ficheroBajaCalidad', ficheroBajaCalidad)
+    return 0
 
 # Funcion para eliminar un podcast
 def eliminarPodcast(r, id):
-    r.delete(id)
+    # Compruebo que exista el podcast y no sea id vacio
+    if id == '':
+        print('ERROR: No se ha podido eliminar el podcast, el id no puede estar vacio')
+        return -1
+    else:
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido eliminar el podcast, el podcast no existe')
+            return -1
+        else:
+            r.delete(id)
+    return 0
 
 #########################################################################################
 #
