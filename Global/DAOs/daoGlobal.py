@@ -447,30 +447,61 @@ def eliminarCarpeta(r, id):
 #
 #########################################################################################
 
+
 # Funcion para obtener una carpeta
 def obtenerCarpeta(r, id):
-    return r.hgetall(id)
+    # Compruebo que la carpeta existe
+    if not r.exists(id):
+        print('Error: La carpeta ' + id + ' no existe')
+        return -1
+    else:
+        return r.hgetall(id)
 
 # Funcion para obtener el nombre de una carpeta
 def obtenerNombreCarpeta(r, id):
-    return r.hget(id, 'nombre')
+    # Compruebo que la carpeta existe
+    if not r.exists(id):
+        print('Error: La carpeta ' + id + ' no existe')
+        return -1
+    else:
+        return r.hget(id, 'nombre')
 
 # Funcion para obtener el usuario de una carpeta
 def obtenerUsuarioCarpeta(r, id):
-    return r.hget(id, 'usuario')
+    # Compruebo que la carpeta existe
+    if not r.exists(id):
+        print('Error: La carpeta ' + id + ' no existe')
+        return -1
+    else:
+        return r.hget(id, 'usuario')
 
 # Funcion para obtener el tipo de carpeta (publica o privada)
 def obtenerPublicaCarpeta(r, id):
-    return r.hget(id, 'publica')
+    # Compruebo que la carpeta existe
+    if not r.exists(id):
+        print('Error: La carpeta ' + id + ' no existe')
+        return -1
+    else:
+        return r.hget(id, 'publica')
 
 # Funcion para obtener las playlists de una carpeta
 def obtenerPlaylistsCarpeta(r, id):
-    # Primero obtengo la lista de playlists de la carpeta
-    idListaPlay = r.hget(id, 'idListaIDsPlaylist')
+    # Compruebo que la carpeta existe
+    if not r.exists(id):
+        print('Error: La carpeta ' + id + ' no existe')
+        return -1
+    else:
+        # Primero obtengo la lista de playlists de la carpeta
+        idListaPlay = r.hget(id, 'idListaIDsPlaylist')
 
-    # Devuelvo los miembros de la lista
-    return r.smembers(idListaPlay)
+        # Devuelvo los miembros de la lista
+        return r.smembers(idListaPlay)
 
 # Funcion para obtener el id de la lista de playlists de una carpeta
 def obtenerIDListaPlaylistsCarpeta(r, id):
-    return r.hget(id, 'idListaIDsPlaylist')
+    # Compruebo que la carpeta existe
+    if not r.exists(id):
+        print('Error: La carpeta ' + id + ' no existe')
+        return -1
+    else:
+        return r.hget(id, 'idListaIDsPlaylist')
