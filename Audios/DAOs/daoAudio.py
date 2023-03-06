@@ -438,36 +438,72 @@ def eliminarPodcast(r, id):
 
 # Funcion para obtener un podcast
 def obtenerPodcast(r, id):
-    return r.hgetall(id)
+    if id == '':
+        print('ERROR: No se ha podido obtener el podcast, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hgetall(id)
 
 # Funcion para obtener el nombre de un podcast
 def obtenerNombrePodcast(r, id):
-    return r.hget(id, 'nombre')
+    if id == '':
+        print('ERROR: No se ha podido obtener el nombre del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'nombre')
 
 # Funcion para obtener el artista de un podcast
 def obtenerArtistaPodcast(r, id):
-    return r.hget(id, 'artista')
+    if id == '':
+        print('ERROR: No se ha podido obtener el artista del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'artista')
 
 # Funcion para obtener la calidad de un podcast
 def obtenerCalidadPodcast(r, id):
-    return r.hget(id, 'calidad')
+    if id == '':
+        print('ERROR: No se ha podido obtener la calidad del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'calidad')
 
 # Funcion para obtener el num de veces que se ha escuchado un podcast
 def obtenerVecesreproducidasPodcast(r, id):
-    return r.hget(id, 'nVeces')
+    if id == '':
+        print('ERROR: No se ha podido obtener el num de veces que se ha escuchado el podcast, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'nVeces')
 
 # Funcion para obtener la valoracion de un podcast
 def obtenerValPodcast(r, id):
-    return r.hget(id, 'val')
+    if id == '':
+        print('ERROR: No se ha podido obtener la valoracion del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'val')
 
 # Funcion para obtener la descripcion de un podcast
 def obtenerDescPodcast(r, id):
-    return r.hget(id, 'desc')
+    if id == '':
+        print('ERROR: No se ha podido obtener la descripcion del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'desc')
 
 # Funcion para obtener el fichero de alta calidad de un podcast
 def obtenerFicheroAltaCalidadPodcast(r, id):
-    return r.hget(id, 'ficheroAltaCalidad')
+    if id == '':
+        print('ERROR: No se ha podido obtener el fichero de alta calidad del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'ficheroAltaCalidad')
 
 # Funcion para obtener el fichero de baja calidad de un podcast
 def obtenerFicheroBajaCalidadPodcast(r, id):
-    return r.hget(id, 'ficheroBajaCalidad')
+    if id == '':
+        print('ERROR: No se ha podido obtener el fichero de baja calidad del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'ficheroBajaCalidad')
