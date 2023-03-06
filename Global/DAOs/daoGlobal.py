@@ -226,39 +226,74 @@ def eliminarPlaylist(r, id):
 
 # Funcion para obtener una playlist
 def obtenerPlaylist(r, id):
-    return r.hgetall(id)
+    # Compruebo que la playlist existe
+    if not r.exists(id):
+        print('Error: La playlist ' + id + ' no existe')
+        return -1
+    else:
+        return r.hgetall(id)
 
 # Funcion para obtener el nombre de una playlist
 def obtenerNombrePlaylist(r, id):
-    return r.hget(id, 'nombre')
+    # Compruebo que la playlist existe
+    if not r.exists(id):
+        print('Error: La playlist ' + id + ' no existe')
+        return -1
+    else:
+        return r.hget(id, 'nombre')
 
 # Funcion para obtener el usuario de una playlist
 def obtenerUsuarioPlaylist(r, id):
-    return r.hget(id, 'usuario')
+    # Compruebo que la playlist existe
+    if not r.exists(id):
+        print('Error: La playlist ' + id + ' no existe')
+        return -1
+    else:
+        return r.hget(id, 'usuario')
 
 # Funcion para obtener el tipo de playlist (publica o privada)
 def obtenerPublicaPlaylist(r, id):
-    return r.hget(id, 'publica')
+    # Compruebo que la playlist existe
+    if not r.exists(id):
+        print('Error: La playlist ' + id + ' no existe')
+        return -1
+    else:
+        return r.hget(id, 'publica')
 
 # Funcion para obtener las canciones de una playlist
 def obtenerCancionesPlaylist(r, id):
-    # Primero obtengo la lista de canciones de la playlist
-    idListaCan = r.hget(id, 'idListaIDsCanciones')
-
-    # Devuelvo los miembros de la lista
-    return r.smembers(idListaCan)
+    # Compruebo que la playlist existe
+    if not r.exists(id):
+        print('Error: La playlist ' + id + ' no existe')
+        return -1
+    else:
+        # Primero obtengo la lista de canciones de la playlist
+        idListaCan = r.hget(id, 'idListaIDsCanciones')
+    
+        # Devuelvo los miembros de la lista
+        return r.smembers(idListaCan)
 
 # Funcion para obtener los podcasts de una playlist
 def obtenerPodcastsPlaylist(r, id):
-    # Primero obtengo la lista de podcasts de la playlist
-    idListaPod = r.hget(id, 'idListaIDsCanciones')
+    # Compruebo que la playlist existe
+    if not r.exists(id):
+        print('Error: La playlist ' + id + ' no existe')
+        return -1
+    else:
+        # Primero obtengo la lista de podcasts de la playlist
+        idListaPod = r.hget(id, 'idListaIDsCanciones')
 
-    # Devuelvo los miembros de la lista
-    return r.smembers(idListaPod)
+        # Devuelvo los miembros de la lista
+        return r.smembers(idListaPod)
 
 # Funcion para obtener el id de la lista de canciones de una playlist
 def obtenerIDListaCancionesPlaylist(r, id):
-    return r.hget(id, 'idListaIDsCanciones')
+    # Compruebo que la playlist existe
+    if not r.exists(id):
+        print('Error: La playlist ' + id + ' no existe')
+        return -1
+    else:
+        return r.hget(id, 'idListaIDsCanciones')
 
 #########################################################################################
 #
