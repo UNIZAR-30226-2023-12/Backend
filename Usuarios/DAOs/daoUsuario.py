@@ -1,7 +1,7 @@
 #Constantes simbólicas de las claves de los atributos de usuario
 CLAVE_ID = "email"
 CLAVE_ALIAS = "alias"
-CLAVE_CONTRASEÑA = "contraseña"
+CLAVE_CONTRASENYA = "contrasenya"
 CLAVE_TIPO_USUARIO = "tipoUsuario"
 CLAVE_AMIGOS = "amigos"
 CLAVE_ARTISTA = "artista"
@@ -11,7 +11,7 @@ USUARIO_ADMINISTRADOR = "admin"
 USUARIO_NORMAL = "normalUser"
 USUARIO_ARTISTA = "artista"
 
-listaClaves = [CLAVE_ID, CLAVE_ALIAS, CLAVE_CONTRASEÑA, CLAVE_TIPO_USUARIO]
+listaClaves = [CLAVE_ID, CLAVE_ALIAS, CLAVE_CONTRASENYA, CLAVE_TIPO_USUARIO]
 
 import redis
 
@@ -43,10 +43,10 @@ def cambiarAlias(r, id, alias):
     r.hset(id, CLAVE_ALIAS, alias)
     return 0
 
-def cambiarContraseña(r, id, contraseña):
-    if(r.exists(id) == 0 or contraseña == None):
+def cambiarContrasenya(r, id, contrasenya):
+    if(r.exists(id) == 0 or contrasenya == None):
         return -1
-    r.hset(id, contraseña)
+    r.hset(id, contrasenya)
 
 def cambiarTipoUsuario(r, id, tipoUsuario):
     if(r.exists(id) == 0 or tipoUsuario == None):
@@ -76,17 +76,17 @@ def obtenerAlias(r, id):
         return -1
     return r.hget(id, CLAVE_ALIAS)
 
-def obtenerContraseña(r, id):
+def obtenerContrasenya(r, id):
     if(r.exists(id) == 0):
         return -1
-    return r.hget(id, CLAVE_CONTRASEÑA)
+    return r.hget(id, CLAVE_CONTRASENYA)
 
 def obtenerTipoUsuario(r, id):
     if(r.exists(id) == 0):
         return -1
     return r.hget(id, CLAVE_TIPO_USUARIO)
 
-def añadirAmigo(r, id, idAmigo):
+def anyadirAmigo(r, id, idAmigo):
     if(r.exists(id) == 0 or r.exists(idAmigo) == 0):
         return -1
     r.sadd(CLAVE_AMIGOS + id, idAmigo)
@@ -122,7 +122,7 @@ def obtenerArtistasSuscritos(r, id):
         return -1
     return r.smembers(CLAVE_ARTISTA + id)
 
-def añadirLista(r, id, idLista):
+def anyadirLista(r, id, idLista):
     if(r.exists(id) == 0 or r.exists(idLista) == 0):
         return -1
     r.sadd(CLAVE_LISTAS + id, idLista)
