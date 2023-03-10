@@ -37,14 +37,17 @@ def crearPlaylist(r, playlistDic, canciones, podcasts):
     else:
         # Compruebo que las canciones y podcasts existen
         crear = True
+        pipeLine = r.pipeline()
         for cancion in canciones:
-            if not r.exists(cancion):
-                print('Error: La cancion ' + cancion + ' no existe')
-                crear = False
-                return -1
+            # Utilizo un pipeline para hacer las comprobaciones de forma mas eficiente
+            pipeLine.exists(cancion)
         for podcast in podcasts:
-            if not r.exists(podcast):
-                print('Error: El podcast ' + podcast + ' no existe')
+            pipeLine.exists(podcast)
+        resultados = pipeLine.execute()
+        # Compruebo que los resultados de las comprobaciones son correctos
+        for resultado in resultados:
+            if not resultado:
+                print('Error: Alguna de las canciones o podcasts no existen')
                 crear = False
                 return -1
 
@@ -110,12 +113,20 @@ def anadirCancionPlaylist(r, idLista, idCanciones):
         return -1
     else:
         anadir = True
+        # Uso pipeline para hacer las comprobaciones de forma mas eficiente
+        pipeLine = r.pipeline()
+
         for cancion in idCanciones:
-            if not r.exists(cancion):
-                print('Error: La cancion ' + cancion + ' no existe')
+            pipeLine.exists(cancion)
+
+        resultados = pipeLine.execute()
+
+        for resultado in resultados:
+            if not resultado:
+                print('Error: Alguna de las canciones no existe')
                 anadir = False
                 return -1
-            
+
         if anadir:
             # Primero obtengo la lista de canciones de la playlist
             idListaCan = r.hget(idLista, 'idListaIDsCanciones')
@@ -135,12 +146,20 @@ def anadirPodcastPlaylist(r, idLista, idPodcasts):
         return -1
     else:
         anadir = True
+        # Uso pipeline para hacer las comprobaciones de forma mas eficiente
+        pipeLine = r.pipeline()
+
         for podcast in idPodcasts:
-            if not r.exists(podcast):
-                print('Error: El podcast ' + podcast + ' no existe')
+            pipeLine.exists(podcast)
+
+        resultados = pipeLine.execute()
+
+        for resultado in resultados:
+            if not resultado:
+                print('Error: Alguno de los podcasts no existe')
                 anadir = False
                 return -1
-            
+
         if anadir:
             # Primero obtengo la lista de podcasts de la playlist
             idListaPod = r.hget(idLista, 'idListaIDsCanciones')
@@ -160,12 +179,20 @@ def eliminarCancionPlaylist(r, idLista, idCanciones):
         return -1
     else:
         eliminar = True
+        # Uso pipeline para hacer las comprobaciones de forma mas eficiente
+        pipeLine = r.pipeline()
+
         for cancion in idCanciones:
-            if not r.exists(cancion):
-                print('Error: La cancion ' + cancion + ' no existe')
+            pipeLine.exists(cancion)
+
+        resultados = pipeLine.execute()
+
+        for resultado in resultados:
+            if not resultado:
+                print('Error: Alguna de las canciones no existe')
                 eliminar = False
                 return -1
-            
+                    
         if eliminar:
             # Primero obtengo la lista de canciones de la playlist
             idListaCan = r.hget(idLista, 'idListaIDsCanciones')
@@ -185,12 +212,21 @@ def eliminarPodcastPlaylist(r, idLista, idPodcasts):
         return -1
     else:
         eliminar = True
+        # Uso pipeline para hacer las comprobaciones de forma mas eficiente
+        pipeLine = r.pipeline()
+
         for podcast in idPodcasts:
-            if not r.exists(podcast):
-                print('Error: El podcast ' + podcast + ' no existe')
+            pipeLine.exists(podcast)
+
+        resultados = pipeLine.execute()
+
+
+        for resultado in resultados:
+            if not resultado:
+                print('Error: Alguno de los podcasts no existe')
                 eliminar = False
                 return -1
-            
+        
         if eliminar:
             # Primero obtengo la lista de podcasts de la playlist
             idListaPod = r.hget(idLista, 'idListaIDsCanciones')
@@ -321,11 +357,20 @@ def crearCarpeta(r, carpetaDic, playlists):
     else:
         crear = True
         # Compruebo que las playlists existen
+        # Uso pipeline para hacer las comprobaciones de forma mas eficiente
+        pipeLine = r.pipeline()
+
         for playlist in playlists:
-            if not r.exists(playlist):
-                print('Error: La playlist ' + playlist + ' no existe')
+            pipeLine.exists(playlist)
+
+        resultados = pipeLine.execute()
+
+        for resultado in resultados:
+            if not resultado:
+                print('Error: Alguna de las playlists no existe')
                 crear = False
                 return -1
+
         if crear:
             id = carpetaDic['id']
             del carpetaDic['id']
@@ -385,12 +430,20 @@ def anadirPlaylistCarpeta(r, idCarpeta, idPlaylists):
     else:
         crear = True
         # Compruebo que las playlists existen
+        # Uso pipeline para hacer las comprobaciones de forma mas eficiente
+        pipeLine = r.pipeline()
+
         for playlist in idPlaylists:
-            if not r.exists(playlist):
-                print('Error: La playlist ' + playlist + ' no existe')
+            pipeLine.exists(playlist)
+
+        resultados = pipeLine.execute()
+
+        for resultado in resultados:
+            if not resultado:
+                print('Error: Alguna de las playlists no existe')
                 crear = False
                 return -1
-            
+
         if crear:
             # Primero obtengo la lista de playlists de la carpeta
             idListaPlay = r.hget(idCarpeta, 'idListaIDsPlaylist')
@@ -408,12 +461,20 @@ def eliminarPlaylistCarpeta(r, idCarpeta, idPlaylists):
     else:
         crear = True
         # Compruebo que las playlists existen
+        # Uso pipeline para hacer las comprobaciones de forma mas eficiente
+        pipeLine = r.pipeline()
+
         for playlist in idPlaylists:
-            if not r.exists(playlist):
-                print('Error: La playlist ' + playlist + ' no existe')
+            pipeLine.exists(playlist)
+
+        resultados = pipeLine.execute()
+
+        for resultado in resultados:
+            if not resultado:
+                print('Error: Alguna de las playlists no existe')
                 crear = False
                 return -1
-            
+        
         if crear:
             # Primero obtengo la lista de playlists de la carpeta
             idListaPlay = r.hget(idCarpeta, 'idListaIDsPlaylist')
