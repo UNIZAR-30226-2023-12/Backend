@@ -25,7 +25,7 @@ def GetSong(request):
     calidadAlta = request.GET.get('calidadAlta')
 
     # Gets the serialized audio
-    return daoAudio.obtenerFicheroAltaCalidad(r, id)
+    return JsonResponse({'fichero': daoAudio.obtenerFicheroAltaCalidad(r, id)})
 
 def SetSong(request):
 
@@ -47,7 +47,7 @@ def SetUser(request):
         json_data = json.loads(request.body)
         
         # Stores the user in the database
-        daoUsuario.guardarUsuario(json_data)
+        daoUsuario.guardarUsuario(r, json_data)
         
         return True
     else:
@@ -60,8 +60,13 @@ def ValidateUser(request):
         # Parse the JSON data from the request body
         # json_data = json.loads(request.body)
 
-        # Validates the user 
-        return request.Get.get('contrasenya') == daoUsuario.obtenerContrasenya(r, request.Get.get('id'))
+        # Validates the user
+        
+        if request.Get.get('contrasenya') == daoUsuario.obtenerContrasenya(r, request.Get.get('id')):
+            return JsonResponse({'validate': True})
+        else:
+            return JsonResponse({'validate': False})
+
     else:
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
