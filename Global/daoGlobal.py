@@ -306,8 +306,18 @@ def obtenerCancionesPlaylist(r, id):
         # Primero obtengo la lista de canciones de la playlist
         idListaCan = r.hget(id, 'idListaIDsCanciones')
     
-        # Devuelvo los miembros de la lista
-        return r.smembers(idListaCan)
+        # Devuelvo los miembros de la lista utilizando sscan
+        stop = False
+        iterador = 0
+        cancionesPlaylist = []
+        while not stop:
+            scan = r.sscan(idListaCan, iterador, count=100)
+            cancionesPlaylist.extend(scan[1])
+            iterador = scan[0]
+            if iterador == 0:
+                stop = True
+
+        return cancionesPlaylist
 
 # Funcion para obtener los podcasts de una playlist
 def obtenerPodcastsPlaylist(r, id):
@@ -319,8 +329,18 @@ def obtenerPodcastsPlaylist(r, id):
         # Primero obtengo la lista de podcasts de la playlist
         idListaPod = r.hget(id, 'idListaIDsCanciones')
 
-        # Devuelvo los miembros de la lista
-        return r.smembers(idListaPod)
+        # Devuelvo los miembros de la lista utilizando sscan
+        stop = False
+        iterador = 0
+        podcastsPlaylist = []
+        while not stop:
+            scan = r.sscan(idListaPod, iterador, count=100)
+            podcastsPlaylist.extend(scan[1])
+            iterador = scan[0]
+            if iterador == 0:
+                stop = True
+        
+        return podcastsPlaylist
 
 # Funcion para obtener el id de la lista de canciones de una playlist
 def obtenerIDListaCancionesPlaylist(r, id):
@@ -555,8 +575,18 @@ def obtenerPlaylistsCarpeta(r, id):
         # Primero obtengo la lista de playlists de la carpeta
         idListaPlay = r.hget(id, 'idListaIDsPlaylist')
 
-        # Devuelvo los miembros de la lista
-        return r.smembers(idListaPlay)
+        # Devuelvo los miembros de la lista utilizando sscan
+        stop = False
+        iterador = 0
+        playlistsCarpeta = []
+        while not stop:
+            scan = r.sscan(idListaPlay, iterador, count=100)
+            playlistsCarpeta.extend(scan[1])
+            iterador = scan[0]
+            if iterador == 0:
+                stop = True
+    
+        return playlistsCarpeta
 
 # Funcion para obtener el id de la lista de playlists de una carpeta
 def obtenerIDListaPlaylistsCarpeta(r, id):
