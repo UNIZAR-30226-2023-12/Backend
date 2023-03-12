@@ -5,6 +5,7 @@ from Audios import daoAudio
 from Usuarios import daoUsuario
 from Global import daoGlobal
 
+# echo request
 def echo(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
