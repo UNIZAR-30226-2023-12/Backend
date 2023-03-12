@@ -21,5 +21,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('GetSong/', viewsApi.GetSong, name='GetSong'),
     path('SetSong/', viewsApi.SetSong, name='SetSong'),
+    path('SetUser/', viewsApi.SetUser, name='SetUser'),
+    path('ValidateUser/', viewsApi.ValidateUser, name='ValidateUser'),
     path('echo/', viewsApi.echo, name='echo'),
 ]

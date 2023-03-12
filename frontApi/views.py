@@ -1,9 +1,12 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 import json
+import redis
 from Audios import daoAudio
 from Usuarios import daoUsuario
 from Global import daoGlobal
+
+r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 # echo request
 def echo(request):
@@ -22,7 +25,7 @@ def GetSong(request):
     calidadAlta = request.GET.get('calidadAlta')
 
     # Gets the serialized audio
-    return daoAudio.getCancion(id, calidadAlta)
+    return daoAudio.obtenerFicheroAltaCalidad(r, id)
 
 def SetSong(request):
 
@@ -37,3 +40,30 @@ def SetSong(request):
     else:
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+def SetUser(request):
+    if request.method == 'POST':
+        # Parse the JSON data from the request body
+        json_data = json.loads(request.body)
+        
+        # Stores the user in the database
+        daoUsuario.guardarUsuario(json_data)
+        
+        return True
+    else:
+        # Return a 405 Method Not Allowed response for other HTTP methods
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+        
+
+def ValidateUser(request):
+    if request.method == 'POST':
+        # Parse the JSON data from the request body
+        # json_data = json.loads(request.body)
+
+        # Validates the user 
+        return request.Get.get('contrasenya') == daoUsuario.obtenerContrasenya(r, request.Get.get('id'))
+    else:
+        # Return a 405 Method Not Allowed response for other HTTP methods
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+        
+        
