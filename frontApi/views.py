@@ -1,16 +1,11 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 import json
-import sys
-sys.path.append('../../../Audios/')
-import daoAudio
-
-import Backend.Audios.daoAudio
-
-import Backend.Audios.daoAudio
+from Audios import daoAudio
+from Usuarios import daoUsuario
+from Global import daoGlobal
 
 def echo(request):
-    
     if request.method == 'POST':
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
