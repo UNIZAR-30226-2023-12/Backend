@@ -61,8 +61,11 @@ def ValidateUser(request):
         # json_data = json.loads(request.body)
 
         # Validates the user
+        #data = json.loads(request.data)
+
+        #print(data)
         
-        if request.GET.get('contrasenya') == daoUsuario.obtenerContrasenya(r, request.G.get('id')):
+        if request.POST.get('contrasenya') == daoUsuario.obtenerContrasenya(r, request.POST.get('id')):
             return JsonResponse({'validate': True})
         else:
             return JsonResponse({'validate': False})
