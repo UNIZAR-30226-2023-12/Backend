@@ -1,7 +1,8 @@
 # Módulo usuarios, con funciones de alto nivel para la api
 import redis
-import daoUsuario
+import DAOS.daoUsuario as daoUsuario
 
+# Funciones de usuarios normales
 def setUser(r, usuarioDiccionario):
     return daoUsuario.guardarUsuario(r, usuarioDiccionario)
 
@@ -20,9 +21,7 @@ def removeUser(r, id, contrasenya):
     return daoUsuario.eliminarUsuario(r, id)
 
 def AskAdminToBeArtist(r, id, contrasenya):
-    if(daoUsuario.obtenerContrasenya(r, id) != contrasenya):
-        return -1
-    return daoUsuario.cambiarTipoUsuario(r, id, daoUsuario.USUARIO_ARTISTA)
+    return 0
     
 def ValidateUser(r, id, contrasenya):
     return daoUsuario.obtenerContrasenya(r, id) == contrasenya
@@ -31,7 +30,16 @@ def getUser(r, id):
     usuario = daoUsuario.obtenerUsuario(r, id)
     if(usuario == -1):
         #El usuario era un artista que ha sido eliminado
-        daoUsuario.desuscribirArtistas(r, id)
+        daoUsuario.desuscribirArtista(r, id)
         return -1
     return usuario
+
+
+
+# Funciones adicionales de artistas
+
+
+# Funciones adcionales de administradores
+def acceptArtist(r, id):
+    return daoUsuario.cambiarTipoUsuario(r, id, daoUsuario.constantesPrefijosClaves.USUARIO_ARTISTA)
 
