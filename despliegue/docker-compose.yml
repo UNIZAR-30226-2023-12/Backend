@@ -5,6 +5,8 @@ services:
     build:
       context: django
       dockerfile: Dockerfile
+      tags:
+        - "melodia/django:latest"
     image: melodia/django:latest
     container_name: django
     depends_on:
@@ -17,6 +19,8 @@ services:
     build:
       context: redis
       dockerfile: Dockerfile
+      tags:
+        - "melodia/redis:latest"
     image: melodia/redis:latest
     ports:
       - "6379:6379"
