@@ -1,31 +1,36 @@
-import Audios.DAOs.daoAudio
+from Audios import daoAudio
+from Usuarios import daoUsuario
+from Global import daoGlobal
 import pytest
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 def test_guardarCancion():
-    assert (Audios.DAOs.daoAudio.guardarCancion(canc) == 0)
+    assert (daoAudio.guardarCancion(r, canc) == 0)
 
 def test_cambiarNombreCancion():
     nombreCancion = "PRUEBA"
-    assert (Audios.DAOs.daoAudio.cambiarNombreCancion(1, nombreCancion) == 0)
-    assert (Audios.DAOs.daoAudio.obtenerNombreCancion(1) == nombreCancion)
+    assert (daoAudio.cambiarNombreCancion(r, 1, nombreCancion) == 0)
+    assert (daoAudio.obtenerNombreCancion(r, 1) == nombreCancion)
 
 def test_cambiarArtistaCancion():
     artista = "ARTISTA DE PRUEBA"
-    assert(Audios.DAOs.daoAudio.cambiarArtistaCancion(1, artista) == 0)
-    assert(Audios.DAOs.daoAudio.obtenerArtistaCancion(1) == artista)
+    assert(daoAudio.cambiarArtistaCancion(r, 1, artista) == 0)
+    assert(daoAudio.obtenerArtistaCancion(r, 1) == artista)
 
 def test_cambiarCalidadCancion():
     calidad = 1
-    assert(Audios.DAOs.daoAudio.cambiarCalidadCancion(1, calidad) == 0)
-    assert(Audios.DAOs.daoAudio.obtenerCalidad(1) == calidad)
+    assert(daoAudio.cambiarCalidadCancion(r, 1, calidad) == 0)
+    assert(daoAudio.obtenerCalidad(r, 1) == calidad)
 
 def test_cambiarVecesReproducidasCancion():
     veces = 150
-    assert(Audios.DAOs.daoAudio.cambiarVecesreproducidasCancion(1, veces) == 0)
-    assert(Audios.DAOs.daoAudio.obtenerVecesreproducidasCancion(1) == veces)
+    assert(daoAudio.cambiarVecesreproducidasCancion(r, 1, veces) == 0)
+    assert(daoAudio.obtenerVecesreproducidasCancion(1) == veces)
 
 def test_cambiarValCancion():
     valoracion = 2
-    assert(Audios.DAOs.daoAudio.cambiarValCancion(1, valoracion) == 0)
-    assert(Audios.DAOs.daoAudio.obtenerValCancion(1) == valoracion)
+    assert(daoAudio.cambiarValCancion(r, 1, valoracion) == 0)
+    assert(daoAudio.obtenerValCancion(r, 1) == valoracion)
     
