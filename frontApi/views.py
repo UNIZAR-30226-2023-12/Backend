@@ -2,9 +2,9 @@ from django.shortcuts import render
 from django.http import JsonResponse
 import json
 import redis
-from Audios import daoAudio
-from Usuarios import daoUsuario
-from Global import daoGlobal
+from DAOS import daoAudio
+from DAOS import daoUsuario
+from DAOS import daoGlobal
 
 r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
