@@ -362,7 +362,7 @@ def obtenerListas(r, id):
     listas = []
 
     while(parar == False):
-        scan = r.sscan(constantesPrefijosClaves.CLAVE_LISTAS + id, cursor, count=COUNT)
+        scan = r.sscan(constantesPrefijosClaves.CLAVE_LISTAS + id, cursor, count=100)
         cursor = scan[0]
         listas.extend(scan[1])
         if(cursor == 0):
