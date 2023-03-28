@@ -6,6 +6,8 @@ from DAOS import daoAudio
 from DAOS import daoUsuario
 from DAOS import daoGlobal
 
+from Audios import moduloAudios
+
 r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 # echo request
@@ -27,14 +29,14 @@ def GetSong(request):
     # Gets the serialized audio
     return JsonResponse({'fichero': daoAudio.obtenerFicheroAltaCalidad(r, id)})
 
+# View para añadir una canción a la base de datos
 def SetSong(request):
 
     if request.method == 'POST':
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
         
-        # Stores the song in the database
-        daoAudio.guardarCancion(json_data)
+        moduloAudios.anyadirCancion(r, json_data)
         
         return True
     else:
