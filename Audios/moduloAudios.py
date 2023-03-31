@@ -7,8 +7,8 @@
 #
 ##############################################################################################################
 
-import controlAudios
-import controlCalidadAudios
+from Audios import controlAudios
+from Audios import controlCalidadAudios
 
 ##############################################################################################################
 #
@@ -54,6 +54,7 @@ def anyadirCancion(r, dic):
     # Incremento el id
     controlAudios.incrementarIDUltimoAudio(r, id+1)
 
+    id = 'idAudio:' + str(id)
     # Construyo el diccionario para almacenar los datos de la canción
     cancionDic = {'id': id, 'nombre': nombre, 'artista': artista, 'calidad': calidad, 'nVeces': nVeces, 'val': val, 'generos': generos, 'ficheroAltaCalidad': ficheroAltaCalidad, 'ficheroBajaCalidad': ficheroBajaCalidad}
 
@@ -65,9 +66,7 @@ def anyadirCancion(r, dic):
 # Función para eliminar una canción
 def eliminarCancion(r, id):
     # Elimino la canción
-    controlAudios.borrarCancion(r, id)
-
-    return 0
+    return controlAudios.borrarCancion(r, id)
 
 # Función para devolver el audio de una canción ya sea el de alta calidad o el de baja calidad
 def obtenerFicheroCancion(r, id, calidad):
@@ -142,6 +141,8 @@ def anyadirPodcast(r, dic):
     # Incremento el id
     controlAudios.incrementarIDUltimoPodcast(r, id+1)
 
+    id = 'idAudio:' + str(id)
+
     # Construyo el diccionario para almacenar los datos del podcast
     podcastDic = {'id': id, 'nombre': nombre, 'artista': artista, 'calidad': calidad, 'nVeces': nVeces, 'val': val, 'desc': desc, 'ficheroAltaCalidad': ficheroAltaCalidad, 'ficheroBajaCalidad': ficheroBajaCalidad}
 
@@ -149,3 +150,37 @@ def anyadirPodcast(r, dic):
     controlAudios.almacenarPodcast(r, podcastDic)
 
     return 0
+
+# Función para eliminar un podcast
+def eliminarPodcast(r, id):
+    # Elimino el podcast
+    return controlAudios.borrarPodcast(r, id)
+
+# Función para devolver el audio de un podcast ya sea el de alta calidad o el de baja calidad
+def obtenerFicheroPodcast(r, id, calidad):
+    # Obtengo el diccionario del podcast
+    cal = controlAudios.obtenerCalPodcast(r, id)
+
+    # Si el podcast está almacenado en alta calidad y el usuario quiere obtenerlo en alta calidad se le 
+    # devuelve el fichero de alta calidad sino el de baja calidad
+    # Obtengo el fichero del podcast
+    if calidad == 'alta' and cal == 'alta':
+        fichero = controlAudios.obtenerAltaCalidadPodcast(r, id)
+    else:
+        fichero = controlAudios.obtenerBajaCalidadPodcast(r, id)
+
+    return fichero
+
+# Función para cambiar los atributos de un podcast
+# Si alguno de los valores disponibles no se quiere cambiar, se debe pasar como None en el dic (salvo el id)
+def modificarPodcast(r, id, dic):
+    # Compruebo que el dic tenga todo lo necesario
+    if 'nombre' not in dic or 'artista' not in dic or 'calidad' not in dic or 'desc' not in dic or 'ficheroAltaCalidad' not in dic or 'ficheroBajaCalidad' not in dic or 'nVeces' not in dic or 'val' not in dic:
+        print("Diccionario no válido")
+        return -1
+    else:
+        return controlAudios.cambiarAtributosPodcast(r, id, dic['nombre'], dic['artista'], dic['calidad'], dic['nVeces'], dic['val'], dic['desc'], dic['ficheroAltaCalidad'], dic['ficheroBajaCalidad'])
+    
+# Función para obtener el diccionario de un podcast (todos los atributos del mismo)
+def obtenerDiccionarioPodcast(r, id):
+    return controlAudios.obtenerTodosPodcast(r, id)

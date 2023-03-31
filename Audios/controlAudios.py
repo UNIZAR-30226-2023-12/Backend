@@ -114,7 +114,7 @@ def almacenarPodcast(r, podcastDic):
 
 # Función para cambiar los valores de un podcast
 # Si alguno de los valores no se quiere cambiar, se debe pasar como parámetro None (salvo el id)
-def cambiarAtributosPodcast(r, id, nombre, artista, calidad, nVeces, val, descripcion, ficheroAltaCalidad, ficheroBajaCalidad, episodios):
+def cambiarAtributosPodcast(r, id, nombre, artista, calidad, nVeces, val, descripcion, ficheroAltaCalidad, ficheroBajaCalidad):
     if nombre != None:
         daoAudio.cambiarNombrePodcast(r, id, nombre)
     if artista != None:

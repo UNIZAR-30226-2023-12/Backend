@@ -4,7 +4,7 @@ import Configuracion.constantesPrefijosClaves as constantesPrefijosClaves
 #Numero de elementos que se devuelven en cada iteración de sscan
 COUNT = 100
 
-listaClaves = [constantesPrefijosClaves.CLAVE_ID_USUARIO_USUARIO, constantesPrefijosClaves.CLAVE_EMAIL, constantesPrefijosClaves.CLAVE_ALIAS, constantesPrefijosClaves.CLAVE_CONTRASENYA, constantesPrefijosClaves.CLAVE_TIPO_USUARIO]
+listaClaves = [constantesPrefijosClaves.CLAVE_ID_USUARIO, constantesPrefijosClaves.CLAVE_EMAIL, constantesPrefijosClaves.CLAVE_ALIAS, constantesPrefijosClaves.CLAVE_CONTRASENYA, constantesPrefijosClaves.CLAVE_TIPO_USUARIO]
 
 
 
