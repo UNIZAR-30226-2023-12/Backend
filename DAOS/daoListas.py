@@ -1,6 +1,18 @@
 import redis
 import Configuracion.constantesPrefijosClaves as constantesPrefijosClaves
 
+
+def getIdContador(r):
+    id = r.get(constantesPrefijosClaves.CLAVE_CONTADOR_LISTAS)
+    if(id == None):
+        r.set(constantesPrefijosClaves.CLAVE_CONTADOR_LISTAS, 0)
+        id = 0
+    pipe = r.pipeline()
+    pipe.get(constantesPrefijosClaves.CLAVE_CONTADOR_LISTAS)
+    pipe.incr(constantesPrefijosClaves.CLAVE_CONTADOR_LISTAS)
+    id = pipe.execute()[0]
+    return id
+
 #########################################################################################
 #
 #
@@ -341,30 +353,3 @@ def obtenerIDListaCancionesPlaylist(r, id):
     else:
         return r.hget(id, 'idListaIDsCanciones')
     
-
-def anyadirLista(r, id, idLista):
-    if(r.exists(id) == 0 or r.exists(idLista) == 0):
-        return -1
-    r.sadd(constantesPrefijosClaves.CLAVE_LISTAS + id, idLista)
-    return 0
-
-def eliminarLista(r, id, idLista):
-    if(r.exists(id) == 0 or r.exists(idLista) == 0):
-        return -1
-    r.srem(constantesPrefijosClaves.CLAVE_LISTAS + id, idLista)
-    return 0
-
-def obtenerListas(r, id):
-    if(r.exists(id) == 0):
-        return -1
-    parar = False
-    cursor = 0
-    listas = []
-
-    while(parar == False):
-        scan = r.sscan(constantesPrefijosClaves.CLAVE_LISTAS + id, cursor, count=100)
-        cursor = scan[0]
-        listas.extend(scan[1])
-        if(cursor == 0):
-            parar = True
-    return listas  

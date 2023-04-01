@@ -1,9 +1,13 @@
 # Módulo usuarios, con funciones de alto nivel para la api
 import redis
+import DAOS.daoListas as daoListas
 import DAOS.daoUsuario as daoUsuario
+import Configuracion.constantesPrefijosClaves as constantes
 
 # Funciones de usuarios normales
 def setUser(r, usuarioDiccionario):
+    id = daoUsuario.getIdContador(r)
+    usuarioDiccionario.add(constantes.CLAVE_ID_USUARIO, id)
     return daoUsuario.guardarUsuario(r, usuarioDiccionario)
 
 def removeUser(r, id, contrasenya):
@@ -40,6 +44,50 @@ def getUser(r, id):
 
 
 # Funciones adcionales de administradores
-def acceptArtist(r, id):
+def acceptArtist(r, idUsario):
     return daoUsuario.cambiarTipoUsuario(r, id, daoUsuario.constantesPrefijosClaves.USUARIO_ARTISTA)
 
+
+# Funciones de listas de repro
+def setSongLista(r, idUsuario, idLista, idAudio):
+    if (r.exists(idUsuario) == 0 or r.exists(idAudio) == 0 or r.exists(idLista) == 0):
+        return -1
+    return daoListas.anadirCancionPlaylist(r, idLista, idAudio)
+
+def setPrivacyLista(r, idUsuario, idLista, publica):
+    if (r.exists(idUsuario) == 0):
+        return -2
+    if (r.exists(idLista) == 0):
+        return -1
+    daoListas.cambiarPublicaPlaylist(r, idLista, publica)
+    return 1
+
+def removListaRepUsr(r, idUsuario, idLista):
+    if (r.exists(idUsuario) == 0):
+        return -2
+    if (r.exists(idLista) == 0):
+        return -1
+    daoListas.eliminarPlaylist(r, idLista)
+    daoUsuario.eliminarLista(r, idUsuario, idLista)
+    return 1
+
+def getListasUsr(r, idUsuario):
+    return daoUsuario.obtenerListas(r, idUsuario)
+
+def getSongsArtist(r, idArtista):
+    if(r.exists(idArtista) == 0):
+        return -1
+    return daoUsuario.obtenerCanciones(r, idArtista)
+
+def getListaRepUsr(r, idLista):
+    return daoListas.obtenerPlaylist(r, idLista)
+
+def removeSongLista(r, idUsuario, idLista, idAudio):
+    if(r.exists(idUsuario) == 0):
+        return -2
+    if(r.exists(idLista) == 0):
+        return -1
+    return daoListas.eliminarCancionPlaylist(r, idLista, idAudio)
+
+def changeNameListRepUsr(r, idLista, nombre):
+    return daoListas.cambiarNombrePlaylist(r, idLista, nombre)

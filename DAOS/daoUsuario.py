@@ -8,7 +8,16 @@ listaClaves = [constantesPrefijosClaves.CLAVE_ID_USUARIO, constantesPrefijosClav
 
 
 
-
+def getIdContador(r):
+    id = r.get(constantesPrefijosClaves.CLAVE_CONTADOR_USUARIOS)
+    if(id == None):
+        r.set(constantesPrefijosClaves.CLAVE_CONTADOR_USUARIOS, 1)
+        id = 1
+    pipe = r.pipeline()
+    pipe.get(constantesPrefijosClaves.CLAVE_CONTADOR_USUARIOS)
+    pipe.incr(constantesPrefijosClaves.CLAVE_CONTADOR_USUARIOS)
+    id = pipe.execute()[0]
+    return id
 
 def guardarUsuario(r, usuarioDiccionario):
     if (sorted(listaClaves) != sorted(list(usuarioDiccionario.keys())) or usuarioDiccionario[constantesPrefijosClaves.CLAVE_ID_USUARIO] == None
@@ -135,3 +144,60 @@ def obtenerArtistasSuscritos(r, id):
         if(cursor == 0):
             parar = True
     return artistas  
+
+def anyadirLista(r, id, idLista):
+    if(r.exists(id) == 0 or r.exists(idLista) == 0):
+        return -1
+    r.sadd(constantesPrefijosClaves.CLAVE_LISTAS + id, idLista)
+    return 0
+
+def eliminarLista(r, id, idLista):
+    if(r.exists(id) == 0 or r.exists(idLista) == 0):
+        return -1
+    r.srem(constantesPrefijosClaves.CLAVE_LISTAS + id, idLista)
+    return 0
+
+def obtenerListas(r, id):
+    if(r.exists(id) == 0):
+        return -1
+    parar = False
+    cursor = 0
+    listas = []
+
+    while(parar == False):
+        scan = r.sscan(constantesPrefijosClaves.CLAVE_LISTAS + id, cursor, count=100)
+        cursor = scan[0]
+        listas.extend(scan[1])
+        if(cursor == 0):
+            parar = True
+    return listas  
+
+# Funcion adicional de artista
+def anyadirCancion(r, id, idCancion):
+    if(r.exists(id) == 0 or r.exists(idCancion) == 0 or 
+       r.hget(id, constantesPrefijosClaves.CLAVE_TIPO_USUARIO) != constantesPrefijosClaves.USUARIO_ARTISTA):
+        return -1
+    r.sadd(constantesPrefijosClaves.CLAVE_CANCIONES + id, idCancion)
+    return 0
+
+def eliminarCancion(r, id, idCancion):
+    if(r.exists(id) == 0 or r.exists(idCancion) == 0 or 
+       r.hget(id, constantesPrefijosClaves.CLAVE_TIPO_USUARIO) != constantesPrefijosClaves.USUARIO_ARTISTA):
+        return -1
+    r.srem(constantesPrefijosClaves.CLAVE_CANCIONES + id, idCancion)
+    return 0
+
+def obtenerCanciones(r, id):
+    if(r.exists(id) == 0 or r.hget(id, constantesPrefijosClaves.CLAVE_TIPO_USUARIO) != constantesPrefijosClaves.USUARIO_ARTISTA):
+        return -1
+    parar = False
+    cursor = 0
+    canciones = []
+
+    while(parar == False):
+        scan = r.sscan(constantesPrefijosClaves.CLAVE_CANCIONES + id, cursor, count = COUNT)
+        cursor = scan[0]
+        canciones.extend(scan[1])
+        if(cursor == 0):
+            parar = True
+    return canciones
