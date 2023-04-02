@@ -64,62 +64,61 @@ def getTipoUsuario(r, id):
     return r.hget(id, constantes.CLAVE_TIPO_USUARIO)
 
 def anyadirAmigo(r, id, idAmigo):
-    return r.sadd(constantes.CLAVE_AMIGOS + id, idAmigo)
+    return anyadirRelacion(r, id, idAmigo, constantes.CLAVE_AMIGOS)
     
 
 def eliminarAmigo(r, id, idAmigo):
-    return r.srem(constantes.CLAVE_AMIGOS + id, idAmigo)
+    return eliminarRelacion(r, id, idAmigo, constantes.CLAVE_AMIGOS)
 
 def getAmigos(r, id):
-    parar = False
-    cursor = 0
-    amigos = []
-
-    while(parar == False):
-        scan = r.sscan(constantes.CLAVE_AMIGOS + id, cursor, count = COUNT)
-        cursor = scan[0]
-        amigos.extend(scan[1])
-        if(cursor == 0):
-            parar = True
-    return amigos
+    return getRelaciones(r, id, constantes.CLAVE_AMIGOS)
 
 def anyadirArtista(r, id, idArtista):
-    return r.sadd(constantes.CLAVE_ARTISTAS + id, idArtista)
+    return anyadirRelacion(r, id, idArtista, constantes.CLAVE_ARTISTAS)
 
 def eliminarArtista(r, id, idArtista):
-    return r.srem(constantes.CLAVE_ARTISTAS + str(id), idArtista)
+    return eliminarRelacion(r, id, idArtista, constantes.CLAVE_ARTISTAS)
 
 def getArtistas(r, id):
-    parar = False
-    cursor = 0
-    artistas = []
-
-    while(parar == False):
-        scan = r.sscan(constantes.CLAVE_ARTISTAS + id, cursor, count = COUNT)
-        cursor = scan[0]
-        artistas.extend(scan[1])
-        if(cursor == 0):
-            parar = True
-    return artistas  
+    return getRelaciones(r, id, constantes.CLAVE_ARTISTAS)  
 
 def anyadirLista(r, id, idLista):
-    return r.sadd(constantes.CLAVE_LISTAS + id, idLista)
+    return anyadirRelacion(r, id, idLista, constantes.CLAVE_LISTAS)
 
 def eliminarLista(r, id, idLista):
-    return r.srem(constantes.CLAVE_LISTAS + id, idLista)
+    return eliminarRelacion(r, id, idLista, constantes.CLAVE_LISTAS)
 
 def getListas(r, id):
+    return getRelaciones(r, id, constantes.CLAVE_LISTAS)
+
+def anyadirNotificacion(r, id, idNotificacion):
+    return anyadirRelacion(r, id, idNotificacion, constantes.CLAVE_NOTIFICACIONES)
+
+def eliminarNotificacion(r, id, idNotificacion):
+    return eliminarRelacion(r, id, idNotificacion, constantes.CLAVE_NOTIFICACIONES)
+
+def getNotificaciones(r, idNotificacion):
+    return getRelaciones(r, id, constantes.CLAVE_NOTIFICACIONES)
+
+def anyadirRelacion(r, idUsuario, idRealacion, prefijoRelacion):
+    return r.sadd(prefijoRelacion + id, idRealacion)
+
+def eliminarRelacion(r, idUsuario, idRealacion, prefijoRelacion):
+    return r.srem(prefijoRelacion + id, idRealacion)
+
+def getRelaciones(r, idUsuario, prefijoRelacion):
     parar = False
     cursor = 0
-    listas = []
+    relaciones = []
 
     while(parar == False):
-        scan = r.sscan(constantes.CLAVE_LISTAS + id, cursor, count=100)
+        scan = r.sscan(prefijoRelacion + id, cursor, count=100)
         cursor = scan[0]
-        listas.extend(scan[1])
+        relaciones.extend(scan[1])
         if(cursor == 0):
             parar = True
-    return listas  
+    return relaciones
+
 
 # Funcion adicional de artista
 def anyadirCancion(r, id, idCancion):
@@ -128,7 +127,7 @@ def anyadirCancion(r, id, idCancion):
 def eliminarCancion(r, id, idCancion):
     return r.srem(constantes.CLAVE_CANCIONES + id, idCancion)
 
-def obtenerCanciones(r, id):
+def getCanciones(r, id):
     parar = False
     cursor = 0
     canciones = []
@@ -140,3 +139,12 @@ def obtenerCanciones(r, id):
         if(cursor == 0):
             parar = True
     return canciones
+
+# Función adicional de administrador
+def anyadirAdministrador(r, id):
+    return r.sadd(constantes.CLAVE_ADMINISTRADORES, id)
+
+def eliminarAdministrador(r, id):
+    return r.srem(constantes.CLAVE_ADMINISTRADORES, id)
+
+def 

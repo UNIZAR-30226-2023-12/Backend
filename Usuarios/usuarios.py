@@ -2,13 +2,15 @@
 import redis
 import DAOS.daoListas as daoListas
 import DAOS.daoUsuario as daoUsuario
+import DAOS.daoNotificaciones as daoNotificaciones
 import Configuracion.constantesPrefijosClaves as constantes
 
 # Funciones de usuarios normales
 def setUser(r, usuarioDiccionario):
     id = daoUsuario.getIdContador(r)
     usuarioDiccionario.add(constantes.CLAVE_ID_USUARIO, id)
-    return daoUsuario.setUsuario(r, usuarioDiccionario)
+    daoUsuario.setUsuario(r, usuarioDiccionario)
+    return 1
 
 def removeUser(r, id, contrasenya):
     if(daoUsuario.getContrasenya(r, id) != contrasenya):
@@ -24,11 +26,20 @@ def removeUser(r, id, contrasenya):
     r.delete(daoUsuario.CLAVE_LISTAS + id)
     return daoUsuario.eliminarUsuario(r, id)
 
-def AskAdminToBeArtist(r, id, contrasenya):
+def AskAdminToBeArtist(r, idUsuario, contrasenya):
+    validado = ValidateUser(r, idUsuario, contrasenya)
+    if (validado == 1):
+        id = daoNotificaciones.getIdContador(r)
+        diccionarioNotificaciones = {constantes.CLAVE_ID_NOTIFICACION: id, constantes.CLAVE_ID_USUARIO_EMISIOR: idUsuario, constantes.CLAVE_TIPO_NOTIFICACION: constantes.NOTIFICACION_TIPO_SOLICITUD_ARTISTA}
+        daoNotificaciones.setNotificacion(r, diccionarioNotificaciones)
     return 0
     
 def ValidateUser(r, id, contrasenya):
-    return daoUsuario.getContrasenya(r, id) == contrasenya
+    if (r.exists(id) == 0):
+        return -2
+    if (daoUsuario.getContrasenya(r, id) == contrasenya):
+        return 1
+    return -1
 
 def getUser(r, id):
     usuario = daoUsuario.getUsuario(r, id)
@@ -86,7 +97,7 @@ def getListasUsr(r, idUsuario):
 def getSongsArtist(r, idArtista):
     if(r.exists(idArtista) == 0):
         return -1
-    return daoUsuario.obtenerCanciones(r, idArtista)
+    return daoUsuario.getCanciones(r, idArtista)
 
 def getListaRepUsr(r, idLista):
     return daoListas.obtenerPlaylist(r, idLista)
