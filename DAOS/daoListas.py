@@ -1,15 +1,15 @@
 import redis
-import Configuracion.constantesPrefijosClaves as constantesPrefijosClaves
+import Configuracion.constantesPrefijosClaves as constantes
 
 
 def getIdContador(r):
-    id = r.get(constantesPrefijosClaves.CLAVE_CONTADOR_LISTAS)
+    id = r.get(constantes.CLAVE_CONTADOR_LISTAS)
     if(id == None):
-        r.set(constantesPrefijosClaves.CLAVE_CONTADOR_LISTAS, 0)
+        r.set(constantes.CLAVE_CONTADOR_LISTAS, 0)
         id = 0
     pipe = r.pipeline()
-    pipe.get(constantesPrefijosClaves.CLAVE_CONTADOR_LISTAS)
-    pipe.incr(constantesPrefijosClaves.CLAVE_CONTADOR_LISTAS)
+    pipe.get(constantes.CLAVE_CONTADOR_LISTAS)
+    pipe.incr(constantes.CLAVE_CONTADOR_LISTAS)
     id = pipe.execute()[0]
     return id
 

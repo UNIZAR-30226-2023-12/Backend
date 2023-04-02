@@ -49,7 +49,7 @@ def SetUser(request):
         json_data = json.loads(request.body)
         
         # Stores the user in the database
-        daoUsuario.guardarUsuario(r, json_data)
+        daoUsuario.setUsuario(r, json_data)
         
         return True
     else:
@@ -67,7 +67,7 @@ def ValidateUser(request):
 
         #print(data)
         
-        if request.POST.get('contrasenya') == daoUsuario.obtenerContrasenya(r, request.POST.get('id')):
+        if request.POST.get('contrasenya') == daoUsuario.getContrasenya(r, request.POST.get('id')):
             return JsonResponse({'validate': True})
         else:
             return JsonResponse({'validate': False})

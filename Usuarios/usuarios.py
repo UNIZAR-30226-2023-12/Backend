@@ -8,7 +8,7 @@ import Configuracion.constantesPrefijosClaves as constantes
 def setUser(r, usuarioDiccionario):
     id = daoUsuario.getIdContador(r)
     usuarioDiccionario.add(constantes.CLAVE_ID_USUARIO, id)
-    return daoUsuario.guardarUsuario(r, usuarioDiccionario)
+    return daoUsuario.setUsuario(r, usuarioDiccionario)
 
 def removeUser(r, id, contrasenya):
     if(daoUsuario.getContrasenya(r, id) != contrasenya):
@@ -28,13 +28,13 @@ def AskAdminToBeArtist(r, id, contrasenya):
     return 0
     
 def ValidateUser(r, id, contrasenya):
-    return daoUsuario.obtenerContrasenya(r, id) == contrasenya
+    return daoUsuario.getContrasenya(r, id) == contrasenya
 
 def getUser(r, id):
-    usuario = daoUsuario.obtenerUsuario(r, id)
+    usuario = daoUsuario.getUsuario(r, id)
     if(usuario == -1):
         #El usuario era un artista que ha sido eliminado
-        daoUsuario.desuscribirArtista(r, id)
+        daoUsuario.eliminarArtista(r, id)
         return -1
     return usuario
 
@@ -45,12 +45,21 @@ def getUser(r, id):
 
 # Funciones adcionales de administradores
 def acceptArtist(r, idUsario):
-    return daoUsuario.cambiarTipoUsuario(r, id, daoUsuario.constantesPrefijosClaves.USUARIO_ARTISTA)
+    return daoUsuario.setTipoUsuario(r, id, daoUsuario.constantes.USUARIO_ARTISTA)
 
 
-# Funciones de listas de repro
-def setSongLista(r, idUsuario, idLista, idAudio):
-    if (r.exists(idUsuario) == 0 or r.exists(idAudio) == 0 or r.exists(idLista) == 0):
+# Funciones de listas de reproducción
+def setLista(r, idUsuario, diccionarioLista):
+    if (r.exists(idUsuario) == 0):
+        return -1
+    id = daoListas.getIdContador(r)
+    diccionarioLista.add(constantes.CLAVE_ID_LISTA, id)
+    return daoListas.crearPlaylist(r, diccionarioLista) 
+
+def setSongLista(r, idLista, idAudio):
+    if (r.exists(idAudio) == 0):
+        return -3
+    if (r.exists(idLista) == 0):
         return -1
     return daoListas.anadirCancionPlaylist(r, idLista, idAudio)
 
@@ -72,7 +81,7 @@ def removListaRepUsr(r, idUsuario, idLista):
     return 1
 
 def getListasUsr(r, idUsuario):
-    return daoUsuario.obtenerListas(r, idUsuario)
+    return daoUsuario.getListas(r, idUsuario)
 
 def getSongsArtist(r, idArtista):
     if(r.exists(idArtista) == 0):

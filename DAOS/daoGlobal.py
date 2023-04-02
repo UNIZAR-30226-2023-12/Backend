@@ -1,2 +1,2 @@
 import redis
-import Configuracion.constantesPrefijosClaves as constantesPrefijosClaves
+import Configuracion.constantesPrefijosClaves as constantes
