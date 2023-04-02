@@ -16,10 +16,16 @@ CLAVE_EMAIL = "email"
 CLAVE_ALIAS = "alias"
 CLAVE_CONTRASENYA = "contrasenya"
 CLAVE_TIPO_USUARIO = "tipoUsuario"
+CLAVE_ID_ULTIMA_CANCION = "idUltimaCancion"
+CLAVE_SEGUNDO_ULTIMA_CANCION = "segundaUltimaCancion"
 
 # Constantes simbólicas de los prefijos de los sets de usuario
 CLAVE_AMIGOS = "amigos"
 CLAVE_ARTISTAS = "artistas"
+CLAVE_NOTIFICACIONES = "notificaciones"
+CLAVE_CARPETAS = "carpetas"
+# Clave de set de ids de administradores
+CLAVE_ADMINISTRADORES = "administradores"
 # Se usa tambien para acceder al set de listas de Carpeta
 CLAVE_LISTAS = "listas"
 # Se usa para acceder a las canciones de un artista
@@ -57,8 +63,13 @@ CLAVE_TIPO_NOTIFICACION = "tipoNotificacion"
 CLAVE_ID_USUARIO_EMISIOR = "idUsuarioEmisor"
 CLAVE_TITULO_NOTIFICACION = "titulo"
 CLAVE_MENSAJE_NOTIFICACION = "mensaje"
-NOTIFCACION_NORMAL = "normal"
-NOTIFICACION_AMIGO = "amigo"
+NOTIFCACION_TIPO_NORMAL = "normal"
+NOTIFICACION_TIPO_AMIGO = "amigo"
+NOTIFICACION_TIPO_SOLICITUD_ARTISTA = "quieroArtista"
+
+# Constantes para mensajes y títulos default
+TITULO_NOTIFICACION_ARTISTA = "Solicitud de artista"
+MENSAJE_NOTIFICACION_ARTISTA = " quiere ser artista"
 
 # Constantes simbólicas para las Lista de reproducción
 CLAVE_CONTADOR_LISTAS = "contadorListas"

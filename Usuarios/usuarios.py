@@ -9,11 +9,14 @@ import Configuracion.constantesPrefijosClaves as constantes
 def setUser(r, usuarioDiccionario):
     id = daoUsuario.getIdContador(r)
     usuarioDiccionario.add(constantes.CLAVE_ID_USUARIO, id)
+    # Si el usuario es administrador lo añadimos a la lista de administradores
+    if(usuarioDiccionario[constantes.CLAVE_TIPO_USUARIO] == constantes.USUARIO_ADMINISTRADOR):
+        daoUsuario.anyadirAdministrador(r, id)
     daoUsuario.setUsuario(r, usuarioDiccionario)
     return 1
 
 def removeUser(r, id, contrasenya):
-    if(daoUsuario.getContrasenya(r, id) != contrasenya):
+    if(r.exists(id) == 0):
         return -1
     amigos = daoUsuario.getAmigos(r, id)
     #Eliminar usuario de la lista de amigos de sus amigos
@@ -21,18 +24,30 @@ def removeUser(r, id, contrasenya):
         daoUsuario.eliminarAmigo(r, amigo, id)
 
     #Eliminar los sets de amigos, artistas y listas del usuario
-    r.delete(daoUsuario.CLAVE_AMIGOS + id)
-    r.delete(daoUsuario.CLAVE_ARTISTAS + id)
-    r.delete(daoUsuario.CLAVE_LISTAS + id)
-    return daoUsuario.eliminarUsuario(r, id)
+    r.delete(constantes.CLAVE_AMIGOS + id)
+    r.delete(constantes.CLAVE_ARTISTAS + id)
+    r.delete(constantes.CLAVE_LISTAS + id)
 
-def AskAdminToBeArtist(r, idUsuario, contrasenya):
-    validado = ValidateUser(r, idUsuario, contrasenya)
-    if (validado == 1):
-        id = daoNotificaciones.getIdContador(r)
-        diccionarioNotificaciones = {constantes.CLAVE_ID_NOTIFICACION: id, constantes.CLAVE_ID_USUARIO_EMISIOR: idUsuario, constantes.CLAVE_TIPO_NOTIFICACION: constantes.NOTIFICACION_TIPO_SOLICITUD_ARTISTA}
-        daoNotificaciones.setNotificacion(r, diccionarioNotificaciones)
-    return 0
+    #Si es administrador, eliminarlo de la lista de administradores
+    if(daoUsuario.getTipoUsuario(r, id) == constantes.USUARIO_ADMINISTRADOR):
+        daoUsuario.eliminarAdministrador(r, id)
+    daoUsuario.eliminarUsuario(r, id)
+    return 1
+
+def AskAdminToBeArtist(r, idUsuario):
+    if(r.exists(idUsuario) == 0):
+        return -2
+    idNotificacion = daoNotificaciones.getIdContador(r)
+    diccionarioNotificaciones = {constantes.CLAVE_ID_NOTIFICACION: idNotificacion, 
+                                 constantes.CLAVE_ID_USUARIO_EMISIOR: idUsuario, 
+                                 constantes.CLAVE_TIPO_NOTIFICACION: constantes.NOTIFICACION_TIPO_SOLICITUD_ARTISTA,
+                                 constantes.CLAVE_TITULO_NOTIFICACION: constantes.TITULO_NOTIFICACION_ARTISTA,
+                                 constantes.CLAVE_MENSAJE_NOTIFICACION: daoUsuario.getAlias(r,) + constantes.MENSAJE_NOTIFICACION_ARTISTA}
+    daoNotificaciones.setNotificacion(r, diccionarioNotificaciones)
+    administradores = daoUsuario.getAdministradores(r)
+    for admin in administradores:
+        daoUsuario.anyadirNotificacion(r, admin, idNotificacion)
+    return 1
     
 def ValidateUser(r, id, contrasenya):
     if (r.exists(id) == 0):
@@ -55,8 +70,18 @@ def getUser(r, id):
 
 
 # Funciones adcionales de administradores
-def acceptArtist(r, idUsario):
-    return daoUsuario.setTipoUsuario(r, id, daoUsuario.constantes.USUARIO_ARTISTA)
+def acceptArtist(r, idUsuario, idNotificacion):
+    administradores = daoUsuario.getAdministradores(r)
+    if(daoNotificaciones.getIdUsuarioEmisor(r, idNotificacion) != idUsuario):
+        return -1
+    if(daoNotificaciones.getTipoNotificacion(r, idNotificacion) != constantes.NOTIFICACION_TIPO_SOLICITUD_ARTISTA):
+        return -1
+    
+    # Eliminamos la notificación a los administradores
+    for admin in administradores:
+        daoUsuario.eliminarNotificacion(r, admin, idNotificacion)
+    
+    return daoUsuario.setTipoUsuario(r, idUsuario, daoUsuario.constantes.USUARIO_ARTISTA)
 
 
 # Funciones de listas de reproducción
