@@ -6,8 +6,7 @@ COUNT = 100
 
 listaClaves = [constantes.CLAVE_ID_USUARIO, constantes.CLAVE_EMAIL, 
                constantes.CLAVE_ALIAS, constantes.CLAVE_CONTRASENYA, 
-               constantes.CLAVE_TIPO_USUARIO, constantes.CLAVE_ID_ULTIMA_CANCION,
-               constantes.CLAVE_SEGUNDO_ULTIMA_CANCION]
+               constantes.CLAVE_TIPO_USUARIO, constantes.CLAVE_ID_ULTIMO_AUDIO]
 
 
 
@@ -31,8 +30,7 @@ def setEmail(r, idUsuario, email):
     return r.hset(idUsuario, constantes.CLAVE_EMAIL, email)
 
 def setAlias(r, idUsuario, alias):
-    return r.hset(idUsuario, constantes.CLAVE_ALIAS, alias)
-    
+    return r.hset(idUsuario, constantes.CLAVE_ALIAS, alias)  
 
 def setContrasenya(r, idUsuario, contrasenya):
     return r.hset(idUsuario, constantes.CLAVE_CONTRASENYA, contrasenya)
@@ -40,11 +38,8 @@ def setContrasenya(r, idUsuario, contrasenya):
 def setTipoUsuario(r, idUsuario, tipoUsuario):
     return r.hset(idUsuario, constantes.CLAVE_TIPO_USUARIO, tipoUsuario)
 
-def setUltimaCancion(r, idUsuario, idCancion):
-    return r.hset(idUsuario, constantes.CLAVE_ID_ULTIMA_CANCION, idCancion)
-
-def setSegundoUltimaCancion(r, idUsuario, idCancion):
-    return r.hset(idUsuario, constantes.CLAVE_SEGUNDO_ULTIMA_CANCION, idCancion)
+def setUltimaCancion(r, idUsuario, idAudio):
+    return r.hset(idUsuario, constantes.CLAVE_ID_ULTIMO_AUDIO, idAudio)
 
 def eliminarUsuario(r, idUsuario):
     return r.delete(idUsuario)
@@ -71,15 +66,11 @@ def getTipoUsuario(r, idUsuario):
     return r.hget(idUsuario, constantes.CLAVE_TIPO_USUARIO)
 
 def getUltimaCancion(r, idUsuario):
-    return r.hget(idUsuario, constantes.CLAVE_ID_ULTIMA_CANCION)
-
-def getSegundoUltimaCancion(r, idUsuario):
-    return r.hget(idUsuario, constantes.CLAVE_SEGUNDO_ULTIMA_CANCION)
+    return r.hget(idUsuario, constantes.CLAVE_ID_ULTIMO_AUDIO)
 
 def anyadirAmigo(r, idUsuario, idAmigo):
     return anyadirRelacion(r, idUsuario, idAmigo, constantes.CLAVE_AMIGOS)
     
-
 def eliminarAmigo(r, idUsuario, idAmigo):
     return eliminarRelacion(r, idUsuario, idAmigo, constantes.CLAVE_AMIGOS)
 
@@ -144,11 +135,11 @@ def getRelaciones(r, idUsuario, prefijoRelacion):
 
 
 # Funcion adicional de artista
-def anyadirCancion(r, idUsuario, idCancion):
-    return anyadirRelacion(r, idUsuario, idCancion, constantes.CLAVE_CANCIONES)
+def anyadirCancion(r, idUsuario, idAudio):
+    return anyadirRelacion(r, idUsuario, idAudio, constantes.CLAVE_CANCIONES)
 
-def eliminarCancion(r, idUsuario, idCancion):
-    return eliminarRelacion(r, idUsuario, idCancion, constantes.CLAVE_CANCIONES)
+def eliminarCancion(r, idUsuario, idAudio):
+    return eliminarRelacion(r, idUsuario, idAudio, constantes.CLAVE_CANCIONES)
 
 def getCanciones(r, id):
     return getRelaciones(r, id, constantes.CLAVE_CANCIONES)
@@ -172,3 +163,12 @@ def getAdministradores(r):
         if(cursor == 0):
             parar = True
     return administradores
+
+def setUltimoSegundo(r, idUsuario, idAudio, segundo):
+    return r.set(constantes.CLAVE_ULTIMO_SEGUNDO + idUsuario + ":" + idAudio, segundo)
+
+def getUltimoSegundo(r, idUsuario, idAudio):
+    return r.get(constantes.CLAVE_ULTIMO_SEGUNDO + idUsuario + ":" + idAudio)
+
+def eliminarUltimoSegundo(r, idUsuario, idAudio):
+    return r.delete(constantes.CLAVE_ULTIMO_SEGUNDO + idUsuario + ":" + idAudio)

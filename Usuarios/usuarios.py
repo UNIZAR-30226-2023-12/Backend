@@ -23,10 +23,12 @@ def removeUser(r, id, contrasenya):
     for amigo in amigos:
         daoUsuario.eliminarAmigo(r, amigo, id)
 
-    #Eliminar los sets de amigos, artistas y listas del usuario
+    #Eliminar los sets de amigos, artistas, listas del usuario, notificaciones y carpetas
     r.delete(constantes.CLAVE_AMIGOS + id)
     r.delete(constantes.CLAVE_ARTISTAS + id)
     r.delete(constantes.CLAVE_LISTAS + id)
+    r.delete(constantes.CLAVE_NOTIFICACIONES + id)
+    r.delete(constantes.CLAVE_CARPETAS + id)
 
     #Si es administrador, eliminarlo de la lista de administradores
     if(daoUsuario.getTipoUsuario(r, id) == constantes.USUARIO_ADMINISTRADOR):
@@ -56,28 +58,34 @@ def ValidateUser(r, id, contrasenya):
         return 1
     return -1
 
-def getUser(r, id):
-    usuario = daoUsuario.getUsuario(r, id)
-    if(usuario == -1):
-        #El usuario era un artista que ha sido eliminado
-        daoUsuario.eliminarArtista(r, id)
-        return -1
-    return usuario
+def setLastSecondHeard(r, idUsuario, idAudio, segundo):
+    if (r.exists(idUsuario) == 0 or r.exists(idAudio) == 0):
+        return -2
+    daoUsuario.setUltimoSegundo(r, idUsuario, idAudio, segundo)
+    return 1
 
+def getLastSecondHeard(r, idUsuario, idAudio):
+    if (r.exists(idUsuario) == 0 or r.exists(idAudio) == 0):
+        return -2
+    segundo = daoUsuario.getUltimoSegundo(r, idUsuario, idAudio)
 
+    # En caso de que no exista devolvemos que va por el segundo 0
+    if (segundo == None):
+        return 0
+    return segundo
 
 # Funciones adicionales de artistas
 
 
 # Funciones adcionales de administradores
 def acceptArtist(r, idUsuario, idNotificacion):
-    administradores = daoUsuario.getAdministradores(r)
     if(daoNotificaciones.getIdUsuarioEmisor(r, idNotificacion) != idUsuario):
         return -1
     if(daoNotificaciones.getTipoNotificacion(r, idNotificacion) != constantes.NOTIFICACION_TIPO_SOLICITUD_ARTISTA):
         return -1
     
     # Eliminamos la notificación a los administradores
+    administradores = daoUsuario.getAdministradores(r)
     for admin in administradores:
         daoUsuario.eliminarNotificacion(r, admin, idNotificacion)
     

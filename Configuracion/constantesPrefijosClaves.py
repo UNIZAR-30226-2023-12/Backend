@@ -16,14 +16,14 @@ CLAVE_EMAIL = "email"
 CLAVE_ALIAS = "alias"
 CLAVE_CONTRASENYA = "contrasenya"
 CLAVE_TIPO_USUARIO = "tipoUsuario"
-CLAVE_ID_ULTIMA_CANCION = "idUltimaCancion"
-CLAVE_SEGUNDO_ULTIMA_CANCION = "segundaUltimaCancion"
+CLAVE_ID_ULTIMO_AUDIO = "idUltimoAudio"
 
 # Constantes simbólicas de los prefijos de los sets de usuario
 CLAVE_AMIGOS = "amigos"
 CLAVE_ARTISTAS = "artistas"
 CLAVE_NOTIFICACIONES = "notificaciones"
 CLAVE_CARPETAS = "carpetas"
+CLAVE_ULTIMO_SEGUNDO = "ultimoSegundo"
 # Clave de set de ids de administradores
 CLAVE_ADMINISTRADORES = "administradores"
 # Se usa tambien para acceder al set de listas de Carpeta
