@@ -1,2 +1,3 @@
 testPOSTGET.py
 *.tar
+__pycache__/
