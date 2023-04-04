@@ -40,10 +40,10 @@ def incrementarIDAudio(r, id):
 def guardarCancion(r, cancionDic):
     # Antes de guardar compruebo si el diccionario contiene todas las claves necesarias
     if 'id' not in cancionDic or 'nombre' not in cancionDic or 'artista' not in cancionDic or 'calidad' not in cancionDic or 'nVeces' not in cancionDic or 'val' not in cancionDic or 'generos' not in cancionDic or 'ficheroAltaCalidad' not in cancionDic or 'ficheroBajaCalidad' not in cancionDic or 'longitud' not in cancionDic:
-        print('ERROR: No se ha podido guardar la cancion, falta el algunas de las claves necesarias o tienen el nombre incorrecto')
+        print('ERROR: No se ha podido guardar la cancion, faltan algunas de las claves necesarias o tienen el nombre incorrecto')
         return -1
     else:
-        if id == '':
+        if cancionDic['id'] == '':
             print('ERROR: No se ha podido guardar la cancion, el id no puede estar vacio')
             return -1
         else:

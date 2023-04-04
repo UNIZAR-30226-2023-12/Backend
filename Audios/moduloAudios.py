@@ -26,6 +26,7 @@ from Audios import controlCalidadAudios
 #   generos
 #   ficheroAltaCalidad
 #   ficheroBajaCalidad
+#   longitud
 def anyadirCancion(r, dic):
     # Extraigo algunos datos del diccionario y otros los inicializo a 0,
     # ya que por ejemplo no tiene sentido que una canción tenga valoración o 
@@ -53,7 +54,7 @@ def anyadirCancion(r, dic):
     id = controlAudios.IDUltimoAudio(r)
 
     # Incremento el id
-    controlAudios.incrementarIDUltimoAudio(r, id+1)
+    controlAudios.incrementarIDUltimoAudio(r, int(id)+1)
 
     id = 'idAudio:' + str(id)
     # Construyo el diccionario para almacenar los datos de la canción
