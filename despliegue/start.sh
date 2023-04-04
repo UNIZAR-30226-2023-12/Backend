@@ -1,8 +1,4 @@
 #!/bin/bash
 
-cd django && ./build.sh
-cd ..
-
-docker compose up -d
-
-cd redis && ./populate.sh
+cd django && ./start.sh
+cd ../redis && ./start.sh

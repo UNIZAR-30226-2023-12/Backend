@@ -1,4 +1,5 @@
 #!/bin/bash
 
-docker stop django
+./stop.sh
 docker rm django
+docker rmi melodia/django

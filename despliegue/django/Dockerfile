@@ -2,6 +2,9 @@
 FROM python:3.11
 MAINTAINER melodia
 
+RUN apt-get update; \
+    apt-get install -y ffmpeg
+
 # setup environment variable  
 ENV DOCKERHOME=/usr/local/melodia/backend
 
@@ -19,13 +22,14 @@ ENV PYTHONUNBUFFERED 1
 RUN pip install --upgrade pip  
 
 # copy whole project to your docker home directory. 
-COPY requirements.txt $DOCKERHOME
-COPY manage.py $DOCKERHOME
-COPY backend_melodia/ $DOCKERHOME/backend_melodia/
-COPY DAOS/ $DOCKERHOME/DAOS/
-COPY frontApi/ $DOCKERHOME/frontApi/
-COPY Configuracion/ $DOCKERHOME/Configuracion/
-COPY Usuarios/ $DOCKERHOME/Usuarios/
+COPY ./requirements.txt $DOCKERHOME
+COPY ./manage.py $DOCKERHOME
+COPY ./Audios/ $DOCKERHOME/Audios/
+COPY ./backend_melodia/ $DOCKERHOME/backend_melodia/
+COPY ./Configuracion/ $DOCKERHOME/Configuracion/
+COPY ./DAOS/ $DOCKERHOME/DAOS/
+COPY ./frontApi/ $DOCKERHOME/frontApi/
+COPY ./Usuarios/ $DOCKERHOME/Usuarios/
 
 # run this command to install all dependencies  
 RUN pip install -r requirements.txt
