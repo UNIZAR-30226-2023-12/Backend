@@ -32,7 +32,7 @@ def almacenarCancion(r, cancionDic):
     
 # Función para cambiar los valores de una canción
 # Si alguno de los valores no se quiere cambiar, se debe pasar como parámetro None (salvo el id)
-def cambiarAtributosCancion(r, id, nombre, artista, calidad, nVeces, val, generos, ficheroAltaCalidad, ficheroBajaCalidad):
+def cambiarAtributosCancion(r, id, nombre, artista, calidad, nVeces, val, generos, ficheroAltaCalidad, ficheroBajaCalidad, longitud):
     if nombre != None:
         daoAudio.cambiarNombreCancion(r, id, nombre)
     if artista != None:
@@ -49,6 +49,8 @@ def cambiarAtributosCancion(r, id, nombre, artista, calidad, nVeces, val, genero
         daoAudio.cambiarFicheroAltaCalidad(r, id, ficheroAltaCalidad)
     if ficheroBajaCalidad != None:
         daoAudio.cambiarFicheroBajaCalidad(r, id, ficheroBajaCalidad)
+    if longitud != None:
+        daoAudio.cambiarLongitudCancion(r, id, longitud)
     return 0
     
 # Función para eliminar una canción
@@ -99,6 +101,10 @@ def obtenerAltaCalidadCancion(r, id):
 def obtenerBajaCalidadCancion(r, id):
     return daoAudio.obtenerFicheroBajaCalidad(r, id)
 
+# Función para obtener la longitud de una canción
+def obtenerLongitudCancion(r, id):
+    return daoAudio.obtenerLongitudCancion(r, id)
+
 ##############################################################################################################
 #
 #
@@ -114,7 +120,7 @@ def almacenarPodcast(r, podcastDic):
 
 # Función para cambiar los valores de un podcast
 # Si alguno de los valores no se quiere cambiar, se debe pasar como parámetro None (salvo el id)
-def cambiarAtributosPodcast(r, id, nombre, artista, calidad, nVeces, val, descripcion, ficheroAltaCalidad, ficheroBajaCalidad):
+def cambiarAtributosPodcast(r, id, nombre, artista, calidad, nVeces, val, descripcion, ficheroAltaCalidad, ficheroBajaCalidad, longitud, generos):
     if nombre != None:
         daoAudio.cambiarNombrePodcast(r, id, nombre)
     if artista != None:
@@ -131,6 +137,10 @@ def cambiarAtributosPodcast(r, id, nombre, artista, calidad, nVeces, val, descri
         daoAudio.cambiarFicheroAltaCalidadPodcast(r, id, ficheroAltaCalidad)
     if ficheroBajaCalidad != None:
         daoAudio.cambiarFicheroBajaCalidadPodcast(r, id, ficheroBajaCalidad)
+    if longitud != None:
+        daoAudio.cambiarLongitudPodcast(r, id, longitud)
+    if generos != None:
+        daoAudio.cambiarGeneroPodcast(r, id, generos)
     return 0
 
 # Función para eliminar un podcast
@@ -180,3 +190,11 @@ def obtenerAltaCalidadPodcast(r, id):
 # Función para obtener el fichero de baja calidad de un podcast
 def obtenerBajaCalidadPodcast(r, id):
     return daoAudio.obtenerFicheroBajaCalidadPodcast(r, id)
+
+# Función para obtener la longitud de un podcast
+def obtenerLongitudPodcast(r, id):
+    return daoAudio.obtenerLongitudPodcast(r, id)
+
+# Función para obtener los generos de un podcast
+def obtenerGenerosPodcast(r, id):
+    return daoAudio.obtenerGenerosPodcast(r, id)

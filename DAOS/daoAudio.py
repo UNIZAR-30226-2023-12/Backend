@@ -39,7 +39,7 @@ def incrementarIDAudio(r, id):
 # Funcion para guardar una cancion en la base de datos, modificada para trabajar con diccionarios
 def guardarCancion(r, cancionDic):
     # Antes de guardar compruebo si el diccionario contiene todas las claves necesarias
-    if 'id' not in cancionDic or 'nombre' not in cancionDic or 'artista' not in cancionDic or 'calidad' not in cancionDic or 'nVeces' not in cancionDic or 'val' not in cancionDic or 'generos' not in cancionDic or 'ficheroAltaCalidad' not in cancionDic or 'ficheroBajaCalidad' not in cancionDic:
+    if 'id' not in cancionDic or 'nombre' not in cancionDic or 'artista' not in cancionDic or 'calidad' not in cancionDic or 'nVeces' not in cancionDic or 'val' not in cancionDic or 'generos' not in cancionDic or 'ficheroAltaCalidad' not in cancionDic or 'ficheroBajaCalidad' not in cancionDic or 'longitud' not in cancionDic:
         print('ERROR: No se ha podido guardar la cancion, falta el algunas de las claves necesarias o tienen el nombre incorrecto')
         return -1
     else:
@@ -174,6 +174,21 @@ def cambiarFicheroBajaCalidad(r, id, ficheroBajaCalidad):
         
     return 0
 
+# Funcion para cambiar la longitud de una canción
+def cambiarLongitudCancion(r, id, longitud):
+    if longitud == '':
+        print('ERROR: No se ha podido cambiar la longitud de la cancion, la longitud no puede estar vacia')
+        return -1
+    else:
+        # Compruebo si existe una cancion con ese id
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar la longitud de la cancion, no existe ninguna cancion con ese id')
+            return -1
+        else:
+            r.hset(id, 'longitud', longitud)
+        
+    return 0
+
 # Funcion para eliminar una cancion
 def eliminarCancion(r, id):
     if id == '':
@@ -271,6 +286,14 @@ def obtenerFicheroBajaCalidad(r, id):
         return -1
     else:
         return r.hget(id, 'ficheroBajaCalidad')
+    
+# Funcion para obtener la longitud de una cancion
+def obtenerLongitudCancion(r, id):
+    if id == '':
+        print('ERROR: No se ha podido obtener la longitud de la cancion, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'longitud')
 
 #########################################################################################
 #
@@ -293,7 +316,7 @@ def obtenerFicheroBajaCalidad(r, id):
 # Funcion para guardar un podcast en la base de datos
 def guardarPodcast(r, podcastDic):
     # Compruebo que el diccionario tenga todos los atributos necesarios
-    if 'id' not in podcastDic or 'nombre' not in podcastDic or 'artista' not in podcastDic or 'calidad' not in podcastDic or 'nVeces' not in podcastDic or 'val' not in podcastDic or 'desc' not in podcastDic or 'ficheroAltaCalidad' not in podcastDic or 'ficheroBajaCalidad' not in podcastDic:
+    if 'id' not in podcastDic or 'nombre' not in podcastDic or 'artista' not in podcastDic or 'calidad' not in podcastDic or 'nVeces' not in podcastDic or 'val' not in podcastDic or 'desc' not in podcastDic or 'ficheroAltaCalidad' not in podcastDic or 'ficheroBajaCalidad' not in podcastDic or 'generos' not in podcastDic or 'longitud' not in podcastDic:
         print('ERROR: No se ha podido guardar el podcast, el diccionario no tiene todos los atributos necesarios')
         return -1
     else:
@@ -422,6 +445,34 @@ def cambiarFicheroBajaCalidadPodcast(r, id, ficheroBajaCalidad):
             r.hset(id, 'ficheroBajaCalidad', ficheroBajaCalidad)
     return 0
 
+# Funcion para cambiar el genero de un podcast
+def cambiarGeneroPodcast(r, id, genero):
+    # Compruebo que exista el podcast y no sea id vacio
+    if id == '':
+        print('ERROR: No se ha podido cambiar el genero del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar el genero del podcast, el podcast no existe')
+            return -1
+        else:
+            r.hset(id, 'generos', genero)
+    return 0
+
+# Funcion para cambiar la longitud de un podcast
+def cambiarLongitudPodcast(r, id, longitud):
+    # Compruebo que exista el podcast y no sea id vacio
+    if id == '':
+        print('ERROR: No se ha podido cambiar la longitud del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        if r.exists(id) == 0:
+            print('ERROR: No se ha podido cambiar la longitud del podcast, el podcast no existe')
+            return -1
+        else:
+            r.hset(id, 'longitud', longitud)
+    return 0
+
 # Funcion para eliminar un podcast
 def eliminarPodcast(r, id):
     # Compruebo que exista el podcast y no sea id vacio
@@ -515,3 +566,19 @@ def obtenerFicheroBajaCalidadPodcast(r, id):
         return -1
     else:
         return r.hget(id, 'ficheroBajaCalidad')
+    
+# Funcion para obtener el genero de un podcast
+def obtenerGeneroPodcast(r, id):
+    if id == '':
+        print('ERROR: No se ha podido obtener el genero del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'generos')
+    
+# Funcion para obtener la longitud de un podcast
+def obtenerLongitudPodcast(r, id):
+    if id == '':
+        print('ERROR: No se ha podido obtener la longitud del podcast, el id no puede estar vacio')
+        return -1
+    else:
+        return r.hget(id, 'longitud')

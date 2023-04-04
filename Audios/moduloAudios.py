@@ -36,6 +36,7 @@ def anyadirCancion(r, dic):
     nVeces = 0
     val = 0
     generos = dic['generos']
+    longitud = dic['longitud']
 
     if calidad == 'alta':
         ficheroAltaCalidad = dic['ficheroAltaCalidad']
@@ -56,7 +57,7 @@ def anyadirCancion(r, dic):
 
     id = 'idAudio:' + str(id)
     # Construyo el diccionario para almacenar los datos de la canción
-    cancionDic = {'id': id, 'nombre': nombre, 'artista': artista, 'calidad': calidad, 'nVeces': nVeces, 'val': val, 'generos': generos, 'ficheroAltaCalidad': ficheroAltaCalidad, 'ficheroBajaCalidad': ficheroBajaCalidad}
+    cancionDic = {'id': id, 'nombre': nombre, 'artista': artista, 'calidad': calidad, 'nVeces': nVeces, 'val': val, 'generos': generos, 'ficheroAltaCalidad': ficheroAltaCalidad, 'ficheroBajaCalidad': ficheroBajaCalidad, 'longitud': longitud}
 
     # Almaceno la canción
     controlAudios.almacenarCancion(r, cancionDic)
@@ -85,11 +86,11 @@ def obtenerFicheroCancion(r, id, calidad):
 # Si alguno de los valores disponibles no se quiere cambiar, se debe pasar como None en el dic (salvo el id)
 def modificarCancion(r, id, dic):
     # Compruebo que el dic tenga todo lo necesario
-    if 'nombre' not in dic or 'artista' not in dic or 'calidad' not in dic or 'generos' not in dic or 'ficheroAltaCalidad' not in dic or 'ficheroBajaCalidad' not in dic or nVeces not in dic or val not in dic:
+    if 'nombre' not in dic or 'artista' not in dic or 'calidad' not in dic or 'generos' not in dic or 'ficheroAltaCalidad' not in dic or 'ficheroBajaCalidad' not in dic or 'nVeces' not in dic or 'val' not in dic or 'longitud' not in dic:
         print("Diccionario no válido")
         return -1
     else:
-        return controlAudios.cambiarAtributosCancion(r, id, dic['nombre'], dic['artista'], dic['calidad'], dic['nVeces'], dic['val'], dic['generos'], dic['ficheroAltaCalidad'], dic['ficheroBajaCalidad'])
+        return controlAudios.cambiarAtributosCancion(r, id, dic['nombre'], dic['artista'], dic['calidad'], dic['nVeces'], dic['val'], dic['generos'], dic['ficheroAltaCalidad'], dic['ficheroBajaCalidad'], dic['longitud'])
     
 # Función para obtener el diccionario de una canción
 def obtenerDiccionarioCancion(r, id):
@@ -123,6 +124,8 @@ def anyadirPodcast(r, dic):
     nVeces = 0
     val = 0
     desc = dic['desc']
+    longitud = dic['longitud']
+    generos = dic['generos']
 
     if calidad == 'alta':
         ficheroAltaCalidad = dic['ficheroAltaCalidad']
@@ -144,7 +147,7 @@ def anyadirPodcast(r, dic):
     id = 'idAudio:' + str(id)
 
     # Construyo el diccionario para almacenar los datos del podcast
-    podcastDic = {'id': id, 'nombre': nombre, 'artista': artista, 'calidad': calidad, 'nVeces': nVeces, 'val': val, 'desc': desc, 'ficheroAltaCalidad': ficheroAltaCalidad, 'ficheroBajaCalidad': ficheroBajaCalidad}
+    podcastDic = {'id': id, 'nombre': nombre, 'artista': artista, 'calidad': calidad, 'nVeces': nVeces, 'val': val, 'desc': desc, 'ficheroAltaCalidad': ficheroAltaCalidad, 'ficheroBajaCalidad': ficheroBajaCalidad, 'longitud': longitud, 'generos': generos}
 
     # Almaceno el podcast
     controlAudios.almacenarPodcast(r, podcastDic)
@@ -175,11 +178,11 @@ def obtenerFicheroPodcast(r, id, calidad):
 # Si alguno de los valores disponibles no se quiere cambiar, se debe pasar como None en el dic (salvo el id)
 def modificarPodcast(r, id, dic):
     # Compruebo que el dic tenga todo lo necesario
-    if 'nombre' not in dic or 'artista' not in dic or 'calidad' not in dic or 'desc' not in dic or 'ficheroAltaCalidad' not in dic or 'ficheroBajaCalidad' not in dic or 'nVeces' not in dic or 'val' not in dic:
+    if 'nombre' not in dic or 'artista' not in dic or 'calidad' not in dic or 'desc' not in dic or 'ficheroAltaCalidad' not in dic or 'ficheroBajaCalidad' not in dic or 'nVeces' not in dic or 'val' not in dic or 'longitud' not in dic or 'generos' not in dic:
         print("Diccionario no válido")
         return -1
     else:
-        return controlAudios.cambiarAtributosPodcast(r, id, dic['nombre'], dic['artista'], dic['calidad'], dic['nVeces'], dic['val'], dic['desc'], dic['ficheroAltaCalidad'], dic['ficheroBajaCalidad'])
+        return controlAudios.cambiarAtributosPodcast(r, id, dic['nombre'], dic['artista'], dic['calidad'], dic['nVeces'], dic['val'], dic['desc'], dic['ficheroAltaCalidad'], dic['ficheroBajaCalidad'], dic['longitud'], dic['generos'])
     
 # Función para obtener el diccionario de un podcast (todos los atributos del mismo)
 def obtenerDiccionarioPodcast(r, id):
