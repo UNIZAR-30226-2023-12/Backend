@@ -73,8 +73,15 @@ MENSAJE_NOTIFICACION_ARTISTA = " quiere ser artista"
 
 # Constantes simbólicas para las Lista de reproducción
 CLAVE_CONTADOR_LISTAS = "contadorListas"
-CLAVE_ID_LISTA = "nombreLista"
-CLAVE_PRIVADA = "privada"
+CLAVE_ID_LISTA = "idLista"
+CLAVE_NOMBRE_LISTA = "nombreLista"
+CLAVE_PRIVACIDAD_LISTA = "privada"
+CLAVE_TIPO_LISTA = "tipoLista"
+LISTA_TIPO_REPRODUCCION = "listaReproduccion"
+LISTA_TIPO_FAVORTIOS = "listaFavoritos"
+LISTA_TIPO_RANKING = "listaRanking"
+LISTA_PRIVADA = "privada"
+LISTA_PUBLICA = "publica"
 
 
 # Constantes simbólicas de los prefijos de los sets de listas

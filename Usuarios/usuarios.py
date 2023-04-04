@@ -98,21 +98,21 @@ def setLista(r, idUsuario, diccionarioLista):
         return -1
     id = daoListas.getIdContador(r)
     diccionarioLista.add(constantes.CLAVE_ID_LISTA, id)
-    return daoListas.crearPlaylist(r, diccionarioLista) 
+    return daoListas.setLista(r, diccionarioLista) 
 
 def setSongLista(r, idLista, idAudio):
     if (r.exists(idAudio) == 0):
         return -3
     if (r.exists(idLista) == 0):
         return -1
-    return daoListas.anadirCancionPlaylist(r, idLista, idAudio)
+    return daoListas.anyadirAudioLista(r, idLista, idAudio)
 
 def setPrivacyLista(r, idUsuario, idLista, publica):
     if (r.exists(idUsuario) == 0):
         return -2
     if (r.exists(idLista) == 0):
         return -1
-    daoListas.cambiarPublicaPlaylist(r, idLista, publica)
+    daoListas.setPrivacidadLista(r, idLista, publica)
     return 1
 
 def removListaRepUsr(r, idUsuario, idLista):
@@ -120,7 +120,7 @@ def removListaRepUsr(r, idUsuario, idLista):
         return -2
     if (r.exists(idLista) == 0):
         return -1
-    daoListas.eliminarPlaylist(r, idLista)
+    daoListas.eliminarLista(r, idLista)
     daoUsuario.eliminarLista(r, idUsuario, idLista)
     return 1
 
@@ -133,14 +133,14 @@ def getSongsArtist(r, idArtista):
     return daoUsuario.getCanciones(r, idArtista)
 
 def getListaRepUsr(r, idLista):
-    return daoListas.obtenerPlaylist(r, idLista)
+    return daoListas.getLista(r, idLista)
 
 def removeSongLista(r, idUsuario, idLista, idAudio):
     if(r.exists(idUsuario) == 0):
         return -2
     if(r.exists(idLista) == 0):
         return -1
-    return daoListas.eliminarCancionPlaylist(r, idLista, idAudio)
+    return daoListas.eliminarAudioLista(r, idLista, idAudio)
 
 def changeNameListRepUsr(r, idLista, nombre):
-    return daoListas.cambiarNombrePlaylist(r, idLista, nombre)
+    return daoListas.setNombreLista(r, idLista, nombre)
