@@ -23,7 +23,10 @@ CLAVE_AMIGOS = "amigos"
 CLAVE_ARTISTAS = "artistas"
 CLAVE_NOTIFICACIONES = "notificaciones"
 CLAVE_CARPETAS = "carpetas"
-CLAVE_ULTIMO_SEGUNDO = "ultimoSegundo"
+CLAVE_ULTIMOS_AUDIOS = "ultimosAudios"
+# Claves para hash de ultimosAudios
+CLAVE_SEGUNDOS = "segundos"
+
 # Clave de set de ids de administradores
 CLAVE_ADMINISTRADORES = "administradores"
 # Se usa tambien para acceder al set de listas de Carpeta

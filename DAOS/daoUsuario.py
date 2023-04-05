@@ -56,7 +56,7 @@ def tipoUsuarioValido(tipoUsuario):
         return False
     
 def getUsuario(r, idUsuario):
-    return r.hmget(idUsuario, listaClaves)
+    return r.hgetall(idUsuario, listaClaves)
 
 def getEmail(r, id):
     return r.hget(id, constantes.CLAVE_EMAIL)
@@ -169,14 +169,30 @@ def getAdministradores(r):
             parar = True
     return administradores
 
-def setUltimoSegundo(r, idUsuario, idAudio, segundo):
-    return r.set(constantes.CLAVE_ULTIMO_SEGUNDO + ":" + idUsuario + ":" + idAudio, segundo)
+# Funciones para crear set de ulimos Audios escuchados
+def anyadirUltimoAudio(r, idUsuario, idAudio):
+    return anyadirRelacion(r, idUsuario, idAudio, constantes.CLAVE_ULTIMOS_AUDIOS)
 
-def getUltimoSegundo(r, idUsuario, idAudio):
-    return r.get(constantes.CLAVE_ULTIMO_SEGUNDO + ":" + idUsuario + ":" + idAudio)
+def eliminarUltimoAudio(r, idUsuario, idAudio):
+    return eliminarRelacion(r, idUsuario, idAudio, constantes.CLAVE_ULTIMOS_AUDIOS)
 
-def eliminarUltimoSegundo(r, idUsuario, idAudio):
-    return r.delete(constantes.CLAVE_ULTIMO_SEGUNDO + ":" + idUsuario + ":" + idAudio)
+def getIDSUltimosAudios(r, idUsuario):
+    return getRelaciones(r, idUsuario, constantes.CLAVE_ULTIMOS_AUDIOS)
+
+def setUltimoAuido(r, idUsuario, idAudio, diccionarioUltimoAudio):
+    return r.hmset(constantes.CLAVE_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, diccionarioUltimoAudio)
+
+def setSegundosUltimoAudio(r, idUsuario, idAudio, segundos):
+    return r.hset(constantes.CLAVE_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS, segundos)
+
+def getUltimoAudio(r, idUsuario, idAudio):
+    return r.hgetall(constantes.CLAVE_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
+
+def getSegundosUltimoAudio(r, idUsuario, idAudio):
+    return r.hget(constantes.CLAVE_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS)
+
+def eliminarUltimoAudio(r, idUsuario, idAudio):
+    return r.delete(constantes.CLAVE_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
 
 # Daos para crear tabla hash email | idUsuario para agilizar el inicio de sesion
 def setEmailId(r, email, idUsuario):
