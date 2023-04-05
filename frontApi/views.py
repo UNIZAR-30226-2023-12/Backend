@@ -41,8 +41,13 @@ def GetSong(request):
             fichero = moduloAudios.obtenerFicheroCancion(r, id, 'alta')
         elif calidadAlta == "False":
             fichero = moduloAudios.obtenerFicheroCancion(r, id, 'baja')
+    elif esCancion == "False":
+        if calidadAlta == "True":
+            fichero = moduloAudios.obtenerFicheroPodcast(r, id, 'alta')
+        elif calidadAlta == "False":
+            fichero = moduloAudios.obtenerFicheroPodcast(r, id, 'baja')
 
-    if fichero == 419 or fichero == 424:
+    if fichero == 419 or fichero == 424 or fichero == 430 or fichero == 425:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=fichero)
     else:
         # Gets the serialized audio
