@@ -18,6 +18,10 @@ from Configuracion import constantesErroresHTTP
 #
 ##############################################################################################################
 
+# Función que devuelve si existe una canción
+def existeCancion(r, id):
+    return daoAudio.existeCancion(r, id)
+
 # Función para obtener el id del último audio que se ha añadido
 def IDUltimoAudio(r):
     return daoAudio.incrementarIDUltimoAudio(r)
@@ -199,6 +203,10 @@ def obtenerLongitudCancion(r, id):
 #
 #
 ##############################################################################################################
+
+# Función que devuelve si existe un podcast
+def existePodcast(r, id):
+    return daoAudio.existePodcast(r, id)
 
 # Función para almacenar un podcast
 def almacenarPodcast(r, podcastDic):

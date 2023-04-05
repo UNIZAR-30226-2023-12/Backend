@@ -18,6 +18,10 @@ from Audios import controlCalidadAudios
 #
 ##############################################################################################################
 
+# Función que devuelve si existe una canción
+def existeCancion(r, id):
+    return controlAudios.existeCancion(r, id)
+
 # Función para añadir una canción
 # dic debe tener al menos los siguientes campos:
 #   nombre
@@ -101,6 +105,10 @@ def obtenerDiccionarioCancion(r, id):
 #
 #
 ##############################################################################################################
+
+# Función que devuelve si existe un podcast
+def existePodcast(r, id):
+    return controlAudios.existePodcast(r, id)
 
 # Función para añadir un podcast
 # dic debe tener al menos los siguientes campos:
