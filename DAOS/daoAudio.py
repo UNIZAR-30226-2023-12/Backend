@@ -32,9 +32,11 @@ import Configuracion.constantesPrefijosClaves as constantes
 #
 #########################################################################################
 
-# Función para incrementar el id artificial
-def incrementarIDAudio(r, id):
-    r.set('idUltimoAudio', id)
+# Función para incrementar el id artificial y devolverlo de forma atómica
+def incrementarIDUltimoAudio(r):
+    id = r.incr('idUltimoAudio')
+    return id
+
 
 # Funcion para guardar una cancion en la base de datos, modificada para trabajar con diccionarios
 def guardarCancion(r, cancionDic):
@@ -212,9 +214,6 @@ def eliminarCancion(r, id):
 #
 #########################################################################################
 
-# Funcion para obtener el id de la última canción que se ha añadido
-def obtenerIDUltimoAudio(r):
-    return r.get('idUltimoAudio')
 # Funcion para obtener una cancion
 def obtenerCancion(r, id):
     if id == '':

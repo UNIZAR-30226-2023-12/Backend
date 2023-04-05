@@ -50,11 +50,8 @@ def anyadirCancion(r, dic):
         print("Opción de calidad no válida")
         return -1
     
-    # Obtengo el id de la última canción que se ha añadido
+    # Obtengo el id de la última canción que se ha añadido e incremento en 1
     id = controlAudios.IDUltimoAudio(r)
-
-    # Incremento el id
-    controlAudios.incrementarIDUltimoAudio(r, int(id)+1)
 
     id = 'idAudio:' + str(id)
     # Construyo el diccionario para almacenar los datos de la canción
@@ -140,10 +137,7 @@ def anyadirPodcast(r, dic):
         return -1
     
     # Obtengo el id del último podcast que se ha añadido
-    id = controlAudios.IDUltimoPodcast(r)
-
-    # Incremento el id
-    controlAudios.incrementarIDUltimoPodcast(r, id+1)
+    id = controlAudios.IDUltimoAudio(r)
 
     id = 'idAudio:' + str(id)
 

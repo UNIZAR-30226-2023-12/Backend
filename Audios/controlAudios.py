@@ -17,13 +17,9 @@ from DAOS import daoAudio
 #
 ##############################################################################################################
 
-# Función para obtener el id de la última canción añadida a la base
+# Función para obtener el id del último audio que se ha añadido
 def IDUltimoAudio(r):
-    return daoAudio.obtenerIDUltimoAudio(r)
-
-# Función para incrementar el id de la última canción que se ha añadido
-def incrementarIDUltimoAudio(r, id):
-    daoAudio.incrementarIDAudio(r, id)
+    return daoAudio.incrementarIDUltimoAudio(r)
 
 # Función para almacenar una canción
 def almacenarCancion(r, cancionDic):
