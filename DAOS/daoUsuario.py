@@ -21,6 +21,11 @@ def getIdContador(r):
     id = pipe.execute()[0]
     return id
 
+def existeUsuario(r, idUsuario):
+    if(r.exists(idUsuario) == 0):
+        return False
+    return True
+
 def setUsuario(r, usuarioDiccionario):
     idUsuario = usuarioDiccionario[constantes.CLAVE_ID_USUARIO]
     del(usuarioDiccionario[constantes.CLAVE_ID_USUARIO])

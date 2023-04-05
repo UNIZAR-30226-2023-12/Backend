@@ -12,6 +12,11 @@ def getIdContador(r):
     id = pipe.execute()[0]
     return id
 
+def existeCarpeta(r, id):
+    if(r.exists(id) == 0):
+        return False
+    return True
+
 #########################################################################################
 #
 #

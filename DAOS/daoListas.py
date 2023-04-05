@@ -2,6 +2,9 @@ import redis
 import Configuracion.constantesPrefijosClaves as constantes
 
 
+listaClaves = [constantes.CLAVE_ID_LISTA, constantes.CLAVE_NOMBRE_LISTA, 
+               constantes.CLAVE_PRIVACIDAD_LISTA, constantes.CLAVE_TIPO_LISTA]
+
 def getIdContador(r):
     id = r.get(constantes.CLAVE_CONTADOR_LISTAS)
     if(id == None):
@@ -12,6 +15,11 @@ def getIdContador(r):
     pipe.incr(constantes.CLAVE_CONTADOR_LISTAS)
     id = pipe.execute()[0]
     return id
+
+def existeLista(r, id):
+    if(r.exists(id) == 0):
+        return False
+    return True
 
 #########################################################################################
 #
