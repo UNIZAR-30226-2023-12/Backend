@@ -3,3 +3,5 @@ django-rest-framework==0.1.0
 redis
 requests
 pydub
+numpy
+numba
