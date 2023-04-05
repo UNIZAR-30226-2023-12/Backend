@@ -115,10 +115,10 @@ def getCarpetas(r, idUsuario, idCarpeta):
 
 # Funciones para añadir, eliminar y obtener relaciones del usuario
 def anyadirRelacion(r, idUsuario, idRealacion, prefijoRelacion):
-    return r.sadd(prefijoRelacion + idUsuario, idRealacion)
+    return r.sadd(prefijoRelacion + ":" + idUsuario, *idRealacion)
 
 def eliminarRelacion(r, idUsuario, idRealacion, prefijoRelacion):
-    return r.srem(prefijoRelacion + idUsuario, idRealacion)
+    return r.srem(prefijoRelacion + ":" + idUsuario, *idRealacion)
 
 def getRelaciones(r, idUsuario, prefijoRelacion):
     parar = False
@@ -126,7 +126,7 @@ def getRelaciones(r, idUsuario, prefijoRelacion):
     relaciones = []
 
     while(parar == False):
-        scan = r.sscan(prefijoRelacion + idUsuario, cursor, count=COUNT)
+        scan = r.sscan(prefijoRelacion + ":" + idUsuario, cursor, count=COUNT)
         cursor = scan[0]
         relaciones.extend(scan[1])
         if(cursor == 0):
@@ -146,10 +146,10 @@ def getCanciones(r, id):
 
 # Función adicional de administrador
 def anyadirAdministrador(r, id):
-    return r.sadd(constantes.CLAVE_ADMINISTRADORES, id)
+    return r.sadd(constantes.CLAVE_ADMINISTRADORES, *id)
 
 def eliminarAdministrador(r, id):
-    return r.srem(constantes.CLAVE_ADMINISTRADORES, id)
+    return r.srem(constantes.CLAVE_ADMINISTRADORES, *id)
 
 def getAdministradores(r):
     parar = False
@@ -165,10 +165,20 @@ def getAdministradores(r):
     return administradores
 
 def setUltimoSegundo(r, idUsuario, idAudio, segundo):
-    return r.set(constantes.CLAVE_ULTIMO_SEGUNDO + idUsuario + ":" + idAudio, segundo)
+    return r.set(constantes.CLAVE_ULTIMO_SEGUNDO + ":" + idUsuario + ":" + idAudio, segundo)
 
 def getUltimoSegundo(r, idUsuario, idAudio):
-    return r.get(constantes.CLAVE_ULTIMO_SEGUNDO + idUsuario + ":" + idAudio)
+    return r.get(constantes.CLAVE_ULTIMO_SEGUNDO + ":" + idUsuario + ":" + idAudio)
 
 def eliminarUltimoSegundo(r, idUsuario, idAudio):
-    return r.delete(constantes.CLAVE_ULTIMO_SEGUNDO + idUsuario + ":" + idAudio)
+    return r.delete(constantes.CLAVE_ULTIMO_SEGUNDO + ":" + idUsuario + ":" + idAudio)
+
+# Daos para crear tabla hash email | idUsuario para agilizar el inicio de sesion
+def setEmailId(r, email, idUsuario):
+    return r.hset(constantes.CLAVE_HASH_EMAIL_ID, email, idUsuario)
+
+def getIdEmailId(r, email):
+    return r.hget(constantes.CLAVE_HASH_EMAIL_ID, email)
+
+def eliminarEmailId(r, email):
+    return r.hdel(constantes.CLAVE_HASH_EMAIL_ID, email)

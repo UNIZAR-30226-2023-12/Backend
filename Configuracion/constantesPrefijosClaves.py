@@ -53,6 +53,9 @@ CLAVE_FICHERO_BAJA_CALIDAD = "ficheroBajaCalidad"
 # Constantes simbólicas para las Carpeta
 CLAVE_CONTADOR_CARPETAS = "contadorCarpetas"
 CLAVE_ID_CARPETA = "idCarpeta"
+CLAVE_NOMBRE_CARPETA = "nombreCarpeta"
+CLAVE_PRIVACIDAD_CARPETA = "privacidadCarpeta"
+CLAVE_LISTAS_CARPETA = "listasCarpeta"
 
 # Constantes simbólicas para los prefijos de los sets de carpeta
 
@@ -87,3 +90,4 @@ LISTA_PUBLICA = "publica"
 # Constantes simbólicas de los prefijos de los sets de listas
 CLAVE_AUDIOS = "audios"
 
+CLAVE_HASH_EMAIL_ID = "tablaHashEmailId"
