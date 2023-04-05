@@ -112,6 +112,8 @@ def obtenerDiccionarioCancion(r, id):
 #   nVeces
 #   ficheroAltaCalidad
 #   ficheroBajaCalidad
+#   longitud
+#   generos
 def anyadirPodcast(r, dic):
     # Extraigo algunos datos del diccionario y otros los inicializo a 0,
     # ya que por ejemplo no tiene sentido que una canción tenga valoración o 
