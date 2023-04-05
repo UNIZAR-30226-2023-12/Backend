@@ -7,8 +7,12 @@ from DAOS import daoUsuario
 from DAOS import daoGlobal
 
 from Audios import moduloAudios
+from Usuarios import usuarios
 
-r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+
+r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
 
 # echo request
 def echo(request):
@@ -22,36 +26,60 @@ def echo(request):
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 # Create your views here.
+@csrf_exempt
 def GetSong(request):
-    id = request.GET.get('idSong')
-    calidadAlta = request.GET.get('calidadAlta')
-
-    # Gets the serialized audio
-    return JsonResponse({'fichero': daoAudio.obtenerFicheroAltaCalidad(r, id)})
-
-# View para añadir una canción a la base de datos
-def SetSong(request):
-
-    if request.method == 'POST':
-        # Parse the JSON data from the request body
-        json_data = json.loads(request.body)
-        
-        moduloAudios.anyadirCancion(r, json_data)
-        
-        return True
-    else:
-        # Return a 405 Method Not Allowed response for other HTTP methods
+    # Compruebo que el método sea GET
+    if request.method != 'GET':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
+    id = request.GET.get('idSong')
+    calidadAlta = request.GET.get('calidadAlta')
+    esCancion = request.GET.get('esCancion')
+
+    if esCancion == "True":
+        if calidadAlta == "True":
+            fichero = moduloAudios.obtenerFicheroCancion(r, id, 'alta')
+        elif calidadAlta == "False":
+            fichero = moduloAudios.obtenerFicheroCancion(r, id, 'baja')
+
+    if fichero == 419 or fichero == 424:
+        return JsonResponse({'error': 'Ha ocurrido un problema'}, status=fichero)
+    else:
+        # Gets the serialized audio
+        return JsonResponse({'fichero': fichero})
+
+# View para añadir una canción a la base de datos
+@csrf_exempt
+def SetSong(request):
+    # Compruebo que el método sea POST
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    contrasenya = request.POST.get('passwd')
+    usuario = request.POST.get('usr')
+    # Compruebo que el usuario sea válido
+    if usuarios.ValidateUser(r, usuario, contrasenya) == 1:
+        # Parseo el JSON de la petición
+        json_data = json.loads(request.body)
+
+        # Añado la canción a la base de datos
+        status = moduloAudios.anyadirCancion(r, json_data)
+        if status != 0:
+            return JsonResponse({'error': 'Ha ocurrido un problema'}, status=status)
+
+        return JsonResponse({'msg' 'Cancion añadida correctamente'}, status=200)
+    else:
+        return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=401)
+   
 def SetUser(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
         
         # Stores the user in the database
-        daoUsuario.guardarUsuario(r, json_data)
+        status = usuarios.setUser(r, json_data)
         
-        return True
+        return JsonResponse({'status': status}, status=status)
     else:
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -60,17 +88,12 @@ def SetUser(request):
 def ValidateUser(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
-        # json_data = json.loads(request.body)
-
-        # Validates the user
-        #data = json.loads(request.data)
-
-        #print(data)
+        json_data = json.loads(request.body)
         
-        if request.POST.get('contrasenya') == daoUsuario.obtenerContrasenya(r, request.POST.get('id')):
-            return JsonResponse({'validate': True})
-        else:
-            return JsonResponse({'validate': False})
+        # Stores the user in the database
+        status = usuarios.ValidateUser(r, json_data)
+        
+        return JsonResponse({'status': status}, status=status)
 
     else:
         # Return a 405 Method Not Allowed response for other HTTP methods

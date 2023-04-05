@@ -1,137 +1,205 @@
 import redis
-import Configuracion.constantesPrefijosClaves as constantesPrefijosClaves
+import Configuracion.constantesPrefijosClaves as constantes
 
 #Numero de elementos que se devuelven en cada iteración de sscan
 COUNT = 100
 
-listaClaves = [constantesPrefijosClaves.CLAVE_ID_USUARIO_USUARIO, constantesPrefijosClaves.CLAVE_EMAIL, constantesPrefijosClaves.CLAVE_ALIAS, constantesPrefijosClaves.CLAVE_CONTRASENYA, constantesPrefijosClaves.CLAVE_TIPO_USUARIO]
+listaClaves = [constantes.CLAVE_ID_USUARIO, constantes.CLAVE_EMAIL, 
+               constantes.CLAVE_ALIAS, constantes.CLAVE_CONTRASENYA, 
+               constantes.CLAVE_TIPO_USUARIO, constantes.CLAVE_ID_ULTIMO_AUDIO]
 
 
 
+def getIdContador(r):
+    id = r.get(constantes.CLAVE_CONTADOR_USUARIOS)
+    if(id == None):
+        r.set(constantes.CLAVE_CONTADOR_USUARIOS, 1)
+        id = 1
+    pipe = r.pipeline()
+    pipe.get(constantes.CLAVE_CONTADOR_USUARIOS)
+    pipe.incr(constantes.CLAVE_CONTADOR_USUARIOS)
+    id = pipe.execute()[0]
+    return id
 
+def existeUsuario(r, idUsuario):
+    if(r.exists(idUsuario) == 0):
+        return False
+    return True
 
-def guardarUsuario(r, usuarioDiccionario):
-    if (sorted(listaClaves) != sorted(list(usuarioDiccionario.keys())) or usuarioDiccionario[constantesPrefijosClaves.CLAVE_ID_USUARIO] == None
-        or r.exists(usuarioDiccionario[constantesPrefijosClaves.CLAVE_ID_USUARIO]) == 1 or (tipoUsuarioValido(usuarioDiccionario[constantesPrefijosClaves.CLAVE_TIPO_USUARIO]) == False)):
-        return -1
-    else:
-        id = usuarioDiccionario[constantesPrefijosClaves.CLAVE_ID_USUARIO]
-        del(usuarioDiccionario[constantesPrefijosClaves.CLAVE_ID_USUARIO])
-        r.hmset(id, usuarioDiccionario)
-        return 0
+def setUsuario(r, usuarioDiccionario):
+    idUsuario = usuarioDiccionario[constantes.CLAVE_ID_USUARIO]
+    del(usuarioDiccionario[constantes.CLAVE_ID_USUARIO])
+    return r.hmset(idUsuario, usuarioDiccionario)
 
-def cambiarEmail(r, id, email):
-    if (r.exists(id) == 0 or email == None):
-        return -1
-    r.hset(id, constantesPrefijosClaves.CLAVE_EMAIL, email)
-    return 0
+def setEmail(r, idUsuario, email):
+    return r.hset(idUsuario, constantes.CLAVE_EMAIL, email)
 
-def cambiarAlias(r, id, alias):
-    if(r.exists(id) == 0 or alias == None):
-        return -1
-    r.hset(id, constantesPrefijosClaves.CLAVE_ALIAS, alias)
-    return 0
+def setAlias(r, idUsuario, alias):
+    return r.hset(idUsuario, constantes.CLAVE_ALIAS, alias)  
 
-def cambiarContrasenya(r, id, contrasenya):
-    if(r.exists(id) == 0 or contrasenya == None):
-        return -1
-    r.hset(id, constantesPrefijosClaves.CLAVE_CONTRASENYA, contrasenya)
+def setContrasenya(r, idUsuario, contrasenya):
+    return r.hset(idUsuario, constantes.CLAVE_CONTRASENYA, contrasenya)
 
-def cambiarTipoUsuario(r, id, tipoUsuario):
-    if(r.exists(id) == 0 or tipoUsuario == None or not tipoUsuarioValido(tipoUsuario)):
-        return -1
-    r.hset(id, constantesPrefijosClaves.CLAVE_TIPO_USUARIO, tipoUsuario)
-    return 0
+def setTipoUsuario(r, idUsuario, tipoUsuario):
+    return r.hset(idUsuario, constantes.CLAVE_TIPO_USUARIO, tipoUsuario)
 
-def eliminarUsuario(r, id):
-    if(r.exists(id) == 0):
-        return -1
-    r.delete(id)
-    return 0
+def setUltimaCancion(r, idUsuario, idAudio):
+    return r.hset(idUsuario, constantes.CLAVE_ID_ULTIMO_AUDIO, idAudio)
+
+def eliminarUsuario(r, idUsuario):
+    return r.delete(idUsuario)
 
 def tipoUsuarioValido(tipoUsuario):
-    if(tipoUsuario == constantesPrefijosClaves.USUARIO_ADMINISTRADOR or tipoUsuario == constantesPrefijosClaves.USUARIO_NORMAL or tipoUsuario == constantesPrefijosClaves.constantesUsuario.USUARIO_ARTISTA):
+    if(tipoUsuario == constantes.USUARIO_ADMINISTRADOR or tipoUsuario == constantes.USUARIO_NORMAL or tipoUsuario == constantes.constantesUsuario.USUARIO_ARTISTA):
         return True
     else:
         return False
     
-def obtenerUsuario(r, id):
-    if(r.exists(id) == 0):
-        return -1
-    return r.hgetall(id)
+def getUsuario(r, idUsuario):
+    return r.hgetall(idUsuario, listaClaves)
 
-def obtenerEmail(r, id):
-    if(r.exists(id) == 0):
-        return -1
-    return r.hget(id, constantesPrefijosClaves.CLAVE_EMAIL)
+def getEmail(r, id):
+    return r.hget(id, constantes.CLAVE_EMAIL)
 
-def obtenerAlias(r, id):
-    if(r.exists(id) == 0):
-        return -1
-    return r.hget(id, constantesPrefijosClaves.CLAVE_ALIAS)
+def getAlias(r, idUsuario):
+    return r.hget(idUsuario, constantes.CLAVE_ALIAS)
 
-def obtenerContrasenya(r, id):
-    if(r.exists(id) == 0):
-        return -1
-    return r.hget(id, constantesPrefijosClaves.CLAVE_CONTRASENYA)
+def getContrasenya(r, idUsuario):
+    return r.hget(idUsuario, constantes.CLAVE_CONTRASENYA)
 
-def obtenerTipoUsuario(r, id):
-    if(r.exists(id) == 0):
-        return -1
-    return r.hget(id, constantesPrefijosClaves.CLAVE_TIPO_USUARIO)
+def getTipoUsuario(r, idUsuario):
+    return r.hget(idUsuario, constantes.CLAVE_TIPO_USUARIO)
 
-def anyadirAmigo(r, id, idAmigo):
-    if(r.exists(id) == 0 or r.exists(idAmigo) == 0):
-        return -1
-    r.sadd(constantesPrefijosClaves.CLAVE_AMIGOS + id, idAmigo)
-    return 0
+def getUltimaCancion(r, idUsuario):
+    return r.hget(idUsuario, constantes.CLAVE_ID_ULTIMO_AUDIO)
 
-def eliminarAmigo(r, id, idAmigo):
-    if(r.exists(id) == 0 or r.exists(idAmigo) == 0):
-        return -1
-    r.srem(constantesPrefijosClaves.CLAVE_AMIGOS + id, idAmigo)
-    return 0
-
-def obtenerAmigos(r, id):
-    parar = False
-    cursor = 0
-    amigos = []
-    if(r.exists(id) == 0):
-        return -1
+def anyadirAmigo(r, idUsuario, idAmigo):
+    return anyadirRelacion(r, idUsuario, idAmigo, constantes.CLAVE_AMIGOS)
     
-    while(parar == False):
-        scan = r.sscan(constantesPrefijosClaves.CLAVE_AMIGOS + id, cursor, count = COUNT)
-        cursor = scan[0]
-        amigos.extend(scan[1])
-        if(cursor == 0):
-            parar = True
-    return amigos
+def eliminarAmigo(r, idUsuario, idAmigo):
+    return eliminarRelacion(r, idUsuario, idAmigo, constantes.CLAVE_AMIGOS)
 
-def suscribirArtista(r, id, idArtista):
-    if(r.exists(id) == 0 or r.exists(idArtista) == 0 or 
-       r.hget(idArtista, constantesPrefijosClaves.CLAVE_TIPO_USUARIO) != constantesPrefijosClaves.USUARIO_ARTISTA):
-        return -1
-    r.sadd(constantesPrefijosClaves.CLAVE_ARTISTAS + id, idArtista)
-    return 0
+def getAmigos(r, idUsuario):
+    return getRelaciones(r, idUsuario, constantes.CLAVE_AMIGOS)
 
-def desuscribirArtista(r, id, idArtista):
-    if(r.exists(id) == 0 or r.exists(idArtista) == 0 or 
-       r.hget(idArtista, constantesPrefijosClaves.CLAVE_TIPO_USUARIO) != constantesPrefijosClaves.USUARIO_ARTISTA):
-        return -1
-    r.srem(constantesPrefijosClaves.CLAVE_ARTISTAS + str(id), idArtista)
-    return 0
+def anyadirArtista(r, idUsuario, idArtista):
+    return anyadirRelacion(r, idUsuario, idArtista, constantes.CLAVE_ARTISTAS)
 
-def obtenerArtistasSuscritos(r, id):
-    if(r.exists(id) == 0):
-        return -1
+def eliminarArtista(r, idUsuario, idArtista):
+    return eliminarRelacion(r, idUsuario, idArtista, constantes.CLAVE_ARTISTAS)
+
+def getArtistas(r, idUsuario):
+    return getRelaciones(r, idUsuario, constantes.CLAVE_ARTISTAS)  
+
+def anyadirLista(r, idUsuario, idLista):
+    return anyadirRelacion(r, idUsuario, idLista, constantes.CLAVE_LISTAS)
+
+def eliminarLista(r, idUsuario, idLista):
+    return eliminarRelacion(r, idUsuario, idLista, constantes.CLAVE_LISTAS)
+
+def getListas(r, idUsuario):
+    return getRelaciones(r, idUsuario, constantes.CLAVE_LISTAS)
+
+def anyadirNotificacion(r, idUsuario, idNotificacion):
+    return anyadirRelacion(r, idUsuario, idNotificacion, constantes.CLAVE_NOTIFICACIONES)
+
+def eliminarNotificacion(r, idUsuario, idNotificacion):
+    return eliminarRelacion(r, idUsuario, idNotificacion, constantes.CLAVE_NOTIFICACIONES)
+
+def getNotificaciones(r, idUsuario):
+    return getRelaciones(r, idUsuario, constantes.CLAVE_NOTIFICACIONES)
+
+def anyadirCarpeta(r, idUsuario, idCarpeta):
+    return anyadirRelacion(r, idUsuario, idCarpeta, constantes.CLAVE_CARPETAS)
+
+def eliminarCarpeta(r, idUsuario, idCarpeta):
+    return eliminarRelacion(r, idUsuario, idCarpeta, constantes.CLAVE_CARPETAS)
+
+def getCarpetas(r, idUsuario, idCarpeta):
+    return getRelaciones(r, idUsuario, idCarpeta, constantes.CLAVE_CARPETAS)
+
+# Funciones para añadir, eliminar y obtener relaciones del usuario
+def anyadirRelacion(r, idUsuario, idRealacion, prefijoRelacion):
+    return r.sadd(prefijoRelacion + ":" + idUsuario, *idRealacion)
+
+def eliminarRelacion(r, idUsuario, idRealacion, prefijoRelacion):
+    return r.srem(prefijoRelacion + ":" + idUsuario, *idRealacion)
+
+def getRelaciones(r, idUsuario, prefijoRelacion):
     parar = False
     cursor = 0
-    artistas = []
+    relaciones = []
 
     while(parar == False):
-        scan = r.sscan(constantesPrefijosClaves.CLAVE_ARTISTAS + id, cursor, count = COUNT)
+        scan = r.sscan(prefijoRelacion + ":" + idUsuario, cursor, count=COUNT)
         cursor = scan[0]
-        artistas.extend(scan[1])
+        relaciones.extend(scan[1])
         if(cursor == 0):
             parar = True
-    return artistas  
+    return relaciones
+
+
+# Funcion adicional de artista
+def anyadirCancion(r, idUsuario, idAudio):
+    return anyadirRelacion(r, idUsuario, idAudio, constantes.CLAVE_CANCIONES)
+
+def eliminarCancion(r, idUsuario, idAudio):
+    return eliminarRelacion(r, idUsuario, idAudio, constantes.CLAVE_CANCIONES)
+
+def getCanciones(r, id):
+    return getRelaciones(r, id, constantes.CLAVE_CANCIONES)
+
+# Función adicional de administrador
+def anyadirAdministrador(r, id):
+    return r.sadd(constantes.CLAVE_ADMINISTRADORES, *id)
+
+def eliminarAdministrador(r, id):
+    return r.srem(constantes.CLAVE_ADMINISTRADORES, *id)
+
+def getAdministradores(r):
+    parar = False
+    cursor = 0
+    administradores = []
+
+    while(parar == False):
+        scan = r.sscan(constantes.CLAVE_ADMINISTRADORES, cursor, count = COUNT)
+        cursor = scan[0]
+        administradores.extend(scan[1])
+        if(cursor == 0):
+            parar = True
+    return administradores
+
+# Funciones para crear set de ulimos Audios escuchados
+def anyadirUltimoAudio(r, idUsuario, idAudio):
+    return anyadirRelacion(r, idUsuario, idAudio, constantes.CLAVE_ULTIMOS_AUDIOS)
+
+def eliminarUltimoAudio(r, idUsuario, idAudio):
+    return eliminarRelacion(r, idUsuario, idAudio, constantes.CLAVE_ULTIMOS_AUDIOS)
+
+def getIDSUltimosAudios(r, idUsuario):
+    return getRelaciones(r, idUsuario, constantes.CLAVE_ULTIMOS_AUDIOS)
+
+def setUltimoAuido(r, idUsuario, idAudio, diccionarioUltimoAudio):
+    return r.hmset(constantes.CLAVE_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, diccionarioUltimoAudio)
+
+def setSegundosUltimoAudio(r, idUsuario, idAudio, segundos):
+    return r.hset(constantes.CLAVE_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS, segundos)
+
+def getUltimoAudio(r, idUsuario, idAudio):
+    return r.hgetall(constantes.CLAVE_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
+
+def getSegundosUltimoAudio(r, idUsuario, idAudio):
+    return r.hget(constantes.CLAVE_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS)
+
+def eliminarUltimoAudio(r, idUsuario, idAudio):
+    return r.delete(constantes.CLAVE_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
+
+# Daos para crear tabla hash email | idUsuario para agilizar el inicio de sesion
+def setEmailId(r, email, idUsuario):
+    return r.hset(constantes.CLAVE_HASH_EMAIL_ID, email, idUsuario)
+
+def getIdEmailId(r, email):
+    return r.hget(constantes.CLAVE_HASH_EMAIL_ID, email)
+
+def eliminarEmailId(r, email):
+    return r.hdel(constantes.CLAVE_HASH_EMAIL_ID, email)
