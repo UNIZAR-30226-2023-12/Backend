@@ -30,9 +30,7 @@ ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1', 'localhost']
 # la peticion SetSong necesita esta memoria
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760 # 10MB
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
