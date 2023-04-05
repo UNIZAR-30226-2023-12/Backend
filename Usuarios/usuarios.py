@@ -3,17 +3,37 @@ import redis
 import DAOS.daoListas as daoListas
 import DAOS.daoUsuario as daoUsuario
 import DAOS.daoNotificaciones as daoNotificaciones
+import DAOS.daoCarpetas as daoCarpetas
 import Configuracion.constantesPrefijosClaves as constantes
+import Configuracion.constantesErroresHTTP as erroresHTTP
 
 # Funciones de usuarios normales
+
+def existeUsuario(r, id):
+    return daoUsuario.existeUsuario(r, id)
+
+def existeNotificacion(r, id):
+    return daoNotificaciones.existeNotificacion(r, id)
+
+def existeLista(r, id):
+    return daoListas.existeLista(r, id)
+
+def existeCarpeta(r, id):
+    return daoCarpetas.existeCarpeta(r, id)
+
+
 def setUser(r, usuarioDiccionario):
     id = daoUsuario.getIdContador(r)
     usuarioDiccionario.add(constantes.CLAVE_ID_USUARIO, id)
+
+    if(usuarioDiccionario.keys().sort() != daoUsuario.listaClaves.sort()):
+        return erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS
+
     # Si el usuario es administrador lo añadimos a la lista de administradores
     if(usuarioDiccionario[constantes.CLAVE_TIPO_USUARIO] == constantes.USUARIO_ADMINISTRADOR):
         daoUsuario.anyadirAdministrador(r, id)
     daoUsuario.setUsuario(r, usuarioDiccionario)
-    return 1
+    return erroresHTTP.OK
 
 def removeUser(r, id, contrasenya):
     if(r.exists(id) == 0):
@@ -52,8 +72,9 @@ def AskAdminToBeArtist(r, idUsuario):
     return 1
     
 def ValidateUser(r, id, contrasenya):
-    if (r.exists(id) == 0):
-        return -2
+    if (existeUsuario(r, id) == False): 
+        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
+    
     if (daoUsuario.getContrasenya(r, id) == contrasenya):
         return 1
     return -1
@@ -93,19 +114,28 @@ def acceptArtist(r, idUsuario, idNotificacion):
 
 
 # Funciones de listas de reproducción
-def setLista(r, idUsuario, diccionarioLista):
-    if (r.exists(idUsuario) == 0):
-        return -1
+def setLista(r, diccionarioLista):
     id = daoListas.getIdContador(r)
     diccionarioLista.add(constantes.CLAVE_ID_LISTA, id)
-    return daoListas.setLista(r, diccionarioLista) 
+
+    if(diccionarioLista.keys().sort() != daoListas.listaClaves.sort()):
+        return erroresHTTP.ERROR_LISTA_PARAMETROS_INCORRECTOS
+    
+    daoListas.setLista(r, diccionarioLista) 
+    return erroresHTTP.OK
+
+def setNombreLista(r, idLista, nombre):
+    if (existeLista(r, idLista) == False):
+        return erroresHTTP.ERROR_LISTA_NO_ENCONTRADA
+    
+    return daoListas.setNombreLista(r, idLista, nombre)
 
 def setSongLista(r, idLista, idAudio):
-    if (r.exists(idAudio) == 0):
-        return -3
-    if (r.exists(idLista) == 0):
-        return -1
-    return daoListas.anyadirAudioLista(r, idLista, idAudio)
+    if(existeLista(r, idLista) == False):
+        return erroresHTTP.ERROR_LISTA_NO_ENCONTRADA
+    daoListas.anyadirAudioLista(r, idLista, idAudio)
+
+    return erroresHTTP.OK
 
 def setPrivacyLista(r, idUsuario, idLista, publica):
     if (r.exists(idUsuario) == 0):
@@ -115,7 +145,7 @@ def setPrivacyLista(r, idUsuario, idLista, publica):
     daoListas.setPrivacidadLista(r, idLista, publica)
     return 1
 
-def removListaRepUsr(r, idUsuario, idLista):
+def removeLista(r, idUsuario, idLista):
     if (r.exists(idUsuario) == 0):
         return -2
     if (r.exists(idLista) == 0):
@@ -142,5 +172,4 @@ def removeSongLista(r, idUsuario, idLista, idAudio):
         return -1
     return daoListas.eliminarAudioLista(r, idLista, idAudio)
 
-def changeNameListRepUsr(r, idLista, nombre):
-    return daoListas.setNombreLista(r, idLista, nombre)
+

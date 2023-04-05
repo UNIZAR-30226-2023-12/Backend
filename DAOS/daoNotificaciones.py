@@ -14,6 +14,10 @@ def getIdContador(r):
     id = pipe.execute()[0]
     return id
 
+def existeNotificacion(r, id):
+    if(r.exists(id) == 0):
+        return False
+    return True
 
 def setNotificacion(r, notificacionDiccionario):
     id = notificacionDiccionario[constantes.CLAVE_ID_NOTIFICACION]
