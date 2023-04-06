@@ -2,9 +2,6 @@ from django.shortcuts import render
 from django.http import JsonResponse
 import json
 import redis
-from DAOS import daoAudio
-from DAOS import daoUsuario
-from DAOS import daoGlobal
 
 from Configuracion import constantesPrefijosClaves as constantes
 from Configuracion import constantesErroresHTTP as erroresHTTP
@@ -111,7 +108,7 @@ def ValidateUser(request):
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-def setLista(request):
+def SetLista(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
@@ -129,7 +126,7 @@ def setLista(request):
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-def changeNameListRepUsr(request):
+def ChangeNameListRepUsr(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
@@ -150,7 +147,7 @@ def changeNameListRepUsr(request):
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-def setSongLista(request):
+def SetSongLista(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
@@ -162,7 +159,7 @@ def setSongLista(request):
             return respuesta
         
         idAudio = json_data[constantes.CLAVE_ID_AUDIO]
-        if (daoAudio.existeCancion(r, idAudio) == False):
+        if (moduloAudios.existeCancion(r, idAudio) == False):
             return JsonResponse({'error': 'No existe el audio'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
         
         idLista = json_data[constantes.CLAVE_ID_LISTA]
