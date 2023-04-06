@@ -8,6 +8,8 @@
 #########################################################################################
 
 # Fichero de constantes simbólicas
+NUMERO_GENEROS = 10
+
 
 # Constantes simbólicas de las claves de los atributos de usuario
 CLAVE_CONTADOR_USUARIOS = "contadorUsuarios"
