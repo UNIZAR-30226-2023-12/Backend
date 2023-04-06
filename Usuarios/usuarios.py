@@ -76,8 +76,8 @@ def ValidateUser(r, id, contrasenya):
         return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
     
     if (daoUsuario.getContrasenya(r, id) == contrasenya):
-        return 1
-    return -1
+        return erroresHTTP.OK
+    return erroresHTTP.ERROR_CONTRASENYA_INCORRECTA
 
 def setLastSecondHeard(r, idUsuario, idAudio, segundo):
     if (r.exists(idUsuario) == 0 or r.exists(idAudio) == 0):
