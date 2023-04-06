@@ -76,13 +76,15 @@ def obtenerFicheroCancion(r, id, calidad):
     # Obtengo el diccionario de la canción
     cal = controlAudios.obtenerCalCancion(r, id)
 
-    # Obtengo el fichero de la canción
-    if calidad == 'alta' and cal == 'alta':
-        fichero = controlAudios.obtenerAltaCalidadCancion(r, id)
-    else:
-        fichero = controlAudios.obtenerBajaCalidadCancion(r, id)
-
-    return fichero
+    listaFicheros = []
+    for ids in id:
+        cal = controlAudios.obtenerCalCancion(r, ids)
+        if cal == 'alta' and calidad == 'alta':
+            listaFicheros.append(controlAudios.obtenerAltaCalidadCancion(r, ids))
+        else:
+            listaFicheros.append(controlAudios.obtenerBajaCalidadCancion(r, ids))
+    
+    return listaFicheros
 
 # Función para cambiar los atributos de una canción
 # Si alguno de los valores disponibles no se quiere cambiar, se debe pasar como None en el dic (salvo el id)

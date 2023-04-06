@@ -52,6 +52,34 @@ def GetSong(request):
     else:
         # Gets the serialized audio
         return JsonResponse({'fichero': fichero})
+    
+# View que devuelve una lista de canciones
+@csrf_exempt
+def GetSongs(request):
+    # Compruebo que el método sea GET
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    listaIDs = request.GET.get('listaIDs')
+    calidadAlta = request.GET.get('calidadAlta')
+    esCancion = request.GET.get('esCancion')
+
+    if esCancion == "True":
+        if calidadAlta == "True":
+            ficheros = moduloAudios.obtenerFicheroCanciones(r, listaIDs, 'alta')
+        elif calidadAlta == "False":
+            ficheros = moduloAudios.obtenerFicheroCanciones(r, listaIDs, 'baja')
+    elif esCancion == "False":
+        if calidadAlta == "True":
+            ficheros = moduloAudios.obtenerFicheroPodcasts(r, listaIDs, 'alta')
+        elif calidadAlta == "False":
+            ficheros = moduloAudios.obtenerFicheroPodcasts(r, listaIDs, 'baja')
+    
+    if ficheros == 419 or ficheros == 424 or ficheros == 430 or ficheros == 425:
+        return JsonResponse({'error': 'Ha ocurrido un problema'}, status=ficheros)
+    else:
+        # Gets the serialized audio
+        return JsonResponse({'ficheros': ficheros})
 
 # View para añadir una canción a la base de datos
 @csrf_exempt
@@ -60,11 +88,8 @@ def SetSong(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    contrasenya = request.POST.get('passwd')
-    usuario = request.POST.get('usr')
-    # Compruebo que el usuario sea válido
-    status = usuarios.ValidateUser(r, usuario, contrasenya)
-    if status == erroresHTTP.OK:
+    respuesta = ValidateUser(request)
+    if respuesta.status_code == erroresHTTP.OK:
         # Parseo el JSON de la petición
         json_data = json.loads(request.body)
 
@@ -73,9 +98,9 @@ def SetSong(request):
         if status != 0:
             return JsonResponse({'error': 'Ha ocurrido un problema'}, status=status)
 
-        return JsonResponse({'msg' 'Cancion añadida correctamente'}, status=200)
+        return JsonResponse({'msg' 'Cancion añadida correctamente'}, status=erroresHTTP.OK)
     else:
-        return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=status)
+        return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=respuesta.status_code)
    
 def SetUser(request):
     if request.method == 'POST':
