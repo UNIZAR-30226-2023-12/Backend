@@ -166,10 +166,10 @@ def getListaRepUsr(r, idLista):
     return daoListas.getLista(r, idLista)
 
 def removeSongLista(r, idUsuario, idLista, idAudio):
-    if(r.exists(idUsuario) == 0):
-        return -2
-    if(r.exists(idLista) == 0):
-        return -1
-    return daoListas.eliminarAudioLista(r, idLista, idAudio)
+    if (daoListas.existeLista(r, idLista) == False):
+        return erroresHTTP.ERROR_LISTA_NO_ENCONTRADA
+    
+    daoListas.eliminarAudioLista(r, idLista, idAudio)
+    return erroresHTTP.OK
 
 

@@ -2,9 +2,6 @@ from django.shortcuts import render
 from django.http import JsonResponse
 import json
 import redis
-from DAOS import daoAudio
-from DAOS import daoUsuario
-from DAOS import daoGlobal
 
 from Configuracion import constantesPrefijosClaves as constantes
 from Configuracion import constantesErroresHTTP as erroresHTTP
@@ -55,6 +52,34 @@ def GetSong(request):
     else:
         # Gets the serialized audio
         return JsonResponse({'fichero': fichero})
+    
+# View que devuelve una lista de canciones
+@csrf_exempt
+def GetSongs(request):
+    # Compruebo que el método sea GET
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    listaIDs = request.GET.get('listaIDs')
+    calidadAlta = request.GET.get('calidadAlta')
+    esCancion = request.GET.get('esCancion')
+
+    if esCancion == "True":
+        if calidadAlta == "True":
+            ficheros = moduloAudios.obtenerFicheroCanciones(r, listaIDs, 'alta')
+        elif calidadAlta == "False":
+            ficheros = moduloAudios.obtenerFicheroCanciones(r, listaIDs, 'baja')
+    elif esCancion == "False":
+        if calidadAlta == "True":
+            ficheros = moduloAudios.obtenerFicheroPodcasts(r, listaIDs, 'alta')
+        elif calidadAlta == "False":
+            ficheros = moduloAudios.obtenerFicheroPodcasts(r, listaIDs, 'baja')
+    
+    if ficheros == 419 or ficheros == 424 or ficheros == 430 or ficheros == 425:
+        return JsonResponse({'error': 'Ha ocurrido un problema'}, status=ficheros)
+    else:
+        # Gets the serialized audio
+        return JsonResponse({'ficheros': ficheros})
 
 # View para añadir una canción a la base de datos
 @csrf_exempt
@@ -63,10 +88,8 @@ def SetSong(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    contrasenya = request.POST.get('passwd')
-    usuario = request.POST.get('usr')
-    # Compruebo que el usuario sea válido
-    if usuarios.ValidateUser(r, usuario, contrasenya) == 1:
+    respuesta = ValidateUser(request)
+    if respuesta.status_code == erroresHTTP.OK:
         # Parseo el JSON de la petición
         json_data = json.loads(request.body)
 
@@ -75,9 +98,9 @@ def SetSong(request):
         if status != 0:
             return JsonResponse({'error': 'Ha ocurrido un problema'}, status=status)
 
-        return JsonResponse({'msg' 'Cancion añadida correctamente'}, status=200)
+        return JsonResponse({'msg' 'Cancion añadida correctamente'}, status=erroresHTTP.OK)
     else:
-        return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=401)
+        return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=respuesta.status_code)
    
 def SetUser(request):
     if request.method == 'POST':
@@ -111,7 +134,7 @@ def ValidateUser(request):
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-def setLista(request):
+def SetLista(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
@@ -129,7 +152,7 @@ def setLista(request):
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-def changeNameListRepUsr(request):
+def ChangeNameListRepUsr(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
@@ -150,7 +173,7 @@ def changeNameListRepUsr(request):
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-def setSongLista(request):
+def SetSongLista(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
@@ -162,7 +185,7 @@ def setSongLista(request):
             return respuesta
         
         idAudio = json_data[constantes.CLAVE_ID_AUDIO]
-        if (daoAudio.existeCancion(r, idAudio) == False):
+        if (moduloAudios.existeCancion(r, idAudio) == False):
             return JsonResponse({'error': 'No existe el audio'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
         
         idLista = json_data[constantes.CLAVE_ID_LISTA]
@@ -173,5 +196,51 @@ def setSongLista(request):
     else:
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+def GetListaRepUsr(request):
+    if request.method == 'GET':
+        # Parse the JSON data from the request body
+        json_data = json.loads(request.body)
+
+        # Compruebo que el usuario sea válido
+        respuesta = ValidateUser(r, request)
+        # Si no es valido devuelvo el error
+        if (respuesta != erroresHTTP.OK):
+            return respuesta
+        
+        idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+
+        # Stores the user in the database
+        lista = usuarios.getListasUsr(r, idUsuario)
+        
+        return JsonResponse({constantes.CLAVE_LISTAS: lista}, status=erroresHTTP.OK)
+    else:
+        # Return a 405 Method Not Allowed response for other HTTP methods
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+def RemoveSongLista(request):
+    if request.method == 'POST':
+        # Parse the JSON data from the request body
+        json_data = json.loads(request.body)
+
+        # Compruebo que el usuario sea válido
+        respuesta = ValidateUser(r, request)
+        # Si no es valido devuelvo el error
+        if (respuesta.status_code != erroresHTTP.OK):
+            return respuesta
+        
+        idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+        idLista = json_data[constantes.CLAVE_ID_LISTA]
+        # Stores the user in the database
+        status = usuarios.removeSongLista(r, idLista, idAudio)
+        
+        return JsonResponse({'status': status}, status=status)
+    else:
+        # Return a 405 Method Not Allowed response for other HTTP methods
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+
+    
+
         
         
