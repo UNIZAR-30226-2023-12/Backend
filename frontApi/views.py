@@ -6,6 +6,9 @@ from DAOS import daoAudio
 from DAOS import daoUsuario
 from DAOS import daoGlobal
 
+from Configuracion import constantesPrefijosClaves as constantes
+from Configuracion import constantesErroresHTTP as erroresHTTP
+
 from Audios import moduloAudios
 from Usuarios import usuarios
 
@@ -75,6 +78,8 @@ def SetUser(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
+
+        
         
         # Stores the user in the database
         status = usuarios.setUser(r, json_data)
@@ -90,11 +95,76 @@ def ValidateUser(request):
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
         
-        # Stores the user in the database
-        status = usuarios.ValidateUser(r, json_data)
+        idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+        contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+        # Validates the user
+        status = usuarios.ValidateUser(r, idUsuario, contrasenya)
         
         return JsonResponse({'status': status}, status=status)
 
+    else:
+        # Return a 405 Method Not Allowed response for other HTTP methods
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+def setLista(request):
+    if request.method == 'POST':
+        # Parse the JSON data from the request body
+        json_data = json.loads(request.body)
+        
+        # Compruebo que el usuario sea válido
+        respuesta = ValidateUser(r, request)
+        # Si no es valido devuelvo el error
+        if (respuesta != erroresHTTP.OK):
+            return respuesta
+        # Stores the list in the database
+        status = usuarios.setLista(r, json_data)
+        
+        return JsonResponse({'status': status}, status=status)
+    else:
+        # Return a 405 Method Not Allowed response for other HTTP methods
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+def changeNameListRepUsr(request):
+    if request.method == 'POST':
+        # Parse the JSON data from the request body
+        json_data = json.loads(request.body)
+
+        # Compruebo que el usuario sea válido
+        respuesta = ValidateUser(r, request)
+        # Si no es valido devuelvo el error
+        if (respuesta != erroresHTTP.OK):
+            return respuesta
+        
+        idLista = json_data[constantes.CLAVE_ID_LISTA]
+        nombre = json_data[constantes.CLAVE_NOMBRE_LISTA]
+        # Stores the user in the database
+        status = usuarios.setNombreLista(r, idLista, nombre)
+        
+        return JsonResponse({'status': status}, status=status)
+    else:
+        # Return a 405 Method Not Allowed response for other HTTP methods
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+def setSongLista(request):
+    if request.method == 'POST':
+        # Parse the JSON data from the request body
+        json_data = json.loads(request.body)
+
+        # Compruebo que el usuario sea válido
+        respuesta = ValidateUser(r, request)
+        # Si no es valido devuelvo el error
+        if (respuesta != erroresHTTP.OK):
+            return respuesta
+        
+        idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+        if (daoAudio.existeCancion(r, idAudio) == False):
+            return JsonResponse({'error': 'No existe el audio'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
+        
+        idLista = json_data[constantes.CLAVE_ID_LISTA]
+        # Stores the user in the database
+        status = usuarios.setSongLista(r, idLista, idAudio)
+        
+        return JsonResponse({'status': status}, status=status)
     else:
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
