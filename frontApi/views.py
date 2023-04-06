@@ -171,5 +171,51 @@ def SetSongLista(request):
     else:
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+def GetListaRepUsr(request):
+    if request.method == 'GET':
+        # Parse the JSON data from the request body
+        json_data = json.loads(request.body)
+
+        # Compruebo que el usuario sea válido
+        respuesta = ValidateUser(r, request)
+        # Si no es valido devuelvo el error
+        if (respuesta != erroresHTTP.OK):
+            return respuesta
+        
+        idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+
+        # Stores the user in the database
+        lista = usuarios.getListasUsr(r, idUsuario)
+        
+        return JsonResponse({constantes.CLAVE_LISTAS: lista}, status=erroresHTTP.OK)
+    else:
+        # Return a 405 Method Not Allowed response for other HTTP methods
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+def RemoveSongLista(request):
+    if request.method == 'POST':
+        # Parse the JSON data from the request body
+        json_data = json.loads(request.body)
+
+        # Compruebo que el usuario sea válido
+        respuesta = ValidateUser(r, request)
+        # Si no es valido devuelvo el error
+        if (respuesta.status_code != erroresHTTP.OK):
+            return respuesta
+        
+        idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+        idLista = json_data[constantes.CLAVE_ID_LISTA]
+        # Stores the user in the database
+        status = usuarios.removeSongLista(r, idLista, idAudio)
+        
+        return JsonResponse({'status': status}, status=status)
+    else:
+        # Return a 405 Method Not Allowed response for other HTTP methods
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+
+    
+
         
         
