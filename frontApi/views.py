@@ -63,7 +63,8 @@ def SetSong(request):
     contrasenya = request.POST.get('passwd')
     usuario = request.POST.get('usr')
     # Compruebo que el usuario sea válido
-    if usuarios.ValidateUser(r, usuario, contrasenya) == 1:
+    status = usuarios.ValidateUser(r, usuario, contrasenya)
+    if status == erroresHTTP.OK:
         # Parseo el JSON de la petición
         json_data = json.loads(request.body)
 
@@ -74,7 +75,7 @@ def SetSong(request):
 
         return JsonResponse({'msg' 'Cancion añadida correctamente'}, status=200)
     else:
-        return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=401)
+        return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=status)
    
 def SetUser(request):
     if request.method == 'POST':
