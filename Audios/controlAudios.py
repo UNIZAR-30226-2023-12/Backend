@@ -29,7 +29,7 @@ def IDUltimoAudio(r):
 # Función para almacenar una canción
 def almacenarCancion(r, cancionDic):
     # Antes de guardar compruebo si el diccionario contiene todas las claves necesarias
-    if 'id' not in cancionDic or 'nombre' not in cancionDic or 'artista' not in cancionDic or 'calidad' not in cancionDic or 'nVeces' not in cancionDic or 'val' not in cancionDic or 'generos' not in cancionDic or 'ficheroAltaCalidad' not in cancionDic or 'ficheroBajaCalidad' not in cancionDic or 'longitud' not in cancionDic:
+    if 'id' not in cancionDic or 'nombre' not in cancionDic or 'artista' not in cancionDic or 'calidad' not in cancionDic or 'nVeces' not in cancionDic or 'val' not in cancionDic or 'generos' not in cancionDic or 'ficheroAltaCalidad' not in cancionDic or 'ficheroBajaCalidad' not in cancionDic or 'longitud' not in cancionDic or 'numFavoritos' not in cancionDic or 'esPodcast' not in cancionDic:
         return constantesErroresHTTP.ERROR_CANCION_ELEMENTOS_FALTANTES
     else:
         if cancionDic['id'] == '':
@@ -39,7 +39,7 @@ def almacenarCancion(r, cancionDic):
     
 # Función para cambiar los valores de una canción
 # Si alguno de los valores no se quiere cambiar, se debe pasar como parámetro None (salvo el id)
-def cambiarAtributosCancion(r, id, nombre, artista, calidad, nVeces, val, generos, ficheroAltaCalidad, ficheroBajaCalidad, longitud):
+def cambiarAtributosCancion(r, id, nombre, artista, calidad, nVeces, val, generos, ficheroAltaCalidad, ficheroBajaCalidad, longitud, numFavoritos, esPodcast):
     # Compruebo que la canción existe y que el id no sea vacío
     if id == '':
         return constantesErroresHTTP.ERROR_CANCION_ELEMENTOS_VACIOS
@@ -82,6 +82,14 @@ def cambiarAtributosCancion(r, id, nombre, artista, calidad, nVeces, val, genero
         if longitud == '':
             return constantesErroresHTTP.ERROR_CANCION_ELEMENTOS_VACIOS
         daoAudio.cambiarLongitudCancion(r, id, longitud)
+    if numFavoritos != None:
+        if numFavoritos == '':
+            return constantesErroresHTTP.ERROR_CANCION_ELEMENTOS_VACIOS
+        daoAudio.cambiarNumFavoritosCancion(r, id, numFavoritos)
+    if esPodcast != None:
+        if esPodcast == '':
+            return constantesErroresHTTP.ERROR_CANCION_ELEMENTOS_VACIOS
+        daoAudio.cambiarEsPodcastCancion(r, id, esPodcast)
     return 0
     
 # Función para eliminar una canción
@@ -194,7 +202,32 @@ def obtenerBajaCalidadCancion(r, id):
 
 # Función para obtener la longitud de una canción
 def obtenerLongitudCancion(r, id):
+    if id == '':
+        return constantesErroresHTTP.ERROR_CANCION_ELEMENTOS_VACIOS
+    if daoAudio.existeCancion(r, id) == False:
+        return constantesErroresHTTP.ERROR_CANCION_NO_ENCONTRADA
+
     return daoAudio.obtenerLongitudCancion(r, id)
+
+# Función para obtener numFavoritos de una canción
+def obtenerNumFavoritosCancion(r, id):
+    if id == '':
+        return constantesErroresHTTP.ERROR_CANCION_ELEMENTOS_VACIOS
+    if daoAudio.existeCancion(r, id) == False:
+        return constantesErroresHTTP.ERROR_CANCION_NO_ENCONTRADA
+
+    return daoAudio.obtenerNumFavoritosCancion(r, id)
+
+# Función para obtener si un audio esPodcast
+def obtenerEsPodcast(r, id):
+    if id == '':
+        return constantesErroresHTTP.ERROR_CANCION_ELEMENTOS_VACIOS
+    if daoAudio.existeCancion(r, id) == False:
+        return constantesErroresHTTP.ERROR_CANCION_NO_ENCONTRADA
+    elif daoAudio.existePodcast(r, id) == False:
+        return constantesErroresHTTP.ERROR_PODCAST_NO_ENCONTRADO
+
+    return daoAudio.obtenerEsPodcast(r, id)
 
 ##############################################################################################################
 #
@@ -211,7 +244,7 @@ def existePodcast(r, id):
 # Función para almacenar un podcast
 def almacenarPodcast(r, podcastDic):
     # Compruebo que el diccionario tenga los atributos necesarios
-    if 'id' not in podcastDic or 'nombre' not in podcastDic or 'artista' not in podcastDic or 'calidad' not in podcastDic or 'nVeces' not in podcastDic or 'val' not in podcastDic or 'desc' not in podcastDic or 'ficheroAltaCalidad' not in podcastDic or 'ficheroBajaCalidad' not in podcastDic or 'generos' not in podcastDic or 'longitud' not in podcastDic:
+    if 'id' not in podcastDic or 'nombre' not in podcastDic or 'artista' not in podcastDic or 'calidad' not in podcastDic or 'nVeces' not in podcastDic or 'val' not in podcastDic or 'desc' not in podcastDic or 'ficheroAltaCalidad' not in podcastDic or 'ficheroBajaCalidad' not in podcastDic or 'generos' not in podcastDic or 'longitud' not in podcastDic or 'esPodcast' not in podcastDic or 'numFavoritos' not in podcastDic:
         return constantesErroresHTTP.ERROR_PODCAST_ELEMENTOS_FALTANTES
     else:
         # Compruebo que el id no esté vacío
@@ -222,7 +255,7 @@ def almacenarPodcast(r, podcastDic):
 
 # Función para cambiar los valores de un podcast
 # Si alguno de los valores no se quiere cambiar, se debe pasar como parámetro None (salvo el id)
-def cambiarAtributosPodcast(r, id, nombre, artista, calidad, nVeces, val, descripcion, ficheroAltaCalidad, ficheroBajaCalidad, longitud, generos):
+def cambiarAtributosPodcast(r, id, nombre, artista, calidad, nVeces, val, descripcion, ficheroAltaCalidad, ficheroBajaCalidad, longitud, generos, esPodcast, numFavoritos):
     # Compruebo que el id no esté vacío y que el podcast exista
     if id == '':
         return constantesErroresHTTP.ERROR_PODCAST_ELEMENTOS_VACIOS
@@ -268,6 +301,14 @@ def cambiarAtributosPodcast(r, id, nombre, artista, calidad, nVeces, val, descri
         if generos == '':
             return constantesErroresHTTP.ERROR_PODCAST_ELEMENTOS_VACIOS
         daoAudio.cambiarGeneroPodcast(r, id, generos)
+    if esPodcast != None:
+        if esPodcast == '':
+            return constantesErroresHTTP.ERROR_PODCAST_ELEMENTOS_VACIOS
+        daoAudio.cambiarEsPodcastPodcast(r, id, esPodcast)
+    if numFavoritos != None:
+        if numFavoritos == '':
+            return constantesErroresHTTP.ERROR_PODCAST_ELEMENTOS_VACIOS
+        daoAudio.cambiarNumFavoritosPodcast(r, id, numFavoritos)
     return 0
 
 # Función para eliminar un podcast
@@ -385,3 +426,12 @@ def obtenerGenerosPodcast(r, id):
     if daoAudio.existePodcast(r, id) == False:
         return constantesErroresHTTP.ERROR_PODCAST_NO_ENCONTRADO
     return daoAudio.obtenerGenerosPodcast(r, id)
+
+# Función para obtener el número de favoritos de un podcast
+def obtenerFavoritosPodcast(r, id):
+    # Compruebo que el id no esté vacío y que el podcast exista
+    if id == '':
+        return constantesErroresHTTP.ERROR_PODCAST_ELEMENTOS_VACIOS
+    if daoAudio.existePodcast(r, id) == False:
+        return constantesErroresHTTP.ERROR_PODCAST_NO_ENCONTRADO
+    return daoAudio.obtenerNumFavoritosPodcast(r, id)

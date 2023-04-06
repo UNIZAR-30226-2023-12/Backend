@@ -28,6 +28,9 @@ import Configuracion.constantesPrefijosClaves as constantes
 #   - generos
 #   - ficheroAltaCalidad
 #   - ficheroBajaCalidad
+#   - longitud
+#   - numFavoritos
+#   - esPodcast
 #
 #
 #########################################################################################
@@ -99,6 +102,16 @@ def cambiarLongitudCancion(r, id, longitud):
     r.hset(id, 'longitud', longitud)    
     return 0
 
+# Funcion para cambiar el numero de favoritos de una canción
+def cambiarNumFavoritosCancion(r, id, numFavoritos):
+    r.incrby(id, 'numFavoritos', numFavoritos)
+    return 0
+
+# Funcion para cambiar el atributo esPodcast de un audio
+def cambiarEsPodcast(r, id, esPodcast):
+    r.hset(id, 'esPodcast', esPodcast)
+    return 0
+
 # Funcion para eliminar una cancion
 def eliminarCancion(r, id):
     r.delete(id)     
@@ -152,6 +165,14 @@ def obtenerFicheroBajaCalidad(r, id):
 def obtenerLongitudCancion(r, id):
     return r.hget(id, 'longitud')
 
+# Funcion para obtener el numero de favoritos de una cancion
+def obtenerNumFavoritosCancion(r, id):
+    return r.hget(id, 'numFavoritos')
+
+# Funcion para obtener el atributo esPodcast de un audio
+def obtenerEsPodcast(r, id):
+    return r.hget(id, 'esPodcast')
+
 #########################################################################################
 #
 #
@@ -166,6 +187,9 @@ def obtenerLongitudCancion(r, id):
 #   - desc
 #  - ficheroAltaCalidad
 #  - ficheroBajaCalidad
+#  - longitud
+#  - numFavoritos
+#  - esPodcast
 #
 #
 #########################################################################################
@@ -237,6 +261,11 @@ def cambiarLongitudPodcast(r, id, longitud):
     r.hset(id, 'longitud', longitud)
     return 0
 
+# Funcion para cambiar el numero de favoritos de un podcast
+def cambiarNumFavoritosPodcast(r, id, numFavoritos):
+    r.incrby(id, 'numFavoritos', numFavoritos)
+    return 0
+
 # Funcion para eliminar un podcast
 def eliminarPodcast(r, id):
     r.delete(id)
@@ -293,3 +322,7 @@ def obtenerGeneroPodcast(r, id):
 # Funcion para obtener la longitud de un podcast
 def obtenerLongitudPodcast(r, id):
     return r.hget(id, 'longitud')
+
+# Funcion para obtener el numero de favoritos de un podcast
+def obtenerNumFavoritosPodcast(r, id):
+    return r.hget(id, 'numFavoritos')
