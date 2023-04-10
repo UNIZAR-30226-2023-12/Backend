@@ -8,6 +8,28 @@
 #########################################################################################
 
 # Fichero de constantes simbólicas
+GENERO_POP = 0
+GENERO_ROCK = 1
+GENERO_METAL = 2
+GENERO_RAP = 3
+GENERO_REGGAE = 4
+GENERO_JAZZ = 5
+GENERO_BLUES = 6
+GENERO_CLASICA = 7
+GENERO_ELECTRONICA = 8
+GENERO_FOLK = 9
+GENERO_LATINA = 10
+GENERO_INDIE = 11
+GENERO_COUNTRY = 12
+GENERO_AMBIENT = 13
+GENERO_TRAP = 14
+GENERO_DANCE = 15
+GENERO_HIPHOP = 16
+GENERO_RNB = 17
+GENERO_SOUL = 18
+GENERO_PUNK = 19
+GENERO_FUNK = 20
+
 
 # Constantes simbólicas de las claves de los atributos de usuario
 CLAVE_CONTADOR_USUARIOS = "contadorUsuarios"
@@ -84,7 +106,7 @@ CLAVE_NOMBRE_LISTA = "nombreLista"
 CLAVE_PRIVACIDAD_LISTA = "privada"
 CLAVE_TIPO_LISTA = "tipoLista"
 LISTA_TIPO_REPRODUCCION = "listaReproduccion"
-LISTA_TIPO_FAVORTIOS = "listaFavoritos"
+LISTA_TIPO_FAVORITOS = "listaFavoritos"
 LISTA_TIPO_RANKING = "listaRanking"
 LISTA_PRIVADA = "privada"
 LISTA_PUBLICA = "publica"
