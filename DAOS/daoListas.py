@@ -94,7 +94,7 @@ def getTipoLista(r, id):
     return r.hget(id, constantes.CLAVE_TIPO_LISTA)
 
 # Funcion para obtener las canciones de una playlist
-def getCacnionesLista(r, id):
+def getAudiosLista(r, id):
     stop = False
     iterador = 0
     canciones = []

@@ -1,5 +1,5 @@
 from Usuarios import usuarios
-from Audios import audios
+from Audios import controlAudios as audios
 from Configuracion import constantesPrefijosClaves as conf
 import numpy as np
 from DAOS import daoGlobal
@@ -67,7 +67,7 @@ def get_training_data():
 # Devuelve una lista de python con los datos de entrada
 def get_audio_prediction_state(id_usr, id_audio):
 
-    esFavorito = audios.esFavorito(id_usr, id_audio)        # 1 si es favorito del usuario, 0 si no
+    esFavorito = usuarios.esFavorito(id_usr, id_audio)        # 1 si es favorito del usuario, 0 si no
     estaGuardado = audios.estaGuardado(id_usr, id_audio)    # 1 si esta guardado en la biblioteca del usuario, 0 si no
     valoracion_media = audios.getValoracionMedia(id_audio)  # Valoración media del audio
     es_podcast = audios.esPodcast(id_audio)                 # 1 si es podcast, 0 si no

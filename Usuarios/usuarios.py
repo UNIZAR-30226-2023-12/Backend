@@ -4,6 +4,7 @@ import DAOS.daoListas as daoListas
 import DAOS.daoUsuario as daoUsuario
 import DAOS.daoNotificaciones as daoNotificaciones
 import DAOS.daoCarpetas as daoCarpetas
+import DAOS.daoAudio as daoAudios
 import Configuracion.constantesPrefijosClaves as constantes
 import Configuracion.constantesErroresHTTP as erroresHTTP
 
@@ -171,5 +172,55 @@ def removeSongLista(r, idUsuario, idLista, idAudio):
     
     daoListas.eliminarAudioLista(r, idLista, idAudio)
     return erroresHTTP.OK
+
+
+# Funciones para recomendador
+def esFavorito(r, idUsuario, idAudio):
+    if(idAudio in getAudiosFavoritos(r, idUsuario)):
+        return 1
+    return 0
+
+def estaGuardado(r, idUsuario, idAudio):
+    listas = daoUsuario.getListas(r, idUsuario)
+    for idLista in listas:
+        if(daoListas.getTipoLista(r, idLista) != constantes.LISTA_TIPO_FAVORITOS):
+            if(idAudio in daoListas.getAudios(r, idLista)):
+                return 1
+    return 0
+
+def estaSuscrito(r, idUsuario, idArtista):
+    artistas = daoUsuario.getArtistas(r, idUsuario)
+    if(idArtista in artistas):
+        return 1
+    return 0
+
+def getNFavoritosPorGenero(r, idUsuario, genero):
+    n = 0
+    for idAudio in getAudiosFavoritos(r, idUsuario):
+        if(daoAudios.obtenerGeneroCancion(r, idAudio) == genero):
+            n = n + 1
+    return n
+
+def getNFavoritosPorArtista(r, idUsuario, idArtista):
+    n = 0
+    for idAudio in getAudiosFavoritos(r, idUsuario):
+        if(idAudio in daoUsuario.getCanciones(r, idArtista)):
+            n = n + 1
+    return n
+
+def getNFavoritos(r ,idUsuario):
+    return len(getAudiosFavoritos(r, idUsuario))
+
+def getAmigos(r, idUsuario):
+    return daoUsuario.getAmigos(r, idUsuario)
+
+def getAudiosFavoritos(r, idUsuario):
+    listas = daoUsuario.getListas(r, idUsuario)
+    audios = []
+    for idLista in listas:
+        if(daoListas.getTipoLista(r, idLista) == constantes.LISTA_TIPO_FAVORITOS):
+            audios = daoListas.getAudios(r, idLista)
+    return audios
+
 
 
