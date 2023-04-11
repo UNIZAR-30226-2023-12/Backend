@@ -6,12 +6,48 @@ import numpy as np
 
 
 def create_model(conn):
-    # Carga los datos de entrenamiento
+    # Carga los datos de entrenamiento, 
+    # cada Xtr compuesto por una pareja 
+    # [información del audio actual, información de los audios anteriores]
     Xtr, ytr = data_gen.get_training_data(conn)
+    
 
-    #############  CREACIÓN DEL MODELO  #############
+    
+    ################  CREACIÓN DEL MODELO  ################
 
-    capa_entrada_actual = keras.models.Sequential([
-        keras.layers.Dense(3, input_shape=(Xtr.shape[1], Xtr.shape[2]), activation="relu"),
+    input_shape_actual = np.shape(Xtr[0, 0]) # [Ejemplo inicial, información actual del ejemplo] 
+    input_shape_temporal = np.shape(Xtr[0, 1]) # [Ejemplo inicial, información temporal del ejemplo]
+
+
+    ########## Capas de entrada ##########
+    capa_actual = keras.models.Sequential([
+        keras.layers.InputLayer(input_shape=input_shape_actual),
         keras.layers.Dense(3, activation="relu"),
+        keras.layers.Dense(3, activation="relu"),  
     ])
+
+    capa_temporal = keras.models.Sequential([
+        keras.layers.InputLayer(input_shape=input_shape_temporal),
+        keras.layers.LSTM(3)
+    ])
+
+
+    ########## Capas de salida ##########
+    capa_combinada = keras.layers.concatenate([capa_actual.output, capa_temporal.output])
+
+    capa_salida = keras.models.Sequential([
+        # Expansión de la capa combinada
+        keras.layers.Dense(3, activation="relu"),
+        keras.layers.Dense(3, activation="relu"),
+
+        # Capa de salida
+        keras.layers.Dense(1, activation="sigmoid")
+
+    ])(capa_combinada)
+
+
+    model = keras.models.Model(inputs=[capa_actual.input, capa_temporal.input], outputs=capa_salida)
+    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
+
+    model.train(Xtr, ytr, epochs=10)
+

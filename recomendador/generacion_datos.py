@@ -35,10 +35,14 @@ def get_training_data(conn):
     
     users_with_training_data = daoGlobal.get_users_with_training_data(conn) 
 
-    datos_entrada = np.empty()
-    datos_salida = np.empty()
+    datos_entrada = np.empty()  # Arrays con los ejemplos de entrada
+    datos_salida = np.empty()   # Arrays con las salidas de cada ejemplo
+
     
     for id_usr in users_with_training_data:
+
+        ############ Obtener datos de la BDD ############
+        
         # Obtiene los datos de entrenamiento de la base de datos
         datos_entrenamiento = daoGlobal.get_usr_training_examples(conn, id_usr)
 
@@ -50,17 +54,33 @@ def get_training_data(conn):
             datos_entrada_usr.append(paquete["inputs"])
             datos_salida_usr.append(paquete["output"])
 
+
+        ############ Preparar datos para la red neuronal ############
+
+        # Crea ventanas deslizantes con el histórico de cada ejemplos
         datos_temporales = np.copy(datos_entrada_usr)
         datos_temporales = limpiar_datos_temporales(datos_temporales)
-        datos_temporales = sliding_window(datos_temporales, conf.TAMANYO_VENTANA_PREDICCION)
+        ventana_inputs_usr, ventana_outputs_usr = sliding_window(datos_temporales, datos_salida_usr, conf.RECOMENDADOR_TAMANYO_VENTANA_PREDICCION)
+
+        # Elimina los datos de entrenamiento iniciales para alinearlos con las ventanas
+        datos_entrada_usr = datos_entrada_usr[conf.RECOMENDADOR_TAMANYO_VENTANA_PREDICCION-1:] 
+        datos_salida_usr = datos_salida_usr[conf.RECOMENDADOR_TAMANYO_VENTANA_PREDICCION-1:]
+
+        # Hace un zip de los datos con las ventanas
+        inputs_usr = zip(datos_entrada_usr, ventana_inputs_usr)
+        outputs_usr = zip(datos_salida_usr, ventana_outputs_usr)
+        
+
+        ############ Añadir datos a la lista de datos ############
 
         # Añade los datos de entrada y salida del usuario a la lista de datos
-        datos_entrada = np.stack(datos_entrada, datos_entrada_usr)
-        datos_salida = np.stack(datos_salida, datos_salida_usr)
+        datos_entrada = np.append(datos_entrada, inputs_usr)
+        datos_salida = np.append(datos_salida, outputs_usr)
 
         # Elimina los datos de entrenamiento del usuario
         daoGlobal.delete_user_with_training_data(conn, id_usr)
         daoGlobal.delete_usr_training_examples(conn, id_usr)
+
 
     return datos_entrada, datos_salida
     
@@ -68,12 +88,34 @@ def get_training_data(conn):
 
 def limpiar_datos_temporales(datos_temporales):
 
-    limpios = np.empty((conf.GENERO_NUMERO_GENEROS+1, datos_temporales.shape[1]))
+    nGeneros = conf.GENERO_NUMERO_GENEROS
+
+    limpios = np.empty((nGeneros+1, np.shape(datos_temporales)[1]))
 
     limpios[:, 0] = datos_temporales[:, 3]      # esPodcast
-    limpios[:, 1] = datos_temporales[:, 9:9+conf.GENERO_NUMERO_GENEROS] # Genero del audio
+    limpios[:, 1:1+nGeneros] = datos_temporales[:, 9:9+nGeneros] # Genero del audio
 
     return limpios
+
+
+
+# Generates a sliding window of inputs and outputs and size `window_size`
+def sliding_window(inputs, outputs, window_size=conf.RECOMENDADOR_TAMANYO_VENTANA_PREDICCION):
+
+    num_inputs, *input_shape = inputs.shape
+    num_windows = num_inputs - window_size + 1
+    
+    # Create empty arrays to hold the sliding window data
+    X = np.zeros((num_windows, window_size, *input_shape), dtype=inputs.dtype)
+    y = np.zeros((num_windows, *outputs[0].shape), dtype=outputs.dtype)
+
+    # Iterate over the sliding window and populate `X` and `y`
+    for i in range(num_windows):
+        X[i] = inputs[i:i+window_size]
+        y[i] = outputs[i+window_size-1]
+        
+    return X, y
+
 
 
 # Captura el estado del audio para la predicción

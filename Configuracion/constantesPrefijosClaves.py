@@ -31,6 +31,7 @@ GENERO_PUNK = 19
 GENERO_FUNK = 20
 
 GENERO_NUMERO_GENEROS = 21
+RECOMENDADOR_TAMANYO_VENTANA_PREDICCION = 10
 
 
 # Constantes simbólicas de las claves de los atributos de usuario
