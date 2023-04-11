@@ -22,13 +22,13 @@ def create_model(conn):
     ########## Capas de entrada ##########
     capa_actual = keras.models.Sequential([
         keras.layers.InputLayer(input_shape=input_shape_actual),
-        keras.layers.Dense(3, activation="relu"),
-        keras.layers.Dense(3, activation="relu"),  
+        keras.layers.Dense(8, activation="relu"),
+        keras.layers.Dense(4, activation="relu"),  
     ])
 
     capa_temporal = keras.models.Sequential([
         keras.layers.InputLayer(input_shape=input_shape_temporal),
-        keras.layers.LSTM(3)
+        keras.layers.LSTM(4)
     ])
 
 
@@ -37,8 +37,7 @@ def create_model(conn):
 
     capa_salida = keras.models.Sequential([
         # Expansión de la capa combinada
-        keras.layers.Dense(3, activation="relu"),
-        keras.layers.Dense(3, activation="relu"),
+        keras.layers.Dense(4, activation="relu"),
 
         # Capa de salida
         keras.layers.Dense(1, activation="sigmoid")
@@ -47,7 +46,7 @@ def create_model(conn):
 
 
     model = keras.models.Model(inputs=[capa_actual.input, capa_temporal.input], outputs=capa_salida)
-    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
+    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy", "recall"])
 
     model.train(Xtr, ytr, epochs=10)
 
