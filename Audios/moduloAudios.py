@@ -73,16 +73,12 @@ def eliminarCancion(r, id):
 
 # Función para devolver el audio de una canción ya sea el de alta calidad o el de baja calidad
 def obtenerFicheroCancion(r, id, calidad):
-    # Obtengo el diccionario de la canción
-    cal = controlAudios.obtenerCalCancion(r, id)
-
     listaFicheros = []
-    for ids in id:
-        cal = controlAudios.obtenerCalCancion(r, ids)
-        if cal == 'alta' and calidad == 'alta':
-            listaFicheros.append(controlAudios.obtenerAltaCalidadCancion(r, ids))
-        else:
-            listaFicheros.append(controlAudios.obtenerBajaCalidadCancion(r, ids))
+    cal = controlAudios.obtenerCalCancion(r, id)
+    if cal == 'alta' and calidad == 'alta':
+        listaFicheros = controlAudios.obtenerAltaCalidadCancion(r, id)
+    else:
+        listaFicheros = controlAudios.obtenerBajaCalidadCancion(r, id)
     
     return listaFicheros
 
