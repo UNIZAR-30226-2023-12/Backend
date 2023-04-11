@@ -50,6 +50,10 @@ def get_training_data(conn):
             datos_entrada_usr.append(paquete["inputs"])
             datos_salida_usr.append(paquete["output"])
 
+        datos_temporales = np.copy(datos_entrada_usr)
+        datos_temporales = limpiar_datos_temporales(datos_temporales)
+        datos_temporales = sliding_window(datos_temporales, conf.TAMANYO_VENTANA_PREDICCION)
+
         # Añade los datos de entrada y salida del usuario a la lista de datos
         datos_entrada = np.stack(datos_entrada, datos_entrada_usr)
         datos_salida = np.stack(datos_salida, datos_salida_usr)
@@ -60,6 +64,16 @@ def get_training_data(conn):
 
     return datos_entrada, datos_salida
     
+
+
+def limpiar_datos_temporales(datos_temporales):
+
+    limpios = np.empty((conf.GENERO_NUMERO_GENEROS+1, datos_temporales.shape[1]))
+
+    limpios[:, 0] = datos_temporales[:, 3]      # esPodcast
+    limpios[:, 1] = datos_temporales[:, 9:9+conf.GENERO_NUMERO_GENEROS] # Genero del audio
+
+    return limpios
 
 
 # Captura el estado del audio para la predicción
