@@ -72,7 +72,7 @@ def get_training_data(conn):
         
 
         ############ Añadir datos a la lista de datos ############
-
+        
         # Añade los datos de entrada y salida del usuario a la lista de datos
         datos_entrada = np.append(datos_entrada, inputs_usr)
         datos_salida = np.append(datos_salida, outputs_usr)
