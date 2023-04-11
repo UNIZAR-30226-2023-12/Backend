@@ -5,7 +5,7 @@ from django.middleware import csrf
 from django.http import HttpRequest
 
 # URL del endpoint SetSong
-url = 'http://127.0.0.1:8081/SetSong/'
+url = 'http://127.0.0.1:8000/SetSong/'
 
 # Crear un objeto HttpRequest vacío
 # request = HttpRequest()
@@ -15,7 +15,7 @@ url = 'http://127.0.0.1:8081/SetSong/'
 # headers = {'X-CSRFToken': token}
 
 # Abrir el archivo MP3 en modo binario
-with open('tono_organo.mp3', 'rb') as f:
+with open('STARSET-DIE FOR YOU.mp3', 'rb') as f:
     # Leer el contenido del archivo
     contenido = f.read()
 
@@ -27,12 +27,14 @@ with open('tono_organo.mp3', 'rb') as f:
 
 # Datos del cuerpo de la petición
 data = {
-    'nombre': 'Demessieux',
-    'artista': 'kdjghd',
+    'nombre': 'Die for you',
+    'idUsuario': '0',
+    'contrasenya': '1234',
+    'artista': 'Starset',
     'calidad': 'baja',
-    'generos': 'Siglo XX',
+    'generos': 'Rock',
     'ficheroBajaCalidad': resultado,
-    'longitud': 63
+    'longitud': 318
 }
 json_data = json.dumps(data)
 

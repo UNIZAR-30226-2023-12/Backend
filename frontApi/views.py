@@ -15,6 +15,7 @@ from django.conf import settings
 r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
 
 # echo request
+@csrf_exempt
 def echo(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
