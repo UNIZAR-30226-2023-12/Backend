@@ -42,6 +42,7 @@ def anyadirCancion(r, dic):
     val = 0
     generos = dic['generos']
     longitud = dic['longitud']
+    esPodcast = dic['esPodcast']
 
     if calidad == 'alta':
         ficheroAltaCalidad = dic['ficheroAltaCalidad']
@@ -59,8 +60,9 @@ def anyadirCancion(r, dic):
 
     id = 'idAudio:' + str(id)
     # Construyo el diccionario para almacenar los datos de la canción
-    cancionDic = {'id': id, 'nombre': nombre, 'artista': artista, 'calidad': calidad, 'nVeces': nVeces, 'val': val, 'generos': generos, 'ficheroAltaCalidad': ficheroAltaCalidad, 'ficheroBajaCalidad': ficheroBajaCalidad, 'longitud': longitud}
+    cancionDic = {'id': id, 'nombre': nombre, 'artista': artista, 'calidad': calidad, 'nVeces': nVeces, 'val': val, 'generos': generos, 'ficheroAltaCalidad': ficheroAltaCalidad, 'ficheroBajaCalidad': ficheroBajaCalidad, 'longitud': longitud, 'numFavoritos': 0, 'esPodcast': esPodcast}
 
+    print("Cancion a almacenar: " + str(cancionDic))
     # Almaceno la canción
     controlAudios.almacenarCancion(r, cancionDic)
 

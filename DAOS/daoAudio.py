@@ -50,6 +50,7 @@ def incrementarIDUltimoAudio(r):
 
 # Funcion para guardar una cancion en la base de datos, modificada para trabajar con diccionarios
 def guardarCancion(r, cancionDic):
+    print("Guardando cancion")
     id = cancionDic['id']
     # Ahora quito el id del diccionario para que no se guarde en el hash
     del cancionDic['id']
