@@ -35,3 +35,10 @@ ERROR_CONTRASENYA_INCORRECTA = 533
 # Constantes para los errores de listas de reproducción
 ERROR_LISTA_NO_ENCONTRADA = 534
 ERROR_LISTA_PARAMETROS_INCORRECTOS = 535
+
+# Constantes para los errores de notificaciones
+ERROR_NOTIFICACION_NO_ENCONTRADA = 436
+ERROR_TIPO_NOTIFICACION_NO_VALIDA = 437
+
+# Constantes para los errores de administradores y artistas
+ERROR_NO_SE_HA_PODIDO_CAMBIAR_TIPO_USUARIO = 438
