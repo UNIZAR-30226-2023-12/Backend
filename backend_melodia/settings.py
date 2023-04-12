@@ -25,10 +25,11 @@ SECRET_KEY = 'django-insecure-9*gsxvxu__%h5x)_(--)yhi%+yf+68g88fe$=q=2p_%kd6n3q@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1', 'localhost']
+#ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['*']
 
 # la peticion SetSong necesita esta memoria
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760 # 10MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600 # 100MB
 
 # Application definition
 INSTALLED_APPS = [

@@ -5,7 +5,7 @@ from django.middleware import csrf
 from django.http import HttpRequest
 
 # URL del endpoint SetSong
-url = 'http://127.0.0.1:8081/SetSong/'
+url = 'http://127.0.0.1:8000/SetUser/'
 
 # Crear un objeto HttpRequest vacío
 # request = HttpRequest()
@@ -13,9 +13,9 @@ url = 'http://127.0.0.1:8081/SetSong/'
 
 # Configurar la cabecera HTTP con el token CSRF
 # headers = {'X-CSRFToken': token}
-
+"""
 # Abrir el archivo MP3 en modo binario
-with open('tono_organo.mp3', 'rb') as f:
+with open('STARSET-DIE FOR YOU.mp3', 'rb') as f:
     # Leer el contenido del archivo
     contenido = f.read()
 
@@ -27,17 +27,39 @@ with open('tono_organo.mp3', 'rb') as f:
 
 # Datos del cuerpo de la petición
 data = {
-    'nombre': 'Demessieux',
-    'artista': 'kdjghd',
+    'nombre': 'Die for you',
+    'idUsuario': '0',
+    'contrasenya': '1234',
+    'artista': 'Starset',
     'calidad': 'baja',
-    'generos': 'Siglo XX',
+    'generos': 'Rock',
     'ficheroBajaCalidad': resultado,
-    'longitud': 63
+    'longitud': 318
 }
+"""
+
+data = {
+    'id': 'Admin',
+    'email': 'admin@melodia.es',
+    'alias': 'Admin',
+    'tipoUsuario': 'admin',
+    'contrasenya': '1234',
+}
+
 json_data = json.dumps(data)
 
 # Realizar la petición HTTP POST
 response = requests.post(url, data=json_data)
 
+# Get the headers from the response
+response_headers = response.request.headers
+
+# Convert headers to a string and get its length
+headers_size = len(str(response_headers))
+
 # Imprimir el código de estado de la respuesta
 print(response.status_code)
+print(headers_size)
+
+# prints de json content
+#print(response.json()['nombre'])
