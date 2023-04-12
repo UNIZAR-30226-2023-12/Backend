@@ -59,7 +59,7 @@ def removeUser(r, id, contrasenya):
 
 def AskAdminToBeArtist(r, idUsuario):
     if(r.exists(idUsuario) == 0):
-        return -2
+        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
     idNotificacion = daoNotificaciones.getIdContador(r)
     diccionarioNotificaciones = {constantes.CLAVE_ID_NOTIFICACION: idNotificacion, 
                                  constantes.CLAVE_ID_USUARIO_EMISIOR: idUsuario, 
@@ -70,7 +70,7 @@ def AskAdminToBeArtist(r, idUsuario):
     administradores = daoUsuario.getAdministradores(r)
     for admin in administradores:
         daoUsuario.anyadirNotificacion(r, admin, idNotificacion)
-    return 1
+    return erroresHTTP.OK
     
 def ValidateUser(r, id, contrasenya):
     if (existeUsuario(r, id) == False): 
@@ -102,16 +102,20 @@ def getLastSecondHeard(r, idUsuario, idAudio):
 # Funciones adcionales de administradores
 def acceptArtist(r, idUsuario, idNotificacion):
     if(daoNotificaciones.getIdUsuarioEmisor(r, idNotificacion) != idUsuario):
-        return -1
+        return erroresHTTP.ERROR_NOTIFICACION_NO_ENCONTRADA
     if(daoNotificaciones.getTipoNotificacion(r, idNotificacion) != constantes.NOTIFICACION_TIPO_SOLICITUD_ARTISTA):
-        return -1
+        return erroresHTTP.ERROR_TIPO_NOTIFICACION_NO_VALIDA
     
     # Eliminamos la notificación a los administradores
     administradores = daoUsuario.getAdministradores(r)
     for admin in administradores:
         daoUsuario.eliminarNotificacion(r, admin, idNotificacion)
     
-    return daoUsuario.setTipoUsuario(r, idUsuario, daoUsuario.constantes.USUARIO_ARTISTA)
+    
+    respuesta = daoUsuario.setTipoUsuario(r, idUsuario, daoUsuario.constantes.USUARIO_ARTISTA)
+    if (respuesta != 0):
+        return erroresHTTP.OK
+    return erroresHTTP.ERROR_NO_SE_HA_PODIDO_CAMBIAR_TIPO_USUARIO
 
 
 # Funciones de listas de reproducción
