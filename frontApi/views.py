@@ -246,8 +246,41 @@ def RemoveSongLista(request):
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-
+# View para solicitar al administrador que un usuario sea artista
+@csrf_exempt    
+def AskAdminToBeArtist(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
     
+    # Primero valido que el usuario que me están pasando sea válido
+    respuesta = ValidateUser(r, request)
+    if (respuesta.status_code != erroresHTTP.OK):
+        return respuesta
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
 
-        
-        
+    status = usuarios.AskAdminToBeArtist(r, idUsuario)
+
+    return JsonResponse({'status': status}, status=status)
+
+# View para aceptar a un usuario como artista
+@csrf_exempt
+def AcceptArtist(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Primero valido que el usuario que me están pasando sea válido
+    respuesta = ValidateUser(r, request)
+    if (respuesta.status_code != erroresHTTP.OK):
+        return respuesta
+    
+    # Parse the JSON data from the request body to extract idUsuario and idNotificacion
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    idNotificacion = json_data[constantes.CLAVE_ID_NOTIFICACION]
+
+    status = usuarios.AcceptArtist(r, idUsuario, idNotificacion)
+
+    return JsonResponse({'status': status}, status=status)
