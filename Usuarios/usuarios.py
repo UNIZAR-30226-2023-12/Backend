@@ -36,6 +36,7 @@ def setUser(r, usuarioDiccionario):
     daoUsuario.setUsuario(r, usuarioDiccionario)
     return erroresHTTP.OK
 
+
 def removeUser(r, id, contrasenya):
     if(r.exists(id) == 0):
         return -1

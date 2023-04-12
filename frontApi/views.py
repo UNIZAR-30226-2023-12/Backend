@@ -21,7 +21,7 @@ def echo(request):
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
         
-        return json_data
+        return JsonResponse(json_data)
     else:
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -96,19 +96,20 @@ def SetSong(request):
 
         # Añado la canción a la base de datos
         status = moduloAudios.anyadirCancion(r, json_data)
+
         if status != 0:
             return JsonResponse({'error': 'Ha ocurrido un problema'}, status=status)
 
-        return JsonResponse({'msg' 'Cancion añadida correctamente'}, status=erroresHTTP.OK)
+        return JsonResponse({'msg': 'Cancion añadida correctamente'}, status=erroresHTTP.OK)
     else:
         return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=respuesta.status_code)
    
+
+@csrf_exempt
 def SetUser(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
-
-        
         
         # Stores the user in the database
         status = usuarios.setUser(r, json_data)
@@ -126,9 +127,10 @@ def ValidateUser(request):
         
         idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
         contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+
         # Validates the user
         status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-        
+
         return JsonResponse({'status': status}, status=status)
 
     else:
