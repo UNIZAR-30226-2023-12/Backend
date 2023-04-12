@@ -12,7 +12,7 @@ from Usuarios import usuarios
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
-r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
+r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True)#, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
 
 # echo request
 def echo(request):
@@ -28,6 +28,7 @@ def echo(request):
 # Create your views here.
 @csrf_exempt
 def GetSong(request):
+    fichero = -1
     # Compruebo que el método sea GET
     if request.method != 'GET':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -101,7 +102,8 @@ def SetSong(request):
         return JsonResponse({'msg' 'Cancion añadida correctamente'}, status=erroresHTTP.OK)
     else:
         return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=respuesta.status_code)
-   
+
+@csrf_exempt
 def SetUser(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
@@ -117,7 +119,7 @@ def SetUser(request):
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
         
-
+@csrf_exempt
 def ValidateUser(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
@@ -134,6 +136,7 @@ def ValidateUser(request):
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
+@csrf_exempt
 def SetLista(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
@@ -152,6 +155,7 @@ def SetLista(request):
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
+@csrf_exempt
 def ChangeNameListRepUsr(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
@@ -172,7 +176,8 @@ def ChangeNameListRepUsr(request):
     else:
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
+
+@csrf_exempt
 def SetSongLista(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
@@ -196,7 +201,8 @@ def SetSongLista(request):
     else:
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
+
+@csrf_exempt 
 def GetListaRepUsr(request):
     if request.method == 'GET':
         # Parse the JSON data from the request body
@@ -217,7 +223,8 @@ def GetListaRepUsr(request):
     else:
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
+
+@csrf_exempt
 def RemoveSongLista(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
