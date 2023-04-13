@@ -19,7 +19,7 @@ def getIdContador(r):
     pipe.get(constantes.CLAVE_CONTADOR_USUARIOS)
     pipe.incr(constantes.CLAVE_CONTADOR_USUARIOS)
     id = pipe.execute()[0]
-    return id
+    return constantes.PREFIJO_ID_USUARIO + id
 
 def existeUsuario(r, idUsuario):
     if(r.exists(idUsuario) == 0):
@@ -74,22 +74,22 @@ def getUltimaCancion(r, idUsuario):
     return r.hget(idUsuario, constantes.CLAVE_ID_ULTIMO_AUDIO)
 
 def anyadirAmigo(r, idUsuario, idAmigo):
-    return anyadirRelacion(r, idUsuario, idAmigo, constantes.CLAVE_AMIGOS)
+    return anyadirRelacion(r, idUsuario, idAmigo, constantes.PREFIJO_AMIGOS)
     
 def eliminarAmigo(r, idUsuario, idAmigo):
-    return eliminarRelacion(r, idUsuario, idAmigo, constantes.CLAVE_AMIGOS)
+    return eliminarRelacion(r, idUsuario, idAmigo, constantes.PREFIJO_AMIGOS)
 
 def getAmigos(r, idUsuario):
-    return getRelaciones(r, idUsuario, constantes.CLAVE_AMIGOS)
+    return getRelaciones(r, idUsuario, constantes.PREFIJO_AMIGOS)
 
 def anyadirArtista(r, idUsuario, idArtista):
-    return anyadirRelacion(r, idUsuario, idArtista, constantes.CLAVE_ARTISTAS)
+    return anyadirRelacion(r, idUsuario, idArtista, constantes.PREFIJO_ARTISTAS_SUSCRITOS)
 
 def eliminarArtista(r, idUsuario, idArtista):
-    return eliminarRelacion(r, idUsuario, idArtista, constantes.CLAVE_ARTISTAS)
+    return eliminarRelacion(r, idUsuario, idArtista, constantes.PREFIJO_ARTISTAS_SUSCRITOS)
 
 def getArtistas(r, idUsuario):
-    return getRelaciones(r, idUsuario, constantes.CLAVE_ARTISTAS)  
+    return getRelaciones(r, idUsuario, constantes.PREFIJO_ARTISTAS_SUSCRITOS)  
 
 def anyadirLista(r, idUsuario, idLista):
     return anyadirRelacion(r, idUsuario, idLista, constantes.CLAVE_LISTAS)
@@ -101,22 +101,22 @@ def getListas(r, idUsuario):
     return getRelaciones(r, idUsuario, constantes.CLAVE_LISTAS)
 
 def anyadirNotificacion(r, idUsuario, idNotificacion):
-    return anyadirRelacion(r, idUsuario, idNotificacion, constantes.CLAVE_NOTIFICACIONES)
+    return anyadirRelacion(r, idUsuario, idNotificacion, constantes.PREFIJO_NOTIFICACIONES)
 
 def eliminarNotificacion(r, idUsuario, idNotificacion):
-    return eliminarRelacion(r, idUsuario, idNotificacion, constantes.CLAVE_NOTIFICACIONES)
+    return eliminarRelacion(r, idUsuario, idNotificacion, constantes.PREFIJO_NOTIFICACIONES)
 
 def getNotificaciones(r, idUsuario):
-    return getRelaciones(r, idUsuario, constantes.CLAVE_NOTIFICACIONES)
+    return getRelaciones(r, idUsuario, constantes.PREFIJO_NOTIFICACIONES)
 
 def anyadirCarpeta(r, idUsuario, idCarpeta):
-    return anyadirRelacion(r, idUsuario, idCarpeta, constantes.CLAVE_CARPETAS)
+    return anyadirRelacion(r, idUsuario, idCarpeta, constantes.PREFIJO_CARPETAS)
 
 def eliminarCarpeta(r, idUsuario, idCarpeta):
-    return eliminarRelacion(r, idUsuario, idCarpeta, constantes.CLAVE_CARPETAS)
+    return eliminarRelacion(r, idUsuario, idCarpeta, constantes.PREFIJO_CARPETAS)
 
 def getCarpetas(r, idUsuario, idCarpeta):
-    return getRelaciones(r, idUsuario, idCarpeta, constantes.CLAVE_CARPETAS)
+    return getRelaciones(r, idUsuario, idCarpeta, constantes.PREFIJO_CARPETAS)
 
 # Funciones para añadir, eliminar y obtener relaciones del usuario
 def anyadirRelacion(r, idUsuario, idRealacion, prefijoRelacion):
@@ -171,28 +171,28 @@ def getAdministradores(r):
 
 # Funciones para crear set de ulimos Audios escuchados
 def anyadirUltimoAudio(r, idUsuario, idAudio):
-    return anyadirRelacion(r, idUsuario, idAudio, constantes.CLAVE_ULTIMOS_AUDIOS)
+    return anyadirRelacion(r, idUsuario, idAudio, constantes.PREFIJO_ULTIMOS_AUDIOS)
 
 def eliminarUltimoAudio(r, idUsuario, idAudio):
-    return eliminarRelacion(r, idUsuario, idAudio, constantes.CLAVE_ULTIMOS_AUDIOS)
+    return eliminarRelacion(r, idUsuario, idAudio, constantes.PREFIJO_ULTIMOS_AUDIOS)
 
 def getIDSUltimosAudios(r, idUsuario):
-    return getRelaciones(r, idUsuario, constantes.CLAVE_ULTIMOS_AUDIOS)
+    return getRelaciones(r, idUsuario, constantes.PREFIJO_ULTIMOS_AUDIOS)
 
 def setUltimoAuido(r, idUsuario, idAudio, diccionarioUltimoAudio):
-    return r.hmset(constantes.CLAVE_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, diccionarioUltimoAudio)
+    return r.hmset(constantes.PREFIJO_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, diccionarioUltimoAudio)
 
 def setSegundosUltimoAudio(r, idUsuario, idAudio, segundos):
-    return r.hset(constantes.CLAVE_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS, segundos)
+    return r.hset(constantes.PREFIJO_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS, segundos)
 
 def getUltimoAudio(r, idUsuario, idAudio):
-    return r.hgetall(constantes.CLAVE_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
+    return r.hgetall(constantes.PREFIJO_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
 
 def getSegundosUltimoAudio(r, idUsuario, idAudio):
-    return r.hget(constantes.CLAVE_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS)
+    return r.hget(constantes.PREFIJO_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS)
 
 def eliminarUltimoAudio(r, idUsuario, idAudio):
-    return r.delete(constantes.CLAVE_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
+    return r.delete(constantes.PREFIJO_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
 
 # Daos para crear tabla hash email | idUsuario para agilizar el inicio de sesion
 def setEmailId(r, email, idUsuario):
