@@ -107,6 +107,7 @@ def SetSong(request):
     else:
         return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=status)
 
+@csrf_exempt
 def SetUser(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
