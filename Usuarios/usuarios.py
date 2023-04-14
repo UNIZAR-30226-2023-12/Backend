@@ -29,11 +29,19 @@ def setUser(r, usuarioDiccionario):
 
     if(sorted(usuarioDiccionario) != sorted(daoUsuario.listaClaves)):
         return erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS
+    
+    if(daoUsuario.existeEmailId(r, usuarioDiccionario[constantes.CLAVE_EMAIL])):
+        return erroresHTTP.ERROR_USUARIO_EMAIL_YA_EXISTE
 
     # Si el usuario es administrador lo añadimos a la lista de administradores
     if(usuarioDiccionario[constantes.CLAVE_TIPO_USUARIO] == constantes.USUARIO_ADMINISTRADOR):
         daoUsuario.anyadirAdministrador(r, id)
+        
+    # Guardamos el usuario en la base de datos    
     daoUsuario.setUsuario(r, usuarioDiccionario)
+
+    # Lo añadimos al hash con la clave como email y el valor como id
+    daoUsuario.setEmailId(r, usuarioDiccionario[constantes.CLAVE_EMAIL], id)
     return erroresHTTP.OK
 
 def removeUser(r, id, contrasenya):
@@ -80,6 +88,12 @@ def ValidateUser(r, id, contrasenya):
     if (daoUsuario.getContrasenya(r, id) == contrasenya):
         return erroresHTTP.OK
     return erroresHTTP.ERROR_CONTRASENYA_INCORRECTA
+
+def validateUserEmail(r, email, contrasenya):
+    idUsuario = daoUsuario.getIdEmailId(r, email)
+    status = ValidateUser(r, idUsuario, contrasenya)
+    respuesta = {"status": status, constantes.CLAVE_ID_USUARIO : idUsuario}
+    return respuesta
 
 def setLastSecondHeard(r, idUsuario, idAudio, segundo):
     if (r.exists(idUsuario) == 0 or r.exists(idAudio) == 0):

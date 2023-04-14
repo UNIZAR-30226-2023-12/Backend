@@ -6,15 +6,7 @@ listaClaves = [constantes.CLAVE_ID_LISTA, constantes.CLAVE_NOMBRE_LISTA,
                constantes.CLAVE_PRIVACIDAD_LISTA, constantes.CLAVE_TIPO_LISTA]
 
 def getIdContador(r):
-    id = r.get(constantes.CLAVE_CONTADOR_LISTAS)
-    if(id == None):
-        r.set(constantes.CLAVE_CONTADOR_LISTAS, 0)
-        id = 0
-    pipe = r.pipeline()
-    pipe.get(constantes.CLAVE_CONTADOR_LISTAS)
-    pipe.incr(constantes.CLAVE_CONTADOR_LISTAS)
-    id = pipe.execute()[0]
-    return constantes.PREFIJO_ID_LISTA + id
+    return constantes.PREFIJO_ID_LISTA + ":" + r.incr(constantes.CLAVE_CONTADOR_LISTAS)
 
 def existeLista(r, id):
     if(r.exists(id) == 0):

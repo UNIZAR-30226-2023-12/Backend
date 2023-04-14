@@ -85,6 +85,7 @@ CLAVE_ID_CARPETA = "idCarpeta"
 CLAVE_NOMBRE_CARPETA = "nombreCarpeta"
 CLAVE_PRIVACIDAD_CARPETA = "privacidadCarpeta"
 CLAVE_LISTAS_CARPETA = "listasCarpeta"
+PREFIJO_ID_CARPETA = "carpeta"
 
 # Constantes simbólicas para los prefijos de los sets de carpeta
 
