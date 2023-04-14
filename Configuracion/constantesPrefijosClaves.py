@@ -43,12 +43,13 @@ CLAVE_CONTRASENYA = "contrasenya"
 CLAVE_TIPO_USUARIO = "tipoUsuario"
 CLAVE_ID_ULTIMO_AUDIO = "idUltimoAudio"
 
-# Constantes simbólicas de los prefijos de los sets de usuario
-CLAVE_AMIGOS = "amigos"
-CLAVE_ARTISTAS = "artistas"
-CLAVE_NOTIFICACIONES = "notificaciones"
-CLAVE_CARPETAS = "carpetas"
-CLAVE_ULTIMOS_AUDIOS = "ultimosAudios"
+# Prefijos de las claves relacionadas con los usuarios
+PREFIJO_ID_USUARIO = "idUsuario:"
+PREFIJO_AMIGOS = "amigos"
+PREFIJO_ARTISTAS_SUSCRITOS = "artistas"
+PREFIJO_NOTIFICACIONES = "notificaciones"
+PREFIJO_CARPETAS = "carpetas"
+PREFIJO_ULTIMOS_AUDIOS = "ultimosAudios"
 # Claves para hash de ultimosAudios
 CLAVE_SEGUNDOS = "segundos"
 
@@ -98,6 +99,8 @@ NOTIFCACION_TIPO_NORMAL = "normal"
 NOTIFICACION_TIPO_AMIGO = "amigo"
 NOTIFICACION_TIPO_SOLICITUD_ARTISTA = "quieroArtista"
 
+PREFIJO_ID_NOTIFICACION = "notificacion"
+
 # Constantes para mensajes y títulos default
 TITULO_NOTIFICACION_ARTISTA = "Solicitud de artista"
 MENSAJE_NOTIFICACION_ARTISTA = " quiere ser artista"
@@ -116,6 +119,7 @@ LISTA_PUBLICA = "publica"
 
 
 # Constantes simbólicas de los prefijos de los sets de listas
+PREFIJO_ID_LISTA = "lista"
 CLAVE_AUDIOS = "audios"
 
 CLAVE_HASH_EMAIL_ID = "tablaHashEmailId"

@@ -12,7 +12,7 @@ def getIdContador(r):
     pipe.get(constantes.CLAVE_CONTADOR_NOTIFICACIONES)
     pipe.incr(constantes.CLAVE_CONTADOR_NOTIFICACIONES)
     id = pipe.execute()[0]
-    return id
+    return constantes.PREFIJO_ID_NOTIFICACION + id
 
 def existeNotificacion(r, id):
     if(r.exists(id) == 0):

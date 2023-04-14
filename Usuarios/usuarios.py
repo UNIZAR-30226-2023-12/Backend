@@ -25,9 +25,9 @@ def existeCarpeta(r, id):
 
 def setUser(r, usuarioDiccionario):
     id = daoUsuario.getIdContador(r)
-    usuarioDiccionario.add(constantes.CLAVE_ID_USUARIO, id)
+    usuarioDiccionario[constantes.CLAVE_ID_USUARIO] = id
 
-    if(usuarioDiccionario.keys().sort() != daoUsuario.listaClaves.sort()):
+    if(sorted(usuarioDiccionario) != sorted(daoUsuario.listaClaves)):
         return erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS
 
     # Si el usuario es administrador lo añadimos a la lista de administradores
@@ -35,7 +35,6 @@ def setUser(r, usuarioDiccionario):
         daoUsuario.anyadirAdministrador(r, id)
     daoUsuario.setUsuario(r, usuarioDiccionario)
     return erroresHTTP.OK
-
 
 def removeUser(r, id, contrasenya):
     if(r.exists(id) == 0):
@@ -46,11 +45,11 @@ def removeUser(r, id, contrasenya):
         daoUsuario.eliminarAmigo(r, amigo, id)
 
     #Eliminar los sets de amigos, artistas, listas del usuario, notificaciones y carpetas
-    r.delete(constantes.CLAVE_AMIGOS + id)
-    r.delete(constantes.CLAVE_ARTISTAS + id)
+    r.delete(constantes.PREFIJO_AMIGOS + id)
+    r.delete(constantes.PREFIJO_ARTISTAS_SUSCRITOS + id)
     r.delete(constantes.CLAVE_LISTAS + id)
-    r.delete(constantes.CLAVE_NOTIFICACIONES + id)
-    r.delete(constantes.CLAVE_CARPETAS + id)
+    r.delete(constantes.PREFIJO_NOTIFICACIONES + id)
+    r.delete(constantes.PREFIJO_CARPETAS + id)
 
     #Si es administrador, eliminarlo de la lista de administradores
     if(daoUsuario.getTipoUsuario(r, id) == constantes.USUARIO_ADMINISTRADOR):
@@ -59,8 +58,9 @@ def removeUser(r, id, contrasenya):
     return 1
 
 def AskAdminToBeArtist(r, idUsuario):
-    if(r.exists(idUsuario) == 0):
+    if(existeUsuario(r, idUsuario) == False):
         return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
+        
     idNotificacion = daoNotificaciones.getIdContador(r)
     diccionarioNotificaciones = {constantes.CLAVE_ID_NOTIFICACION: idNotificacion, 
                                  constantes.CLAVE_ID_USUARIO_EMISIOR: idUsuario, 
@@ -71,7 +71,7 @@ def AskAdminToBeArtist(r, idUsuario):
     administradores = daoUsuario.getAdministradores(r)
     for admin in administradores:
         daoUsuario.anyadirNotificacion(r, admin, idNotificacion)
-    return erroresHTTP.OK
+    return 1
     
 def ValidateUser(r, id, contrasenya):
     if (existeUsuario(r, id) == False): 
@@ -103,28 +103,24 @@ def getLastSecondHeard(r, idUsuario, idAudio):
 # Funciones adcionales de administradores
 def acceptArtist(r, idUsuario, idNotificacion):
     if(daoNotificaciones.getIdUsuarioEmisor(r, idNotificacion) != idUsuario):
-        return erroresHTTP.ERROR_NOTIFICACION_NO_ENCONTRADA
+        return -1
     if(daoNotificaciones.getTipoNotificacion(r, idNotificacion) != constantes.NOTIFICACION_TIPO_SOLICITUD_ARTISTA):
-        return erroresHTTP.ERROR_TIPO_NOTIFICACION_NO_VALIDA
+        return -1
     
     # Eliminamos la notificación a los administradores
     administradores = daoUsuario.getAdministradores(r)
     for admin in administradores:
         daoUsuario.eliminarNotificacion(r, admin, idNotificacion)
     
-    
-    respuesta = daoUsuario.setTipoUsuario(r, idUsuario, daoUsuario.constantes.USUARIO_ARTISTA)
-    if (respuesta != 0):
-        return erroresHTTP.OK
-    return erroresHTTP.ERROR_NO_SE_HA_PODIDO_CAMBIAR_TIPO_USUARIO
+    return daoUsuario.setTipoUsuario(r, idUsuario, daoUsuario.constantes.USUARIO_ARTISTA)
 
 
 # Funciones de listas de reproducción
 def setLista(r, diccionarioLista):
     id = daoListas.getIdContador(r)
-    diccionarioLista.add(constantes.CLAVE_ID_LISTA, id)
+    diccionarioLista[constantes.CLAVE_ID_LISTA] = id
 
-    if(diccionarioLista.keys().sort() != daoListas.listaClaves.sort()):
+    if(sorted(diccionarioLista) != sorted(daoListas.listaClaves)):
         return erroresHTTP.ERROR_LISTA_PARAMETROS_INCORRECTOS
     
     daoListas.setLista(r, diccionarioLista) 

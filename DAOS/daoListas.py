@@ -14,7 +14,7 @@ def getIdContador(r):
     pipe.get(constantes.CLAVE_CONTADOR_LISTAS)
     pipe.incr(constantes.CLAVE_CONTADOR_LISTAS)
     id = pipe.execute()[0]
-    return id
+    return constantes.PREFIJO_ID_LISTA + id
 
 def existeLista(r, id):
     if(r.exists(id) == 0):
