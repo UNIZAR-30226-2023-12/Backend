@@ -114,6 +114,11 @@ def SetUser(request):
         
         # Stores the user in the database
         status = usuarios.setUser(r, json_data)
+        if(status == erroresHTTP.OK):
+            diccionarioLista = {constantes.CLAVE_NOMBRE_LISTA : "Favorites", 
+                                constantes.CLAVE_PRIVACIDAD_LISTA : constantes.LISTA_PRIVADA, 
+                                constantes.CLAVE_TIPO_LISTA : constantes.LISTA_TIPO_FAVORITOS}
+            usuarios.setLista(r, diccionarioLista)
         
         return JsonResponse({'status': status}, status=status)
     else:
