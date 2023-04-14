@@ -44,7 +44,7 @@ CLAVE_TIPO_USUARIO = "tipoUsuario"
 CLAVE_ID_ULTIMO_AUDIO = "idUltimoAudio"
 
 # Prefijos de las claves relacionadas con los usuarios
-PREFIJO_ID_USUARIO = "idUsuario:"
+PREFIJO_ID_USUARIO = "usuario"
 PREFIJO_AMIGOS = "amigos"
 PREFIJO_ARTISTAS_SUSCRITOS = "artistas"
 PREFIJO_NOTIFICACIONES = "notificaciones"
