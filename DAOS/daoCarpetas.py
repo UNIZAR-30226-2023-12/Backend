@@ -2,15 +2,7 @@ import redis
 import Configuracion.constantesPrefijosClaves as constantes
 
 def getIdContador(r):
-    id = r.get(constantes.CLAVE_CONTADOR_CARPETAS)
-    if(id == None):
-        r.set(constantes.CLAVE_CONTADOR_CARPETAS, 0)
-        id = 0
-    pipe = r.pipeline()
-    pipe.get(constantes.CLAVE_CONTADOR_CARPETAS)
-    pipe.incr(constantes.CLAVE_CONTADOR_CARPETAS)
-    id = pipe.execute()[0]
-    return id
+    return constantes.PREFIJO_ID_CARPETA + ":" + r.incr(constantes.CLAVE_CONTADOR_CARPETAS)
 
 def existeCarpeta(r, id):
     if(r.exists(id) == 0):

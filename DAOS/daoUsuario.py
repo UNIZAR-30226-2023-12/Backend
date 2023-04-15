@@ -11,15 +11,7 @@ listaClaves = [constantes.CLAVE_ID_USUARIO, constantes.CLAVE_EMAIL,
 
 
 def getIdContador(r):
-    id = r.get(constantes.CLAVE_CONTADOR_USUARIOS)
-    if(id == None):
-        r.set(constantes.CLAVE_CONTADOR_USUARIOS, 1)
-        id = 1
-    pipe = r.pipeline()
-    pipe.get(constantes.CLAVE_CONTADOR_USUARIOS)
-    pipe.incr(constantes.CLAVE_CONTADOR_USUARIOS)
-    id = pipe.execute()[0]
-    return constantes.PREFIJO_ID_USUARIO + id
+    return constantes.PREFIJO_ID_USUARIO + ":" + r.incr(constantes.CLAVE_CONTADOR_USUARIOS)
 
 def existeUsuario(r, idUsuario):
     if(r.exists(idUsuario) == 0):
@@ -203,3 +195,8 @@ def getIdEmailId(r, email):
 
 def eliminarEmailId(r, email):
     return r.hdel(constantes.CLAVE_HASH_EMAIL_ID, email)
+
+def existeEmailId(r, email):
+    if (r.hexists(constantes.CLAVE_HASH_EMAIL_ID, email) == 1):
+        return True
+    return False
