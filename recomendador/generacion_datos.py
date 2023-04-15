@@ -35,8 +35,9 @@ def get_training_data(conn):
     
     users_with_training_data = daoGlobal.get_users_with_training_data(conn) 
 
-    datos_entrada = np.empty()  # Arrays con los ejemplos de entrada
-    datos_salida = np.empty()   # Arrays con las salidas de cada ejemplo
+    #datos_entrada = np.empty((0, 2))  # Arrays con los ejemplos de entrada
+    datos_entrada = []
+    datos_salida = np.empty((0))   # Arrays con las salidas de cada ejemplo
 
     
     for id_usr in users_with_training_data:
@@ -51,31 +52,42 @@ def get_training_data(conn):
         datos_salida_usr = []
 
         for paquete in datos_entrenamiento:
-            datos_entrada_usr.append(paquete["inputs"])
+
+            inputs = paquete["inputs"]
+            datos_entrada_usr.append(inputs)
             datos_salida_usr.append(paquete["output"])
 
 
         ############ Preparar datos para la red neuronal ############
 
+        datos_entrada_usr = limpiar_datos(datos_entrada_usr)
+
+
+        window_size = min(conf.RECOMENDADOR_TAMANYO_VENTANA_PREDICCION, len(datos_entrada_usr))
         # Crea ventanas deslizantes con el histórico de cada ejemplos
         datos_temporales = np.copy(datos_entrada_usr)
         datos_temporales = limpiar_datos_temporales(datos_temporales)
-        ventana_inputs_usr, ventana_outputs_usr = sliding_window(datos_temporales, datos_salida_usr, conf.RECOMENDADOR_TAMANYO_VENTANA_PREDICCION)
+        ventana_inputs_usr = sliding_window(datos_temporales, conf.RECOMENDADOR_TAMANYO_VENTANA_PREDICCION)
 
+        
         # Elimina los datos de entrenamiento iniciales para alinearlos con las ventanas
-        datos_entrada_usr = datos_entrada_usr[conf.RECOMENDADOR_TAMANYO_VENTANA_PREDICCION-1:] 
-        datos_salida_usr = datos_salida_usr[conf.RECOMENDADOR_TAMANYO_VENTANA_PREDICCION-1:]
+        datos_entrada_usr = datos_entrada_usr[window_size-1:] 
+        datos_salida_usr = datos_salida_usr[window_size-1:]
 
         # Hace un zip de los datos con las ventanas
-        inputs_usr = zip(datos_entrada_usr, ventana_inputs_usr)
-        outputs_usr = zip(datos_salida_usr, ventana_outputs_usr)
+        inputs_usr = zip(datos_entrada_usr, ventana_inputs_usr.tolist())
         
+        # Convierte los datos a numpy arrays
+        inputs_usr = list(inputs_usr)
+
 
         ############ Añadir datos a la lista de datos ############
-        
+
         # Añade los datos de entrada y salida del usuario a la lista de datos
-        datos_entrada = np.append(datos_entrada, inputs_usr)
-        datos_salida = np.append(datos_salida, outputs_usr)
+        #datos_entrada = np.append(datos_entrada, inputs_usr, axis=0)
+        
+        datos_entrada.extend(inputs_usr)
+        datos_salida = np.append(datos_salida, datos_salida_usr, axis=0)
 
         # Elimina los datos de entrenamiento del usuario
         daoGlobal.delete_user_with_training_data(conn, id_usr)
@@ -90,31 +102,51 @@ def limpiar_datos_temporales(datos_temporales):
 
     nGeneros = conf.GENERO_NUMERO_GENEROS
 
-    limpios = np.empty((nGeneros+1, np.shape(datos_temporales)[1]))
-
-    limpios[:, 0] = datos_temporales[:, 3]      # esPodcast
-    limpios[:, 1:1+nGeneros] = datos_temporales[:, 9:9+nGeneros] # Genero del audio
+    n_ejemplos = np.shape(datos_temporales)[0]
+    limpios = np.empty((n_ejemplos, nGeneros+1))
+    
+    for i in range(n_ejemplos):
+        limpios[i, 0] = (datos_temporales[i, 3] == "True")      # esPodcast
+        limpios[i, 1:1+nGeneros] = datos_temporales[i, 9:9+nGeneros] # Genero del audio
 
     return limpios
 
 
 
-# Generates a sliding window of inputs and outputs and size `window_size`
-def sliding_window(inputs, outputs, window_size=conf.RECOMENDADOR_TAMANYO_VENTANA_PREDICCION):
+def limpiar_datos(datos_entrada_usr):
+    for i in range(len(datos_entrada_usr)):
+        datos_entrada_usr[i][0] = float(datos_entrada_usr[i][0])
+        datos_entrada_usr[i][1] = float(datos_entrada_usr[i][1])
+        datos_entrada_usr[i][2] = float(datos_entrada_usr[i][2])
+        datos_entrada_usr[i][3] = float((datos_entrada_usr[i][3] == "True"))
+        datos_entrada_usr[i][4] = float(datos_entrada_usr[i][4])
+        datos_entrada_usr[i][5] = float(datos_entrada_usr[i][5])
+        datos_entrada_usr[i][6] = float(datos_entrada_usr[i][6])
+        datos_entrada_usr[i][7] = float(datos_entrada_usr[i][7])
+        datos_entrada_usr[i][8] = float(datos_entrada_usr[i][8])
 
-    num_inputs, *input_shape = inputs.shape
-    num_windows = num_inputs - window_size + 1
-    
+    return datos_entrada_usr
+
+
+# Generates a sliding window of inputs and outputs and size `window_size`
+def sliding_window(inputs, window_size=conf.RECOMENDADOR_TAMANYO_VENTANA_PREDICCION):
+
+    num_inputs = np.shape(inputs)[0]
+    input_shape = np.shape(inputs)[1:]
+
+    window_size = min(window_size, num_inputs)
+    num_windows = max(num_inputs - window_size + 1, 1)
+
     # Create empty arrays to hold the sliding window data
     X = np.zeros((num_windows, window_size, *input_shape), dtype=inputs.dtype)
-    y = np.zeros((num_windows, *outputs[0].shape), dtype=outputs.dtype)
+    #y = np.zeros((num_windows, *np.shape(outputs[0])), dtype=outputs.dtype)
 
     # Iterate over the sliding window and populate `X` and `y`
     for i in range(num_windows):
-        X[i] = inputs[i:i+window_size]
-        y[i] = outputs[i+window_size-1]
+        X[i] = inputs[i:i+window_size, :]
+        #y[i] = outputs[i+window_size-1]
         
-    return X, y
+    return X    #, y
 
 
 
@@ -146,16 +178,25 @@ def get_audio_prediction_state(conn, id_usr, id_audio):
     # Obtiene el porcentaje de favoritos por genero del usuario
     numero_favoritos_por_genero = usuarios.getNFavoritosPorGenero(conn, id_usr) # Es una lista de enteros
     numero_favoritos_por_genero = np.array(numero_favoritos_por_genero)
-    porcentaje_favoritos_por_genero = numero_favoritos_por_genero / usuarios.getNFavoritos(conn, id_usr)
-    porcentaje_favoritos_por_genero = porcentaje_favoritos_por_genero.tolist()
-
-    # Obtiene el porcentaje de favoritos por genero de los amigos del usuario
-    porcentaje_favoritos_por_genero_amigos = get_porcentaje_favoritos_por_genero_amigos(conn, id_usr)
-
 
     # Obtiene el porcentaje de audios favoritos de ese artista
     numero_favoritos_del_artista = usuarios.getNFavoritosPorArtista(conn, id_usr, id_artista) # Es un entero
-    porcentaje_favoritos_del_artista = numero_favoritos_del_artista / usuarios.getNFavoritos(conn, id_usr)
+
+
+    n_favoritos = usuarios.getNFavoritos(conn, id_usr)
+    
+    if n_favoritos != 0:
+        porcentaje_favoritos_por_genero = numero_favoritos_por_genero / n_favoritos
+        porcentaje_favoritos_del_artista = numero_favoritos_del_artista / n_favoritos
+    else:
+        porcentaje_favoritos_por_genero = np.zeros(len(numero_favoritos_por_genero))
+        porcentaje_favoritos_del_artista = 0
+
+    porcentaje_favoritos_por_genero = porcentaje_favoritos_por_genero.tolist()
+
+
+    # Obtiene el porcentaje de favoritos por genero de los amigos del usuario
+    porcentaje_favoritos_por_genero_amigos = get_porcentaje_favoritos_por_genero_amigos(conn, id_usr)
 
     # Obtiene el porcentaje de favoritos de ese artista de los amigos del usuario
     porcentaje_favoritos_de_artista_amigos = get_porcentaje_favoritos_de_artista_amigos(conn, id_usr, id_artista)
@@ -210,8 +251,12 @@ def get_porcentaje_favoritos_por_genero_amigos(conn, id_usr):
         # Añade el porcentaje de favoritos por genero del amigo
         porcentaje_favoritos_por_genero_amigos += porcentaje_favoritos
 
+
     # Calcula la media entre de los amigos
-    porcentaje_favoritos_por_genero_amigos /= len(amigos)
+    if len(amigos) != 0:    
+        porcentaje_favoritos_por_genero_amigos /= len(amigos)
+    else:
+        porcentaje_favoritos_por_genero_amigos = np.zeros(conf.GENERO_NUMERO_GENEROS)
 
     return porcentaje_favoritos_por_genero_amigos.tolist()
 
@@ -236,6 +281,9 @@ def get_porcentaje_favoritos_de_artista_amigos(conn, id_usr, id_artista):
         porcentaje_favoritos_de_artista_amigos += porcentaje_favoritos
 
     # Calcula la media entre de los amigos
-    porcentaje_favoritos_de_artista_amigos /= len(amigos)
+    if len(amigos) != 0:
+        porcentaje_favoritos_de_artista_amigos /= len(amigos)
+    else:
+        porcentaje_favoritos_de_artista_amigos = 0
 
     return porcentaje_favoritos_de_artista_amigos

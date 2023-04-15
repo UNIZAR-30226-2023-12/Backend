@@ -5,7 +5,8 @@ from django.middleware import csrf
 from django.http import HttpRequest
 
 # URL del endpoint SetSong
-url = 'http://127.0.0.1:8000/SetUser/'
+url = 'http://127.0.0.1:8000/entrenar_recomendador/'
+url_get = 'http://127.0.0.1:8000/GetSong/'
 
 # Crear un objeto HttpRequest vacío
 # request = HttpRequest()
@@ -13,7 +14,7 @@ url = 'http://127.0.0.1:8000/SetUser/'
 
 # Configurar la cabecera HTTP con el token CSRF
 # headers = {'X-CSRFToken': token}
-"""
+
 # Abrir el archivo MP3 en modo binario
 with open('STARSET-DIE FOR YOU.mp3', 'rb') as f:
     # Leer el contenido del archivo
@@ -26,30 +27,39 @@ with open('STARSET-DIE FOR YOU.mp3', 'rb') as f:
     resultado = codificado.decode('utf-8')
 
 # Datos del cuerpo de la petición
-data = {
+new_song_data = {
     'nombre': 'Die for you',
-    'idUsuario': '0',
+    'idUsuario': 'usuario:1',
     'contrasenya': '1234',
     'artista': 'Starset',
     'calidad': 'baja',
     'generos': 'Rock',
-    'ficheroBajaCalidad': resultado,
+    'esPodcast': 'False',
+    'ficheroBajaCalidad': "",
     'longitud': 318
 }
-"""
 
-data = {
-    'id': 'Admin',
-    'email': 'admin@melodia.es',
-    'alias': 'Admin',
-    'tipoUsuario': 'admin',
-    'contrasenya': '1234',
+params_get_song = {
+    'idUsr': 'usuario:1',
+    'idSong': 'idAudio:10',
+    'calidadAlta': 'True',
+    'esCancion': 'True'
 }
 
-json_data = json.dumps(data)
+
+train_data = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234'
+}
+
+train_data = json.dumps(train_data)
+
+for i in range(10):
+    response = requests.get(url_get, params=params_get_song) # Pide canciones
+
 
 # Realizar la petición HTTP POST
-response = requests.post(url, data=json_data)
+response = requests.post(url, data=train_data)
 
 # Get the headers from the response
 response_headers = response.request.headers
@@ -59,7 +69,6 @@ headers_size = len(str(response_headers))
 
 # Imprimir el código de estado de la respuesta
 print(response.status_code)
-print(headers_size)
 
 # prints de json content
 #print(response.json()['nombre'])

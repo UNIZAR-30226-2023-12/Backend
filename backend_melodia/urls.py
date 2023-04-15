@@ -32,4 +32,5 @@ urlpatterns = [
     path('AskAdminToBeArtist/', viewsApi.AskAdminToBeArtist, name='AskAdminToBeArtist'),
     path('AcceptArtist/', viewsApi.AcceptArtist, name='AcceptArtist'),
     path('echo/', viewsApi.echo, name='echo'),
+    path('entrenar_recomendador/', viewsApi.entrenar_recomendador, name='entrenar_recomendador'),
 ]

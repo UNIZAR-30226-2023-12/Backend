@@ -27,7 +27,7 @@ def setUser(r, usuarioDiccionario):
     id = daoUsuario.getIdContador(r)
     usuarioDiccionario[constantes.CLAVE_ID_USUARIO] = id
 
-    if(sorted(usuarioDiccionario) != sorted(daoUsuario.listaClaves)):
+    if(sorted(usuarioDiccionario.keys()) != sorted(daoUsuario.listaClaves)):
         return erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS
     
     if(daoUsuario.existeEmailId(r, usuarioDiccionario[constantes.CLAVE_EMAIL])):
@@ -209,12 +209,14 @@ def estaSuscrito(r, idUsuario, idArtista):
         return 1
     return 0
 
-def getNFavoritosPorGenero(r, idUsuario, genero):
-    n = 0
+def getNFavoritosPorGenero(r, idUsuario):
+    nFavoritos = [0]*constantes.GENERO_NUMERO_GENEROS
+
     for idAudio in getAudiosFavoritos(r, idUsuario):
-        if(daoAudios.obtenerGeneroCancion(r, idAudio) == genero):
-            n = n + 1
-    return n
+        idGenero = daoAudios.obtenerGeneroCancion(r, idAudio)
+        nFavoritos[idGenero] += 1
+
+    return nFavoritos
 
 def getNFavoritosPorArtista(r, idUsuario, idArtista):
     n = 0
