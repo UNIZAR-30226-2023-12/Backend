@@ -128,6 +128,11 @@ def acceptArtist(r, idUsuario, idNotificacion):
     
     return daoUsuario.setTipoUsuario(r, idUsuario, daoUsuario.constantes.USUARIO_ARTISTA)
 
+def esAdministrador(r, id):
+    if (r.exists(id) == 0):
+        return False
+    return daoUsuario.getTipoUsuario(r, id) == constantes.USUARIO_ADMINISTRADOR
+
 
 # Funciones de listas de reproducción
 def setLista(r, diccionarioLista):

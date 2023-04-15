@@ -124,3 +124,5 @@ PREFIJO_ID_LISTA = "lista"
 CLAVE_AUDIOS = "audios"
 
 CLAVE_HASH_EMAIL_ID = "tablaHashEmailId"
+
+PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO = "segundosReproducidos"

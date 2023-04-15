@@ -31,5 +31,6 @@ urlpatterns = [
     path('RemoveSongLista/', viewsApi.RemoveSongLista, name='RemoveSongLista'),
     path('AskAdminToBeArtist/', viewsApi.AskAdminToBeArtist, name='AskAdminToBeArtist'),
     path('AcceptArtist/', viewsApi.AcceptArtist, name='AcceptArtist'),
+    path('ValidateUserEmail/', viewsApi.ValidateUserEmail, name='ValidateUserEmail'),
     path('echo/', viewsApi.echo, name='echo'),
 ]

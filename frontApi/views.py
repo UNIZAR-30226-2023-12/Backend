@@ -8,6 +8,7 @@ from Configuracion import constantesErroresHTTP as erroresHTTP
 
 from Audios import moduloAudios
 from Usuarios import usuarios
+from Global import ModuloGlobal
 
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
@@ -303,6 +304,9 @@ def AcceptArtist(request):
     if (status != erroresHTTP.OK):
         return JsonResponse({'status': status}, status=status)
     
+    if(usuarios.esAdministrador(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no es administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
+    
     idNotificacion = json_data[constantes.CLAVE_ID_NOTIFICACION]
 
     status = usuarios.AcceptArtist(r, idUsuario, idNotificacion)
@@ -322,4 +326,49 @@ def ValidateUserEmail(request):
     respuesta = usuarios.validateUserEmail(r, email, contrasenya)
 
     return JsonResponse({constantes.CLAVE_ID_USUARIO: respuesta[constantes.CLAVE_ID_USUARIO]}, status=respuesta["status"])
+
+@csrf_exempt
+def GetTotRepTime(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    if(usuarios.esAdministrador(r, idUsuario) == False):
+        return JsonResponse({'error': 'No eres administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
+    
+    segundos = ModuloGlobal.getTotalSegundosReproducidosAudio(r)
+
+
+    return JsonResponse({constantes.CLAVE_SEGUNDOS: segundos}, status=erroresHTTP.OK)
+
+@csrf_exempt
+def AddSecondsToSong(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+    segundos = json_data[constantes.CLAVE_SEGUNDOS]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    if(moduloAudios.existeCancion(r, idAudio) == False):
+        return JsonResponse({'error': 'La canción no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
+    
+    status = ModuloGlobal.addSecondsToSong(r, idAudio, segundos)
+
+    return JsonResponse({'status': status}, status=status)
 
