@@ -115,6 +115,11 @@ def SetUser(request):
         
         # Stores the user in the database
         status = usuarios.setUser(r, json_data)
+        if(status == erroresHTTP.OK):
+            diccionarioLista = {constantes.CLAVE_NOMBRE_LISTA : "Favoritos", 
+                                constantes.CLAVE_PRIVACIDAD_LISTA : constantes.LISTA_PRIVADA, 
+                                constantes.CLAVE_TIPO_LISTA : constantes.LISTA_TIPO_FAVORITOS}
+            usuarios.setLista(r, diccionarioLista)
         
         return JsonResponse({'status': status}, status=status)
     else:
@@ -145,13 +150,18 @@ def SetLista(request):
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
         
-        # Compruebo que el usuario sea válido
-        respuesta = ValidateUser(r, request)
-        # Si no es valido devuelvo el error
-        if (respuesta != erroresHTTP.OK):
-            return respuesta
-        # Stores the list in the database
-        status = usuarios.setLista(r, json_data)
+        idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+        contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+
+        # Validates the user
+        status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+        if (status != erroresHTTP.OK):
+            return JsonResponse({'status': status}, status=status)
+        # Creamos el diccionario lista y quitamos los campos que no son necesarios
+        diccionarioLista = json_data.copy()
+        del diccionarioLista[constantes.CLAVE_ID_USUARIO]
+        del diccionarioLista[constantes.CLAVE_CONTRASENYA]
+        status = usuarios.setLista(r, diccionarioLista)
         
         return JsonResponse({'status': status}, status=status)
     else:
@@ -165,10 +175,14 @@ def ChangeNameListRepUsr(request):
         json_data = json.loads(request.body)
 
         # Compruebo que el usuario sea válido
-        respuesta = ValidateUser(r, request)
+        idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+        contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+        status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+
         # Si no es valido devuelvo el error
-        if (respuesta != erroresHTTP.OK):
-            return respuesta
+        if (status != erroresHTTP.OK):
+            return JsonResponse({'status': status}, status=status)
+        
         
         idLista = json_data[constantes.CLAVE_ID_LISTA]
         nombre = json_data[constantes.CLAVE_NOMBRE_LISTA]
@@ -187,10 +201,12 @@ def SetSongLista(request):
         json_data = json.loads(request.body)
 
         # Compruebo que el usuario sea válido
-        respuesta = ValidateUser(r, request)
+        idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+        contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+        status = usuarios.ValidateUser(r, idUsuario, contrasenya)
         # Si no es valido devuelvo el error
-        if (respuesta != erroresHTTP.OK):
-            return respuesta
+        if (status != erroresHTTP.OK):
+            return JsonResponse({'status': status}, status=status)
         
         idAudio = json_data[constantes.CLAVE_ID_AUDIO]
         if (moduloAudios.existeCancion(r, idAudio) == False):
@@ -212,12 +228,12 @@ def GetListaRepUsr(request):
         json_data = json.loads(request.body)
 
         # Compruebo que el usuario sea válido
-        respuesta = ValidateUser(r, request)
-        # Si no es valido devuelvo el error
-        if (respuesta != erroresHTTP.OK):
-            return respuesta
-        
         idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+        contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+        status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+        # Si no es valido devuelvo el error
+        if (status != erroresHTTP.OK):
+            return JsonResponse({'status': status}, status=status)
 
         # Stores the user in the database
         lista = usuarios.getListasUsr(r, idUsuario)
@@ -234,10 +250,12 @@ def RemoveSongLista(request):
         json_data = json.loads(request.body)
 
         # Compruebo que el usuario sea válido
-        respuesta = ValidateUser(r, request)
+        idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+        contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+        status = usuarios.ValidateUser(r, idUsuario, contrasenya)
         # Si no es valido devuelvo el error
-        if (respuesta.status_code != erroresHTTP.OK):
-            return respuesta
+        if (status != erroresHTTP.OK):
+            return JsonResponse({'status': status}, status=status)
         
         idAudio = json_data[constantes.CLAVE_ID_AUDIO]
         idLista = json_data[constantes.CLAVE_ID_LISTA]
@@ -255,15 +273,16 @@ def AskAdminToBeArtist(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    # Primero valido que el usuario que me están pasando sea válido
-    respuesta = ValidateUser(r, request)
-    if (respuesta.status_code != erroresHTTP.OK):
-        return respuesta
-    
     # Parse the JSON data from the request body to extract idUsuario
     json_data = json.loads(request.body)
+    
+    # Primero valido que el usuario que me están pasando sea válido
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
-
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
     status = usuarios.AskAdminToBeArtist(r, idUsuario)
 
     return JsonResponse({'status': status}, status=status)
@@ -274,16 +293,33 @@ def AcceptArtist(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    # Primero valido que el usuario que me están pasando sea válido
-    respuesta = ValidateUser(r, request)
-    if (respuesta.status_code != erroresHTTP.OK):
-        return respuesta
-    
     # Parse the JSON data from the request body to extract idUsuario and idNotificacion
     json_data = json.loads(request.body)
+    
+    # Primero valido que el usuario que me están pasando sea válido
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
     idNotificacion = json_data[constantes.CLAVE_ID_NOTIFICACION]
 
     status = usuarios.AcceptArtist(r, idUsuario, idNotificacion)
 
     return JsonResponse({'status': status}, status=status)
+
+@csrf_exempt
+def ValidateUserEmail(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    email = json_data[constantes.CLAVE_EMAIL]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+
+    respuesta = usuarios.validateUserEmail(r, email, contrasenya)
+
+    return JsonResponse({constantes.CLAVE_ID_USUARIO: respuesta[constantes.CLAVE_ID_USUARIO]}, status=respuesta["status"])
+

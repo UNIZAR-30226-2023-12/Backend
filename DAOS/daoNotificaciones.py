@@ -4,15 +4,7 @@ import Configuracion.constantesPrefijosClaves as constantes
 listaClaves = [constantes.CLAVE_ID_NOTIFICACION, constantes.CLAVE_ID_USUARIO_EMISIOR, constantes.CLAVE_TIPO_NOTIFICACION, constantes.CLAVE_TITULO_NOTIFICACION, constantes.CLAVE_MENSAJE_NOTIFICACION]
 
 def getIdContador(r):
-    id = r.get(constantes.CLAVE_CONTADOR_NOTIFICACIONES)
-    if(id == None):
-        r.set(constantes.CLAVE_CONTADOR_NOTIFICACIONES, 0)
-        id = 0
-    pipe = r.pipeline()
-    pipe.get(constantes.CLAVE_CONTADOR_NOTIFICACIONES)
-    pipe.incr(constantes.CLAVE_CONTADOR_NOTIFICACIONES)
-    id = pipe.execute()[0]
-    return constantes.PREFIJO_ID_NOTIFICACION + id
+    return constantes.PREFIJO_ID_NOTIFICACION + ":" + r.incr(constantes.CLAVE_CONTADOR_NOTIFICACIONES)
 
 def existeNotificacion(r, id):
     if(r.exists(id) == 0):
