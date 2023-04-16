@@ -175,5 +175,7 @@ CLAVE_AUDIOS = "audios"
 
 CLAVE_HASH_EMAIL_ID = "tablaHashEmailId"
 
+
 CLAVE_SET_USUARIOS_ENTRENADOS = "usuariosEntrenados"
 CLAVE_LISTA_ENTRENAMIENTO = "listaEntrenamiento"
+PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO = "segundosReproducidos"
