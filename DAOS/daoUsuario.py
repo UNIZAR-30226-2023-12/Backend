@@ -6,12 +6,12 @@ COUNT = 100
 
 listaClaves = [constantes.CLAVE_ID_USUARIO, constantes.CLAVE_EMAIL, 
                constantes.CLAVE_ALIAS, constantes.CLAVE_CONTRASENYA, 
-               constantes.CLAVE_TIPO_USUARIO, constantes.CLAVE_ID_ULTIMO_AUDIO]
+               constantes.CLAVE_TIPO_USUARIO]
 
 
 
 def getIdContador(r):
-    return constantes.PREFIJO_ID_USUARIO + ":" + r.incr(constantes.CLAVE_CONTADOR_USUARIOS)
+    return constantes.PREFIJO_ID_USUARIO + ":" + str(r.incr(constantes.CLAVE_CONTADOR_USUARIOS))
 
 def existeUsuario(r, idUsuario):
     if(r.exists(idUsuario) == 0):
@@ -143,10 +143,10 @@ def getCanciones(r, id):
 
 # Función adicional de administrador
 def anyadirAdministrador(r, id):
-    return r.sadd(constantes.CLAVE_ADMINISTRADORES, *id)
+    return r.sadd(constantes.CLAVE_ADMINISTRADORES, id)
 
 def eliminarAdministrador(r, id):
-    return r.srem(constantes.CLAVE_ADMINISTRADORES, *id)
+    return r.srem(constantes.CLAVE_ADMINISTRADORES, id)
 
 def getAdministradores(r):
     parar = False
