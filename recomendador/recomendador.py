@@ -9,23 +9,13 @@ def create_model(conn):
     # Carga los datos de entrenamiento, 
     # cada Xtr compuesto por una pareja 
     # [información del audio actual, información de los audios anteriores]
-    Xtr, ytr = data_gen.get_training_data(conn)
-    
-    print("Xtr shape: ", np.shape(Xtr))
-    print("ytr shape: ", np.shape(ytr))
-
-    print("Xtr[0, 0] shape: ", np.shape(Xtr[0][0]))
-    print("Xtr[0, 1] shape: ", np.shape(Xtr[0][1]))
-
-    print(Xtr[0][0])
-    print(Xtr[0][1])
+    Xtr, Xtr_temporal, ytr = data_gen.get_training_data(conn)
 
     
     ################  CREACIÓN DEL MODELO  ################
 
-    input_shape_actual = np.shape(Xtr[0][0]) # [Ejemplo inicial, información actual del ejemplo] 
-    input_shape_temporal = np.shape(Xtr[0][1]) # [Ejemplo inicial, información temporal del ejemplo]
-
+    input_shape_actual = np.shape(Xtr)[1:]              # [información actual del ejemplo] 
+    input_shape_temporal = np.shape(Xtr_temporal)[1:]   # [información temporal del ejemplo]
 
     ########## Capas de entrada ##########
     capa_actual = keras.models.Sequential([
@@ -54,7 +44,7 @@ def create_model(conn):
 
 
     model = keras.Model(inputs=[capa_actual.input, capa_temporal.input], outputs=capa_salida)
-    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy", "recall"])
+    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy", "Recall"])
 
-    model.fit(Xtr, ytr, epochs=10)
+    model.fit([Xtr, Xtr_temporal], ytr, epochs=10)
 

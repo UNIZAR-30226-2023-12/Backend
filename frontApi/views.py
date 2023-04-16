@@ -342,6 +342,27 @@ def ValidateUserEmail(request):
 
 @csrf_exempt
 def entrenar_recomendador(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    if(usuarios.esAdministrador(r, idUsuario) == False):
+        return JsonResponse({'error': 'No eres administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
+    
+    status = rec.create_model(r)
+
+    return JsonResponse({'status': status}, status=status)
+
+
+
 @csrf_exempt
 def GetTotRepTime(request):
     if request.method != 'GET':
