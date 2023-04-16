@@ -5,8 +5,8 @@ from django.middleware import csrf
 from django.http import HttpRequest
 
 # URL del endpoint SetSong
-url = 'http://127.0.0.1:8000/entrenar_recomendador/'
-url_get = 'http://127.0.0.1:8000/GetSong/'
+url_train = 'http://127.0.0.1:8000/entrenar_recomendador/'
+url_add_examples = 'http://127.0.0.1:8000/AlmacenarEjemplo/'
 
 # Crear un objeto HttpRequest vacío
 # request = HttpRequest()
@@ -39,11 +39,10 @@ new_song_data = {
     'longitud': 318
 }
 
-params_get_song = {
+params_example = {
     'idUsr': 'usuario:1',
-    'idSong': 'idAudio:10',
-    'calidadAlta': 'True',
-    'esCancion': 'True'
+    'idAudio': 'idAudio:10',
+    'valoracion': '0.9'
 }
 
 
@@ -55,11 +54,11 @@ train_data = {
 train_data = json.dumps(train_data)
 
 for i in range(10):
-    response = requests.get(url_get, params=params_get_song) # Pide canciones
+    response = requests.post(url_add_examples, params=params_example) # Pide canciones
 
 
 # Realizar la petición HTTP POST
-response = requests.post(url, data=train_data)
+response = requests.post(url_train, data=train_data)
 
 # Get the headers from the response
 response_headers = response.request.headers

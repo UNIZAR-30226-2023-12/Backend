@@ -62,10 +62,35 @@ def GetSong(request):
         if idUsr == None:
             return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
         
-        gen_datos.store_training_example(r, idUsr, id, output=1)
         # Gets the serialized audio
         return JsonResponse({'fichero': fichero})
+
+
+@csrf_exempt
+def AlmacenarEjemplo(request):
+    # Compruebo que el método sea GET
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
     
+    idUsr = request.POST.get('idUsr')
+    if idUsr == None:
+        return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+    
+    idAudio = request.POST.get('idAudio')
+    if idAudio == None:
+        return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+    
+    valoracion = request.POST.get('valoracion')
+    if valoracion == None:
+        return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+    
+    valoracion = float(valoracion)
+
+    gen_datos.store_training_example(r, idUsr, idAudio, valoracion)
+
+    return JsonResponse({'msg': 'Ejemplo almacenado correctamente'}, status=erroresHTTP.OK)
+
+
 # View que devuelve una lista de canciones
 @csrf_exempt
 def GetSongs(request):
