@@ -9,8 +9,8 @@ from Configuracion import constantesErroresHTTP as erroresHTTP
 from Audios import moduloAudios
 from Usuarios import usuarios
 
-from recomendador import generacion_datos as gen_datos
-from recomendador import recomendador as rec
+#from recomendador import generacion_datos as gen_datos
+#from recomendador import recomendador as rec
 
 from Global import ModuloGlobal
 
@@ -338,10 +338,6 @@ def ValidateUserEmail(request):
 
     return JsonResponse({constantes.CLAVE_ID_USUARIO: respuesta[constantes.CLAVE_ID_USUARIO]}, status=respuesta["status"])
 
-
-
-@csrf_exempt
-def entrenar_recomendador(request):
 @csrf_exempt
 def GetTotRepTime(request):
     if request.method != 'GET':
@@ -382,10 +378,13 @@ def AddSecondsToSong(request):
     
     status = rec.create_model(r)
 
-    return JsonResponse({'status': status}, status=status)
     if(moduloAudios.existeCancion(r, idAudio) == False):
         return JsonResponse({'error': 'La canción no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
     
     status = ModuloGlobal.addSecondsToSong(r, idAudio, segundos)
 
     return JsonResponse({'status': status}, status=status)
+
+@csrf_exempt
+def entrenar_recomendador():
+    pass
