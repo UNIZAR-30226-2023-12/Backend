@@ -162,7 +162,7 @@ def SetLista(request):
         diccionarioLista = json_data.copy()
         del diccionarioLista[constantes.CLAVE_ID_USUARIO]
         del diccionarioLista[constantes.CLAVE_CONTRASENYA]
-        status = usuarios.setLista(r, diccionarioLista)
+        status = usuarios.setLista(r, idUsuario, diccionarioLista)
         
         return JsonResponse({'status': status}, status=status)
     else:
@@ -309,7 +309,7 @@ def AcceptArtist(request):
     
     idNotificacion = json_data[constantes.CLAVE_ID_NOTIFICACION]
 
-    status = usuarios.AcceptArtist(r, idUsuario, idNotificacion)
+    status = usuarios.acceptArtist(r, idNotificacion)
 
     return JsonResponse({'status': status}, status=status)
 
@@ -324,6 +324,8 @@ def ValidateUserEmail(request):
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
 
     respuesta = usuarios.validateUserEmail(r, email, contrasenya)
+    if (respuesta["status"] != erroresHTTP.OK):
+        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
 
     return JsonResponse({constantes.CLAVE_ID_USUARIO: respuesta[constantes.CLAVE_ID_USUARIO]}, status=respuesta["status"])
 

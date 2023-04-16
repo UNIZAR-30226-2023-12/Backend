@@ -79,7 +79,7 @@ def AskAdminToBeArtist(r, idUsuario):
     administradores = daoUsuario.getAdministradores(r)
     for admin in administradores:
         daoUsuario.anyadirNotificacion(r, admin, idNotificacion)
-    return 1
+    return erroresHTTP.OK
     
 def ValidateUser(r, id, contrasenya):
     if (existeUsuario(r, id) == False): 
@@ -90,6 +90,9 @@ def ValidateUser(r, id, contrasenya):
     return erroresHTTP.ERROR_CONTRASENYA_INCORRECTA
 
 def validateUserEmail(r, email, contrasenya):
+    if (daoUsuario.existeEmailId(r, email) == False):
+        respuesta = {"status": erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}
+        return respuesta
     idUsuario = daoUsuario.getIdEmailId(r, email)
     status = ValidateUser(r, idUsuario, contrasenya)
     respuesta = {"status": status, constantes.CLAVE_ID_USUARIO : idUsuario}
@@ -115,18 +118,20 @@ def getLastSecondHeard(r, idUsuario, idAudio):
 
 
 # Funciones adcionales de administradores
-def acceptArtist(r, idUsuario, idNotificacion):
-    if(daoNotificaciones.getIdUsuarioEmisor(r, idNotificacion) != idUsuario):
-        return -1
+def acceptArtist(r, idNotificacion):
+    idUsuario = daoNotificaciones.getIdUsuarioEmisor(r, idNotificacion)
+    if(existeUsuario(idUsuario)):
+        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
     if(daoNotificaciones.getTipoNotificacion(r, idNotificacion) != constantes.NOTIFICACION_TIPO_SOLICITUD_ARTISTA):
-        return -1
+        return erroresHTTP.ERROR_NOTIFICACION_NO_SOLICITUD_ARTISTA
     
     # Eliminamos la notificación a los administradores
     administradores = daoUsuario.getAdministradores(r)
     for admin in administradores:
         daoUsuario.eliminarNotificacion(r, admin, idNotificacion)
     
-    return daoUsuario.setTipoUsuario(r, idUsuario, daoUsuario.constantes.USUARIO_ARTISTA)
+    daoUsuario.setTipoUsuario(r, idUsuario, daoUsuario.constantes.USUARIO_ARTISTA)
+    return erroresHTTP.OK
 
 def esAdministrador(r, id):
     if (r.exists(id) == 0):
@@ -135,7 +140,7 @@ def esAdministrador(r, id):
 
 
 # Funciones de listas de reproducción
-def setLista(r, diccionarioLista):
+def setLista(r, idUsuario, diccionarioLista):
     id = daoListas.getIdContador(r)
     diccionarioLista[constantes.CLAVE_ID_LISTA] = id
 
@@ -143,6 +148,7 @@ def setLista(r, diccionarioLista):
         return erroresHTTP.ERROR_LISTA_PARAMETROS_INCORRECTOS
     
     daoListas.setLista(r, diccionarioLista) 
+    daoUsuario.anyadirLista(r, idUsuario, id)
     return erroresHTTP.OK
 
 def setNombreLista(r, idLista, nombre):
