@@ -140,7 +140,7 @@ def obtenerValCancion(r, id):
 
 # Funcion para obtener el genero de una cancion
 def obtenerGeneroCancion(r, id):
-    return r.hget(id, 'generos')
+    return int(r.hget(id, 'generos'))
 
 # Funcion para obtener el nombre de una cancion
 def obtenerNombreCancion(r, id):
@@ -172,7 +172,8 @@ def obtenerNumFavoritosCancion(r, id):
 
 # Funcion para obtener el atributo esPodcast de un audio
 def obtenerEsPodcast(r, id):
-    return r.hget(id, 'esPodcast')
+
+    return r.hget(id, 'esPodcast') == 'True'
 
 #########################################################################################
 #

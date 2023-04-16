@@ -8,12 +8,17 @@ from Configuracion import constantesErroresHTTP as erroresHTTP
 
 from Audios import moduloAudios
 from Usuarios import usuarios
+
+#from recomendador import generacion_datos as gen_datos
+#from recomendador import recomendador as rec
+
 from Global import ModuloGlobal
+
 
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
-r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True)#, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
+r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
 
 # echo request
 @csrf_exempt
@@ -53,12 +58,18 @@ def GetSong(request):
     if fichero == 419 or fichero == 424 or fichero == 430 or fichero == 425:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=fichero)
     else:
+        idUsr = request.GET.get('idUsr')
+        if idUsr == None:
+            return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+        
+        gen_datos.store_training_example(r, idUsr, id, output=1)
         # Gets the serialized audio
         return JsonResponse({'fichero': fichero})
     
 # View que devuelve una lista de canciones
 @csrf_exempt
 def GetSongs(request):
+    
     # Compruebo que el método sea GET
     if request.method != 'GET':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -367,6 +378,8 @@ def AddSecondsToSong(request):
     if (status != erroresHTTP.OK):
         return JsonResponse({'status': status}, status=status)
     
+    status = rec.create_model(r)
+
     if(moduloAudios.existeCancion(r, idAudio) == False):
         return JsonResponse({'error': 'La canción no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
     
@@ -374,3 +387,6 @@ def AddSecondsToSong(request):
 
     return JsonResponse({'status': status}, status=status)
 
+@csrf_exempt
+def entrenar_recomendador():
+    pass

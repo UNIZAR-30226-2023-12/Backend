@@ -9,7 +9,7 @@
 
 from Audios import controlAudios
 from Audios import controlCalidadAudios
-
+from Configuracion import constantesPrefijosClaves as constantes 
 ##############################################################################################################
 #
 #
@@ -40,9 +40,12 @@ def anyadirCancion(r, dic):
     calidad = dic['calidad']
     nVeces = 0
     val = 0
-    generos = dic['generos']
+    genero = dic['generos']
     longitud = dic['longitud']
     esPodcast = dic['esPodcast']
+
+    # Obtiene la id del genero de las constantes
+    idGenero = constantes.obtenerIDGenero(genero)
 
     if calidad == 'alta':
         ficheroAltaCalidad = dic['ficheroAltaCalidad']
@@ -60,9 +63,13 @@ def anyadirCancion(r, dic):
 
     id = 'idAudio:' + str(id)
     # Construyo el diccionario para almacenar los datos de la canción
-    cancionDic = {'id': id, 'nombre': nombre, 'artista': artista, 'calidad': calidad, 'nVeces': nVeces, 'val': val, 'generos': generos, 'ficheroAltaCalidad': ficheroAltaCalidad, 'ficheroBajaCalidad': ficheroBajaCalidad, 'longitud': longitud, 'numFavoritos': 0, 'esPodcast': esPodcast}
+    cancionDic = {'id': id, 'nombre': nombre, 'artista': artista, 
+                  'calidad': calidad, 'nVeces': nVeces, 'val': val, 
+                  'generos': idGenero, 'ficheroAltaCalidad': ficheroAltaCalidad, 
+                  'ficheroBajaCalidad': ficheroBajaCalidad, 'longitud': longitud, 
+                  'numFavoritos': 0, 'esPodcast': esPodcast}
 
-    print("Cancion a almacenar: " + str(cancionDic))
+    #print("Cancion a almacenar: " + str(cancionDic))
     # Almaceno la canción
     controlAudios.almacenarCancion(r, cancionDic)
 

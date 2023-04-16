@@ -31,12 +31,62 @@ GENERO_PUNK = 19
 GENERO_FUNK = 20
 
 GENERO_NUMERO_GENEROS = 21
+
+def obtenerIDGenero(genero):
+    genero = genero.lower()
+
+    if(genero == "pop"):
+        return GENERO_POP
+    elif(genero == "rock"):
+        return GENERO_ROCK
+    elif(genero == "metal"):
+        return GENERO_METAL
+    elif(genero == "rap"):
+        return GENERO_RAP
+    elif(genero == "reggae"):
+        return GENERO_REGGAE
+    elif(genero == "jazz"):
+        return GENERO_JAZZ
+    elif(genero == "blues"):
+        return GENERO_BLUES
+    elif(genero == "clasica"):
+        return GENERO_CLASICA
+    elif(genero == "electronica"):
+        return GENERO_ELECTRONICA
+    elif(genero == "folk"):
+        return GENERO_FOLK
+    elif(genero == "latina"):
+        return GENERO_LATINA
+    elif(genero == "indie"):
+        return GENERO_INDIE
+    elif(genero == "country"):
+        return GENERO_COUNTRY
+    elif(genero == "ambient"):
+        return GENERO_AMBIENT
+    elif(genero == "trap"):
+        return GENERO_TRAP
+    elif(genero == "dance"):
+        return GENERO_DANCE
+    elif(genero == "hiphop"):
+        return GENERO_HIPHOP
+    elif(genero == "rnb"):
+        return GENERO_RNB
+    elif(genero == "soul"):
+        return GENERO_SOUL
+    elif(genero == "punk"):
+        return GENERO_PUNK
+    elif(genero == "funk"):
+        return GENERO_FUNK
+    else:
+        return -1
+
+
 RECOMENDADOR_TAMANYO_VENTANA_PREDICCION = 10
 
 
 # Constantes simbólicas de las claves de los atributos de usuario
 CLAVE_CONTADOR_USUARIOS = "contadorUsuarios"
-CLAVE_ID_USUARIO = "idUsuario"
+CLAVE_ID_USUARIO = "idUsr"
 CLAVE_EMAIL = "email"
 CLAVE_ALIAS = "alias"
 CLAVE_CONTRASENYA = "contrasenya"
@@ -125,4 +175,7 @@ CLAVE_AUDIOS = "audios"
 
 CLAVE_HASH_EMAIL_ID = "tablaHashEmailId"
 
+
+CLAVE_SET_USUARIOS_ENTRENADOS = "usuariosEntrenados"
+CLAVE_LISTA_ENTRENAMIENTO = "listaEntrenamiento"
 PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO = "segundosReproducidos"

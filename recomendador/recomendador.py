@@ -1,4 +1,4 @@
-import generacion_datos as data_gen
+import recomendador.generacion_datos as data_gen
 
 import tensorflow as tf
 from tensorflow import keras
@@ -11,12 +11,20 @@ def create_model(conn):
     # [información del audio actual, información de los audios anteriores]
     Xtr, ytr = data_gen.get_training_data(conn)
     
+    print("Xtr shape: ", np.shape(Xtr))
+    print("ytr shape: ", np.shape(ytr))
+
+    print("Xtr[0, 0] shape: ", np.shape(Xtr[0][0]))
+    print("Xtr[0, 1] shape: ", np.shape(Xtr[0][1]))
+
+    print(Xtr[0][0])
+    print(Xtr[0][1])
 
     
     ################  CREACIÓN DEL MODELO  ################
 
-    input_shape_actual = np.shape(Xtr[0, 0]) # [Ejemplo inicial, información actual del ejemplo] 
-    input_shape_temporal = np.shape(Xtr[0, 1]) # [Ejemplo inicial, información temporal del ejemplo]
+    input_shape_actual = np.shape(Xtr[0][0]) # [Ejemplo inicial, información actual del ejemplo] 
+    input_shape_temporal = np.shape(Xtr[0][1]) # [Ejemplo inicial, información temporal del ejemplo]
 
 
     ########## Capas de entrada ##########
@@ -45,8 +53,8 @@ def create_model(conn):
     ])(capa_combinada)
 
 
-    model = keras.models.Model(inputs=[capa_actual.input, capa_temporal.input], outputs=capa_salida)
+    model = keras.Model(inputs=[capa_actual.input, capa_temporal.input], outputs=capa_salida)
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy", "recall"])
 
-    model.train(Xtr, ytr, epochs=10)
+    model.fit(Xtr, ytr, epochs=10)
 
