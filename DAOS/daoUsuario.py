@@ -112,10 +112,10 @@ def getCarpetas(r, idUsuario, idCarpeta):
 
 # Funciones para añadir, eliminar y obtener relaciones del usuario
 def anyadirRelacion(r, idUsuario, idRealacion, prefijoRelacion):
-    return r.sadd(prefijoRelacion + ":" + idUsuario, *idRealacion)
+    return r.sadd(prefijoRelacion + ":" + idUsuario, idRealacion)
 
 def eliminarRelacion(r, idUsuario, idRealacion, prefijoRelacion):
-    return r.srem(prefijoRelacion + ":" + idUsuario, *idRealacion)
+    return r.srem(prefijoRelacion + ":" + idUsuario, idRealacion)
 
 def getRelaciones(r, idUsuario, prefijoRelacion):
     parar = False

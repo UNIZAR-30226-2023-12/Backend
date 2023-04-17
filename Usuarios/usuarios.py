@@ -42,7 +42,7 @@ def setUser(r, usuarioDiccionario):
 
     # Lo añadimos al hash con la clave como email y el valor como id
     daoUsuario.setEmailId(r, usuarioDiccionario[constantes.CLAVE_EMAIL], id)
-    return erroresHTTP.OK
+    return str(erroresHTTP.OK) + "," + str(id)
 
 def removeUser(r, id, contrasenya):
     if(r.exists(id) == 0):

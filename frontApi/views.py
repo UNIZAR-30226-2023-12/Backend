@@ -126,14 +126,17 @@ def SetUser(request):
         json_data = json.loads(request.body)
         
         # Stores the user in the database
-        status = usuarios.setUser(r, json_data)
-        if(status == erroresHTTP.OK):
+        response = usuarios.setUser(r, json_data)
+        if response == 532 or response == 539:
+            return JsonResponse({'error': 'Ha ocurrido un problema'}, status=response)
+        else:
+            idUsuario = response.split(",")[1]
             diccionarioLista = {constantes.CLAVE_NOMBRE_LISTA : "Favoritos", 
                                 constantes.CLAVE_PRIVACIDAD_LISTA : constantes.LISTA_PRIVADA, 
                                 constantes.CLAVE_TIPO_LISTA : constantes.LISTA_TIPO_FAVORITOS}
-            usuarios.setLista(r, diccionarioLista)
+            usuarios.setLista(r, idUsuario, diccionarioLista)
         
-        return JsonResponse({'status': status}, status=status)
+        return JsonResponse({'status': 200}, status=200)
     else:
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -235,7 +238,7 @@ def SetSongLista(request):
 
 @csrf_exempt 
 def GetListaRepUsr(request):
-    if request.method == 'GET':
+    if request.method == 'POST':
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
 
