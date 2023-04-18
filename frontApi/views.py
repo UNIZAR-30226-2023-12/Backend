@@ -9,10 +9,16 @@ from Configuracion import constantesErroresHTTP as erroresHTTP
 from Audios import moduloAudios
 from Usuarios import usuarios
 
+#from recomendador import generacion_datos as gen_datos
+#from recomendador import recomendador as rec
+
+from Global import ModuloGlobal
+
+
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
-r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True)#, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
+r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
 
 # echo request
 @csrf_exempt
@@ -52,12 +58,18 @@ def GetSong(request):
     if fichero == 419 or fichero == 424 or fichero == 430 or fichero == 425:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=fichero)
     else:
+        idUsr = request.GET.get('idUsr')
+        if idUsr == None:
+            return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+        
+        gen_datos.store_training_example(r, idUsr, id, output=1)
         # Gets the serialized audio
         return JsonResponse({'fichero': fichero})
     
 # View que devuelve una lista de canciones
 @csrf_exempt
 def GetSongs(request):
+    
     # Compruebo que el método sea GET
     if request.method != 'GET':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -114,14 +126,17 @@ def SetUser(request):
         json_data = json.loads(request.body)
         
         # Stores the user in the database
-        status = usuarios.setUser(r, json_data)
-        if(status == erroresHTTP.OK):
+        response = usuarios.setUser(r, json_data)
+        if response == 532 or response == 539:
+            return JsonResponse({'error': 'Ha ocurrido un problema'}, status=response)
+        else:
+            idUsuario = response.split(",")[1]
             diccionarioLista = {constantes.CLAVE_NOMBRE_LISTA : "Favoritos", 
                                 constantes.CLAVE_PRIVACIDAD_LISTA : constantes.LISTA_PRIVADA, 
                                 constantes.CLAVE_TIPO_LISTA : constantes.LISTA_TIPO_FAVORITOS}
-            usuarios.setLista(r, diccionarioLista)
+            usuarios.setLista(r, idUsuario, diccionarioLista)
         
-        return JsonResponse({'status': status}, status=status)
+        return JsonResponse({'status': 200}, status=200)
     else:
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -161,7 +176,7 @@ def SetLista(request):
         diccionarioLista = json_data.copy()
         del diccionarioLista[constantes.CLAVE_ID_USUARIO]
         del diccionarioLista[constantes.CLAVE_CONTRASENYA]
-        status = usuarios.setLista(r, diccionarioLista)
+        status = usuarios.setLista(r, idUsuario, diccionarioLista)
         
         return JsonResponse({'status': status}, status=status)
     else:
@@ -223,7 +238,7 @@ def SetSongLista(request):
 
 @csrf_exempt 
 def GetListaRepUsr(request):
-    if request.method == 'GET':
+    if request.method == 'POST':
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
 
@@ -303,9 +318,12 @@ def AcceptArtist(request):
     if (status != erroresHTTP.OK):
         return JsonResponse({'status': status}, status=status)
     
+    if(usuarios.esAdministrador(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no es administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
+    
     idNotificacion = json_data[constantes.CLAVE_ID_NOTIFICACION]
 
-    status = usuarios.AcceptArtist(r, idUsuario, idNotificacion)
+    status = usuarios.acceptArtist(r, idNotificacion)
 
     return JsonResponse({'status': status}, status=status)
 
@@ -320,6 +338,58 @@ def ValidateUserEmail(request):
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
 
     respuesta = usuarios.validateUserEmail(r, email, contrasenya)
+    if (respuesta["status"] != erroresHTTP.OK):
+        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
 
     return JsonResponse({constantes.CLAVE_ID_USUARIO: respuesta[constantes.CLAVE_ID_USUARIO]}, status=respuesta["status"])
 
+@csrf_exempt
+def GetTotRepTime(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    if(usuarios.esAdministrador(r, idUsuario) == False):
+        return JsonResponse({'error': 'No eres administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
+    
+    segundos = ModuloGlobal.getTotalSegundosReproducidosAudio(r)
+
+
+    return JsonResponse({constantes.CLAVE_SEGUNDOS: segundos}, status=erroresHTTP.OK)
+
+@csrf_exempt
+def AddSecondsToSong(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+    segundos = json_data[constantes.CLAVE_SEGUNDOS]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    status = rec.create_model(r)
+
+    if(moduloAudios.existeCancion(r, idAudio) == False):
+        return JsonResponse({'error': 'La canción no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
+    
+    status = ModuloGlobal.addSecondsToSong(r, idAudio, segundos)
+
+    return JsonResponse({'status': status}, status=status)
+
+@csrf_exempt
+def entrenar_recomendador():
+    pass
