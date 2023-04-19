@@ -83,6 +83,11 @@ def obtenerIDGenero(genero):
 
 RECOMENDADOR_TAMANYO_VENTANA_PREDICCION = 10
 
+# Sets globales
+PREFIJO_LISTA_GLOBAL_CANCIONES = "listaGlobalCanciones"
+PREFIJO_LISTA_GLOBAL_USUARIOS = "listaGlobalUsuarios"
+PREFIJO_LISTA_GLOBAL_ARTISTAS = "listaGlobalArtistas"
+PREFIJO_LISTA_GLOBAL_PODCASTS = "listaGlobalPodcasts"
 
 # Constantes simbólicas de las claves de los atributos de usuario
 CLAVE_CONTADOR_USUARIOS = "contadorUsuarios"

@@ -87,6 +87,7 @@ def ValidateUser(r, id, contrasenya):
     
     if (daoUsuario.getContrasenya(r, id) == contrasenya):
         return erroresHTTP.OK
+
     return erroresHTTP.ERROR_CONTRASENYA_INCORRECTA
 
 def validateUserEmail(r, email, contrasenya):
