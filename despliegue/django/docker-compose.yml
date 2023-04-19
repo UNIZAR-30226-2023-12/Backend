@@ -3,5 +3,5 @@ services:
   django:
     image: melodia/django:latest
     ports:
-      - "8081:8081"
+      - "127.0.0.1:8081:8081"
     container_name: django
