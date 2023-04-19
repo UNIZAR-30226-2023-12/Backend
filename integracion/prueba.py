@@ -5,7 +5,8 @@ from django.middleware import csrf
 from django.http import HttpRequest
 
 # URL del endpoint SetSong
-url = 'http://127.0.0.1:8000/entrenar_recomendador/'
+url_set_song = 'http://127.0.0.1:8000/SetSong/'
+url_set_usr = 'http://127.0.0.1:8000/SetUser/'
 url_get = 'http://127.0.0.1:8000/GetSong/'
 
 # Crear un objeto HttpRequest vacío
@@ -26,10 +27,19 @@ with open('STARSET-DIE FOR YOU.mp3', 'rb') as f:
     # Convertir el resultado a una cadena de texto
     resultado = codificado.decode('utf-8')
 
+# String idUsr, String email, String alias, String contrasenya, String tipoUsuario
+new_user_data = {
+    'idUsr': 'admin',
+    'email': 'admin@melodia.es',
+    'alias': 'admin',
+    'contrasenya': '1234',
+    'tipoUsuario': 'admin'
+}
+
 # Datos del cuerpo de la petición
 new_song_data = {
     'nombre': 'Die for you',
-    'idUsuario': 'usuario:1',
+    'idUsr': 'usuario:2',
     'contrasenya': '1234',
     'artista': 'Starset',
     'calidad': 'baja',
@@ -40,26 +50,17 @@ new_song_data = {
 }
 
 params_get_song = {
-    'idUsr': 'usuario:1',
-    'idSong': 'idAudio:10',
+    'idUsr': 'usuario:2',
+    'idSong': 'idAudio:1',
     'calidadAlta': 'True',
     'esCancion': 'True'
 }
 
 
-train_data = {
-    'idUsr': 'usuario:1',
-    'contrasenya': '1234'
-}
-
-train_data = json.dumps(train_data)
-
-for i in range(10):
-    response = requests.get(url_get, params=params_get_song) # Pide canciones
-
 
 # Realizar la petición HTTP POST
-response = requests.post(url, data=train_data)
+#response = requests.post(url_set_song, json=new_song_data)
+response = requests.get(url_get, params=params_get_song)
 
 # Get the headers from the response
 response_headers = response.request.headers
@@ -69,6 +70,6 @@ headers_size = len(str(response_headers))
 
 # Imprimir el código de estado de la respuesta
 print(response.status_code)
-
+print(response.json())
 # prints de json content
 #print(response.json()['nombre'])

@@ -87,6 +87,7 @@ def ValidateUser(r, id, contrasenya):
     
     if (daoUsuario.getContrasenya(r, id) == contrasenya):
         return erroresHTTP.OK
+
     return erroresHTTP.ERROR_CONTRASENYA_INCORRECTA
 
 def validateUserEmail(r, email, contrasenya):
@@ -190,14 +191,115 @@ def getSongsArtist(r, idArtista):
     return daoUsuario.getCanciones(r, idArtista)
 
 def getListaRepUsr(r, idLista):
-    return daoListas.getLista(r, idLista)
+    if(existeLista(r, idLista) == False):
+        respuesta = {"status": erroresHTTP.ERROR_LISTA_NO_ENCONTRADA}
+        return respuesta
+    
+    respuesta = {"status": erroresHTTP.OK, constantes.PREFIJO_ID_LISTA : daoListas.getLista(r, idLista)}
+    return respuesta
 
-def removeSongLista(r, idUsuario, idLista, idAudio):
+def removeSongLista(r, idLista, idAudio):
     if (daoListas.existeLista(r, idLista) == False):
         return erroresHTTP.ERROR_LISTA_NO_ENCONTRADA
     
+    if (daoAudios.existeCancion(r, idAudio) == False):
+        return erroresHTTP.ERROR_CANCION_NO_ENCONTRADA
+    
     daoListas.eliminarAudioLista(r, idLista, idAudio)
     return erroresHTTP.OK
+
+# Funciones para carpetas
+def setFolder(r, diccionarioCarpeta):
+    id = daoCarpetas.getIdContador(r)
+    diccionarioCarpeta[constantes.CLAVE_ID_CARPETA] = id
+
+    if(sorted(diccionarioCarpeta) != sorted(daoCarpetas.carpetasClaves)):
+        return erroresHTTP.ERROR_CARPETA_PARAMETROS_INCORRECTOS
+    
+    daoCarpetas.setCarpeta(r, diccionarioCarpeta) 
+    return erroresHTTP.OK
+
+def addListToFolder(r, idCarpeta, idLista):
+    if (existeCarpeta(r, idCarpeta) == False):
+        return erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA
+    if (existeLista(r, idLista) == False):
+        return erroresHTTP.ERROR_LISTA_NO_ENCONTRADA
+    daoCarpetas.anyadirListaCarpeta(r, idCarpeta, idLista)
+    return erroresHTTP.OK
+
+def removeListFromFolder(r, idCarpeta, idLista):
+    if (existeCarpeta(r, idCarpeta) == False):
+        return erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA
+    if (existeLista(r, idLista) == False):
+        return erroresHTTP.ERROR_LISTA_NO_ENCONTRADA
+    if(daoCarpetas.eliminarListaCarpeta(r, idCarpeta, idLista) == 0):
+        return erroresHTTP.ERROR_CARPETA_NO_TIENE_LISTA
+    return erroresHTTP.OK
+    
+def removeFolder(r, idCarpeta):
+    if (existeCarpeta(r, idCarpeta) == False):
+        return erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA
+    daoCarpetas.eliminarCarpeta(r, idCarpeta)
+    return erroresHTTP.OK
+
+def getFolder(r, idCarpeta):
+    
+    if(existeCarpeta(r, idCarpeta) == False):
+        respuesta = {"status": erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA}
+        return respuesta
+    respuesta = {"status": erroresHTTP.OK, constantes.PREFIJO_ID_CARPETA : daoCarpetas.getCarpeta(r, idCarpeta)}
+    return respuesta
+
+def getFoldersUser(r, idUsuario):
+    if(existeUsuario(r, idUsuario) == False):
+        respuesta = {"status": erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}
+        return respuesta
+    respuesta = {"status": erroresHTTP.OK, constantes.PREFIJO_ID_CARPETA : daoUsuario.getCarpetas(r, idUsuario)}
+    return respuesta
+
+# Funciones para gestionar amigos
+def askFriend(r, idUsuario, idUsuarioAmigo):
+    if(existeUsuario(r, idUsuario) == False):
+        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
+    if(existeUsuario(r, idUsuarioAmigo) == False):
+        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
+    if(idUsuario in daoUsuario.getAmigos(r, idUsuarioAmigo)):
+        return erroresHTTP.ERROR_USUARIO_YA_AMIGO
+    
+    idNotificacion = daoNotificaciones.getIdContador(r)
+    diccionarioNotificacion = {constantes.CLAVE_ID_NOTIFICACION: idNotificacion,
+                               constantes.CLAVE_ID_USUARIO_EMISIOR: idUsuario,
+                               constantes.CLAVE_TIPO_NOTIFICACION: constantes.NOTIFICACION_TIPO_AMIGO,
+                               constantes.CLAVE_TITULO_NOTIFICACION: "Solicitud de amistad",
+                               constantes.CLAVE_MENSAJE_NOTIFICACION: "El usuario " + daoUsuario.getAlias(r, idUsuario) + " quiere ser tu amigo"} 
+    daoNotificaciones.setNotificacion(r, diccionarioNotificacion)
+    daoUsuario.anyadirNotificacion(r, idUsuarioAmigo, idNotificacion)
+    return erroresHTTP.OK
+
+def accpetFriend(r, idUsuario, idNotificacion):
+    if(existeNotificacion(r, idNotificacion) == False):
+        return erroresHTTP.ERROR_NOTIFICACION_NO_ENCONTRADA
+    if(daoNotificaciones.getTipoNotificacion(r, idNotificacion) != constantes.NOTIFICACION_TIPO_AMIGO):
+        return erroresHTTP.ERROR_NOTIFICACION_NO_AMIGO
+    idUsuarioAmigo = daoNotificaciones.getIdUsuarioEmisor(r, idNotificacion)    
+    daoUsuario.anyadirAmigo(r, idUsuarioAmigo, idUsuario)
+    daoUsuario.anyadirAmigo(r, idUsuario, idUsuarioAmigo)
+    daoNotificaciones.eliminarNotificacion(r, idNotificacion)
+    daoUsuario.eliminarNotificacion(r, idUsuario, idNotificacion)
+    return erroresHTTP.OK
+
+
+def removeFriend(r, idUsuario, idUsuarioAmigo):
+    if(existeUsuario(r, idUsuario) == False):
+        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
+    if(existeUsuario(r, idUsuarioAmigo) == False):
+        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
+    if(idUsuarioAmigo not in daoUsuario.getAmigos(r, idUsuario)):
+        return erroresHTTP.ERROR_USUARIO_NO_AMIGO
+    daoUsuario.eliminarAmigo(r, idUsuario, idUsuarioAmigo)
+    daoUsuario.eliminarAmigo(r, idUsuarioAmigo, idUsuario)
+    return erroresHTTP.OK
+
 
 
 # Funciones para recomendador
@@ -249,6 +351,8 @@ def getAudiosFavoritos(r, idUsuario):
         if(daoListas.getTipoLista(r, idLista) == constantes.LISTA_TIPO_FAVORITOS):
             audios = daoListas.getAudios(r, idLista)
     return audios
+
+
 
 
 

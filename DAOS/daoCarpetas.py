@@ -1,6 +1,8 @@
 import redis
 import Configuracion.constantesPrefijosClaves as constantes
 
+carpetasClaves = [constantes.CLAVE_ID_CARPETA, constantes.CLAVE_NOMBRE_CARPETA, constantes.CLAVE_PRIVACIDAD_CARPETA]
+
 def getIdContador(r):
     return constantes.PREFIJO_ID_CARPETA + ":" + str(r.incr(constantes.CLAVE_CONTADOR_CARPETAS))
 
@@ -41,11 +43,11 @@ def setPrivacidadCarpeta(r, id, privacidad):
 
 # Funcion para añadir una o más playlists a una carpeta
 def anyadirListaCarpeta(r, idCarpeta, idListas):
-    return r.sadd(constantes.CLAVE_LISTAS_CARPETA + ":" + idCarpeta, *idListas)
+    return r.sadd(constantes.CLAVE_LISTAS_CARPETA + ":" + idCarpeta, idListas)
 
 # Funcion para eliminar una o más playlists de una carpeta
 def eliminarListaCarpeta(r, idCarpeta, idPlaylists):
-    return r.srem(constantes.CLAVE_LISTAS_CARPETA + ":" + idCarpeta, *idPlaylists)
+    return r.srem(constantes.CLAVE_LISTAS_CARPETA + ":" + idCarpeta, idPlaylists)
 
 # Funcion para eliminar una carpeta
 def eliminarCarpeta(r, id):
