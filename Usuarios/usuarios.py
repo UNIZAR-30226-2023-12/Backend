@@ -281,7 +281,7 @@ def accpetFriend(r, idUsuario, idNotificacion):
         return erroresHTTP.ERROR_NOTIFICACION_NO_ENCONTRADA
     if(daoNotificaciones.getTipoNotificacion(r, idNotificacion) != constantes.NOTIFICACION_TIPO_AMIGO):
         return erroresHTTP.ERROR_NOTIFICACION_NO_AMIGO
-    idUsuarioAmigo = daoNotificaciones.getIdUsuarioEmisor(r, idNotificacion)    daoUsuario.anyadirAmigo(r, idUsuario, idUsuarioAmigo)
+    idUsuarioAmigo = daoNotificaciones.getIdUsuarioEmisor(r, idNotificacion)    
     daoUsuario.anyadirAmigo(r, idUsuarioAmigo, idUsuario)
     daoUsuario.anyadirAmigo(r, idUsuario, idUsuarioAmigo)
     daoNotificaciones.eliminarNotificacion(r, idNotificacion)
@@ -300,7 +300,6 @@ def removeFriend(r, idUsuario, idUsuarioAmigo):
     daoUsuario.eliminarAmigo(r, idUsuarioAmigo, idUsuario)
     return erroresHTTP.OK
 
-def get
 
 
 # Funciones para recomendador

@@ -563,13 +563,13 @@ def AcceptFriend(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idNotificacion = json_data[constantes.CLAVE_ID_AMIGO]
+    idNotificacion = json_data[constantes.CLAVE_ID_NOTIFICACION]
 
     status = usuarios.ValidateUser(r, idUsuario, contrasenya)
     if (status != erroresHTTP.OK):
         return JsonResponse({'status': status}, status=status)
     
-    status = usuarios.acceptFriend(r, idUsuario, idAmigo)
+    status = usuarios.accpetFriend(r, idUsuario, idNotificacion)
 
     return JsonResponse({'status': status}, status=status)
 
