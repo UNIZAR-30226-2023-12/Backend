@@ -391,5 +391,196 @@ def AddSecondsToSong(request):
     return JsonResponse({'status': status}, status=status)
 
 @csrf_exempt
+def GetLista(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idLista = json_data[constantes.CLAVE_ID_LISTA]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    if(usuarios.existeLista(r, idLista) == False):
+        return JsonResponse({'error': 'La lista no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
+    
+    respuesta = usuarios.getListaRepUsr(r, idLista)
+
+    if(respuesta["status"] != erroresHTTP.OK):
+        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
+    
+    return JsonResponse({constantes.PREFIJO_ID_LISTA : respuesta[constantes.PREFIJO_ID_LISTA]}, status=erroresHTTP.OK)
+
+@csrf_exempt
+def SetFolder(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    nombreCarpeta = json_data[constantes.CLAVE_NOMBRE_CARPETA]
+    privacidad = json_data[constantes.CLAVE_PRIVACIDAD_CARPETA]
+    diccionarioCarpeta = {constantes.CLAVE_NOMBRE_CARPETA: nombreCarpeta,
+                          constantes.CLAVE_PRIVACIDAD_CARPETA: privacidad}
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    status = usuarios.setFolder(r, diccionarioCarpeta)
+
+    return JsonResponse({'status': status}, status=status)
+
+@csrf_exempt
+def AddListToFolder(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idLista = json_data[constantes.CLAVE_ID_LISTA]
+    idCarpeta = json_data[constantes.CLAVE_ID_CARPETA]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    status = usuarios.addListToFolder(r, idLista, idCarpeta)
+
+    return JsonResponse({'status': status}, status=status)
+
+@csrf_exempt
+def RemoveListFromFolder(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idLista = json_data[constantes.CLAVE_ID_LISTA]
+    idCarpeta = json_data[constantes.CLAVE_ID_CARPETA]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    status = usuarios.removeListFromFolder(r, idLista, idCarpeta)
+
+    return JsonResponse({'status': status}, status=status)
+
+@csrf_exempt
+def RemoveFolder(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idCarpeta = json_data[constantes.CLAVE_ID_CARPETA]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    status = usuarios.removeFolder(r, idCarpeta)
+
+    return JsonResponse({'status': status}, status=status)
+
+@csrf_exempt
+def GetFolder(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idCarpeta = json_data[constantes.CLAVE_ID_CARPETA]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    respuesta = usuarios.getFolder(r, idCarpeta)
+
+    if(respuesta["status"] != erroresHTTP.OK):
+        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
+    
+    return JsonResponse({constantes.PREFIJO_ID_CARPETA : respuesta[constantes.PREFIJO_ID_CARPETA]}, status= respuesta["status"])
+
+@csrf_exempt
+def GetFoldersUsr(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    respuesta = usuarios.getFoldersUser(r, idUsuario)
+
+    if(respuesta["status"] != erroresHTTP.OK):
+        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
+    
+    return JsonResponse({constantes.PREFIJO_ID_CARPETA : respuesta[constantes.PREFIJO_ID_CARPETA]}, status= respuesta["status"])
+
+@csrf_exempt
+def AskFriend(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idAmigo = json_data[constantes.CLAVE_ID_AMIGO]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    status = usuarios.askFriend(r, idUsuario, idAmigo)
+
+    return JsonResponse({'status': status}, status=status)
+
+@csrf_exempt
+def AcceptFriend(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idNotificacion = json_data[constantes.CLAVE_ID_AMIGO]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    status = usuarios.acceptFriend(r, idUsuario, idAmigo)
+
+    return JsonResponse({'status': status}, status=status)
+
+@csrf_exempt
+def GetDataSong(r, idAudio):
+    
+
+@csrf_exempt
 def entrenar_recomendador():
     pass
