@@ -573,9 +573,10 @@ def AcceptFriend(request):
 
     return JsonResponse({'status': status}, status=status)
 
-@csrf_exempt
-def GetDataSong(r, idAudio):
-    
+# Cristina: Lo he comentado porque si no el django no se puede iniciar, pero nada más.
+#@csrf_exempt
+#def GetDataSong(r, idAudio):
+#    
 
 @csrf_exempt
 def entrenar_recomendador(request):
