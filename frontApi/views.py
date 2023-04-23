@@ -262,7 +262,7 @@ def SetSongLista(request):
 
 @csrf_exempt
 def GetLista(request):
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     # Parse the JSON data from the request body to extract idUsuario
@@ -287,7 +287,7 @@ def GetLista(request):
 
 @csrf_exempt
 def GetListasUsr(request):
-    if request.method != 'GET':
+    if request.method != 'POST':
          # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     # Parse the JSON data from the request body
@@ -308,7 +308,7 @@ def GetListasUsr(request):
        
 @csrf_exempt 
 def GetAudiosLista(request):
-    if request.method != 'GET':
+    if request.method != 'POST':
          # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     # Parse the JSON data from the request body
