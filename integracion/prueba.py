@@ -5,9 +5,10 @@ from django.middleware import csrf
 from django.http import HttpRequest
 
 # URL del endpoint SetSong
-url_set_song = 'http://127.0.0.1:8000/SetSong/'
-url_set_usr = 'http://127.0.0.1:8000/SetUser/'
-url_get = 'http://127.0.0.1:8000/GetSong/'
+url_set_song = 'http://0.0.0.0:8081/SetSong/'
+url_set_usr = 'http://0.0.0.0:8081/SetUser/'
+url_get_usr = 'http://127.0.0.1:8081/GetUser/'
+url_get = 'http://0.0.0.0:8081/GetSong/'
 
 # Crear un objeto HttpRequest vacío
 # request = HttpRequest()
@@ -56,11 +57,18 @@ params_get_song = {
     'esCancion': 'True'
 }
 
+params_get_usr = {
+    'idUsr': 'usuario:2',
+    'contrasenya': '1234'
+}
+
 
 
 # Realizar la petición HTTP POST
 #response = requests.post(url_set_song, json=new_song_data)
 response = requests.get(url_get, params=params_get_song)
+usr = requests.get(url_get_usr, params=params_get_usr)
+print(usr.json())
 
 # Get the headers from the response
 response_headers = response.request.headers
