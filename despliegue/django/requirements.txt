@@ -6,3 +6,7 @@ pydub
 numpy
 numba
 django-cors-headers
+drf-yasg
+drf_yasg
+documentation
+django-rest-swagger

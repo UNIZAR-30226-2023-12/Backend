@@ -14,9 +14,28 @@ from recomendador import generacion_datos as gen_datos
 
 from Global import ModuloGlobal
 
-
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status, permissions, serializers
+from rest_framework.response import Response
+from rest_framework.generics import GenericAPIView
+
+from django.template.loader import render_to_string
+from django.utils.translation import gettext_lazy as _
+from drf_yasg.inspectors import SwaggerAutoSchema
+from django.utils.decorators import method_decorator
+from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework import response, schemas
+import coreapi
+import coreschema
+from drf_yasg import openapi
+
+CLAVE_ID_USUARIO = openapi.Parameter(constantes.CLAVE_ID_USUARIO, openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_NUMBER)
+CLAVE_CONTRASENYA = openapi.Parameter(constantes.CLAVE_CONTRASENYA, openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_STRING)
+CLAVE_ID_AMIGO = openapi.Parameter(constantes.CLAVE_ID_AMIGO, openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_NUMBER)
 
 r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
 
@@ -294,12 +313,12 @@ def GetListasUsr(request):
     json_data = json.loads(request.body)
 
     # Compruebo que el usuario sea válido
-    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    idUsuario = json_data[constantes.CLAVE_EMAIL]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    status = usuarios.validateUserEmail(r, idUsuario, contrasenya)
     # Si no es valido devuelvo el error
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    if (status["status"] != erroresHTTP.OK):
+        return JsonResponse({'status': status["status"]}, status=status["status"])
 
     # Stores the user in the database
     listas = usuarios.getListasUsr(r, idUsuario)
@@ -674,6 +693,9 @@ def GetFriends(request):
     
     return JsonResponse({constantes.PREFIJO_ID_USUARIO : respuesta[constantes.PREFIJO_ID_USUARIO]}, status= respuesta["status"])
 
+@renderer_classes([SwaggerUIRenderer])
+@swagger_auto_schema(method='post', manual_parameters=[CLAVE_ID_USUARIO, CLAVE_CONTRASENYA, CLAVE_ID_AMIGO])
+@api_view(['POST'])
 @csrf_exempt
 def RemoveFriend(request):
     if request.method != 'POST':
