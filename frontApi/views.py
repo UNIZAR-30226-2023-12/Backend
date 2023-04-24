@@ -601,7 +601,22 @@ def AcceptFriend(request):
 
 #@csrf_exempt
 #def GetDataSong(r, idAudio):
+
+
+# Devuelve un set con n ids de audios recuperadas mediante una búsqueda global
+@csrf_exempt
+def GlobalSearch(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
     
+    query = request.GET.get(constantes.CLAVE_QUERY)
+    n = request.GET.get(constantes.CLAVE_N)    
+
+    
+    #return JsonResponse({'status': status}, status=status)
+    return JsonResponse({'status': 200}, status=200)
+
+ 
 
 @csrf_exempt
 def entrenar_recomendador(request):

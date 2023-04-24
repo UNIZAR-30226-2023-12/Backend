@@ -97,6 +97,8 @@ CLAVE_ALIAS = "alias"
 CLAVE_CONTRASENYA = "contrasenya"
 CLAVE_TIPO_USUARIO = "tipoUsuario"
 CLAVE_ID_ULTIMO_AUDIO = "idUltimoAudio"
+CLAVE_QUERY = "query"
+CLAVE_N = "n"
 
 # Prefijos de las claves relacionadas con los usuarios
 PREFIJO_ID_USUARIO = "usuario"
