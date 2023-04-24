@@ -294,12 +294,12 @@ def GetListasUsr(request):
     json_data = json.loads(request.body)
 
     # Compruebo que el usuario sea válido
-    idUsuario = json_data[constantes.CLAVE_EMAIL]
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    status = usuarios.validateUserEmail(r, idUsuario, contrasenya)
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
     # Si no es valido devuelvo el error
-    if (status["status"] != erroresHTTP.OK):
-        return JsonResponse({'status': status["status"]}, status=status["status"])
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
 
     # Stores the user in the database
     listas = usuarios.getListasUsr(r, idUsuario)
