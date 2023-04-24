@@ -612,9 +612,10 @@ def GlobalSearch(request):
     query = request.GET.get(constantes.CLAVE_QUERY)
     n = request.GET.get(constantes.CLAVE_N)    
 
-    
+    respuesta = moduloAudios.buscarCanciones(r, query, n)
+    print(respuesta)
     #return JsonResponse({'status': status}, status=status)
-    return JsonResponse({'status': 200}, status=200)
+    return JsonResponse({'datos': respuesta}, status=200)
 
  
 

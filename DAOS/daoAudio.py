@@ -63,7 +63,7 @@ def guardarCancion(r, cancionDic):
     r.hmset(id, cancionDic)
     r.hmset(id+":ficheros", {'ficheroAltaCalidad': ficheroAltaCalidad, 
                             'ficheroBajaCalidad': ficheroBajaCalidad})
-    
+
     r.sadd(constantes.PREFIJO_LISTA_GLOBAL_CANCIONES, id)
 
     return 0
@@ -152,7 +152,9 @@ def obtenerDatosCanciones(r, ids):
     datosCanciones = []
 
     for id in ids:
-        datosCanciones.append(obtenerDatosCancion(r, id))
+        datos = obtenerDatosCancion(r, id)
+        datos['id'] = id
+        datosCanciones.append(datos)
 
     return datosCanciones
 
@@ -167,19 +169,19 @@ def buscarAudios(r, query):
     canciones = obtenerTodasLasCanciones(r)
     podcasts = obtenerTodosLosPodcasts(r)
     datosCanciones = obtenerDatosCanciones(r, canciones)
-    datosPodcasts = obtenerDatosPodcast(r, podcasts)
+    datosPodcasts = obtenerDatosPodcasts(r, podcasts)
     encontradas = []
 
-    for i in range(len(datosCanciones)):
-        if (query.lower() in datosCanciones[i]['nombre'].lower() or 
-            query.lower() in datosCanciones[i]['artista'].lower()):
-            encontradas.append(canciones[i])
+    for audio in datosCanciones:
+        if (query.lower() in audio['nombre'].lower() or 
+            query.lower() in audio['artista'].lower()):
+            encontradas.append(audio['id'])
 
-    for i in range(len(datosPodcasts)):
-        if (query.lower() in datosPodcasts[i]['nombre'].lower() or
-            query.lower() in datosPodcasts[i]['artista'].lower() or
-            query.lower() in datosPodcasts[i]['descripcion'].lower()):
-            encontradas.append(podcasts[i])
+    for audio in datosCanciones:
+        if (query.lower() in audio['nombre'].lower() or 
+            query.lower() in audio['artista'].lower() or
+            query.lower() in audio['descripcion'].lower()):
+            encontradas.append(audio['id'])
         
 
     return encontradas
@@ -363,6 +365,14 @@ def obtenerDatosPodcast(r, id):
 def obtenerTodosLosPodcasts(r):
     return r.smembers(constantes.PREFIJO_LISTA_GLOBAL_PODCASTS)
 
+
+def obtenerDatosPodcasts(r, ids):
+    datosPodcasts = []
+
+    for id in ids:
+        datosPodcasts.append(obtenerDatosPodcast(r, id))
+
+    return datosPodcasts
 
 # Funcion para obtener el nombre de un podcast
 def obtenerNombrePodcast(r, id):

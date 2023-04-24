@@ -9,6 +9,7 @@
 
 from Audios import controlAudios
 from Audios import controlCalidadAudios
+from DAOS import daoAudio as dao
 from Configuracion import constantesPrefijosClaves as constantes 
 ##############################################################################################################
 #
@@ -104,6 +105,13 @@ def modificarCancion(r, id, dic):
 # Función para obtener el diccionario de una canción
 def obtenerDiccionarioCancion(r, id):
     return controlAudios.obtenerTodosCancion(r, id)
+
+
+# Función de búsqueda de canciones
+def buscarCanciones(r, query, n):
+    respuesta = dao.buscarAudios(r, query)
+
+    return respuesta[0:n]
 
 ##############################################################################################################
 #

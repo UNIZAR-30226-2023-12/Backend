@@ -12,6 +12,7 @@ url_set_song = 'http://'+ip+':'+port+'/SetSong/'
 url_set_usr = 'http://'+ip+':'+port+'/SetUser/'
 url_get_usr = 'http://'+ip+':'+port+'/GetUser/'
 url_get = 'http://'+ip+':'+port+'/GetSong/'
+url_busqueda = 'http://'+ip+':'+port+'/GlobalSearch/'
 
 # Crear un objeto HttpRequest vacío
 # request = HttpRequest()
@@ -43,7 +44,7 @@ new_user_data = {
 # Datos del cuerpo de la petición
 new_song_data = {
     'nombre': 'Die for you',
-    'idUsr': 'usuario:2',
+    'idUsr': 'usuario:1',
     'contrasenya': '1234',
     'artista': 'Starset',
     'calidad': 'baja',
@@ -54,7 +55,7 @@ new_song_data = {
 }
 
 params_get_song = {
-    'idUsr': 'usuario:2',
+    'idUsr': 'usuario:1',
     'idSong': 'idAudio:1',
     'calidadAlta': 'True',
     'esCancion': 'True'
@@ -71,7 +72,11 @@ params_get_usr = {
 response = requests.post(url_set_song, json=new_song_data)
 response = requests.get(url_get, params=params_get_song)
 usr = requests.get(url_get_usr, params=params_get_usr)
-print(usr.json())
+
+search = requests.get(url_busqueda, params={'query': 'Die for you'})
+
+print(search.json())
+
 
 # Get the headers from the response
 response_headers = response.request.headers
