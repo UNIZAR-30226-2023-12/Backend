@@ -22,6 +22,7 @@ urlpatterns = [
     path('GetSong/', viewsApi.GetSong, name='GetSong'),
     path('SetSong/', viewsApi.SetSong, name='SetSong'),
     path('SetUser/', viewsApi.SetUser, name='SetUser'),
+    path('GetUser/', viewsApi.GetUser, name='GetUser'),
     path('ValidateUser/', viewsApi.ValidateUser, name='ValidateUser'),
     path('SetLista/', viewsApi.SetLista, name='SetLista'),
     path('ChangeNameListRepUsr/', viewsApi.ChangeNameListRepUsr, name='ChangeNameListRepUsr'),

@@ -140,6 +140,32 @@ def SetUser(request):
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
         
+
+@csrf_exempt
+def GetUser(request):
+    if request.method == 'GET':
+        # Get the http parameters        
+        idUsuario = request.GET.get(constantes.CLAVE_ID_USUARIO)
+        contrasenya = request.GET.get(constantes.CLAVE_CONTRASENYA)
+
+        # Validates the user
+        status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+        if (status != erroresHTTP.OK):
+            return JsonResponse({'status': status}, status=status)
+
+
+        # Gets the user from the database
+        response = usuarios.getUser(r, idUsuario)
+
+        if response == 532 or response == 539:
+            return JsonResponse({'error': 'Ha ocurrido un problema'}, status=response)
+        else:
+            return JsonResponse(response, status=200)
+    else:
+        # Return a 405 Method Not Allowed response for other HTTP methods
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
 @csrf_exempt
 def ValidateUser(request):
     if request.method != 'POST':
@@ -573,8 +599,8 @@ def AcceptFriend(request):
 
     return JsonResponse({'status': status}, status=status)
 
-@csrf_exempt
-def GetDataSong(r, idAudio):
+#@csrf_exempt
+#def GetDataSong(r, idAudio):
     
 
 @csrf_exempt
