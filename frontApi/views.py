@@ -143,10 +143,11 @@ def SetUser(request):
 
 @csrf_exempt
 def GetUser(request):
-    if request.method == 'GET':
+    if request.method == 'POST':
+        json_data = json.loads(request.body)
         # Get the http parameters        
-        idUsuario = request.GET.get(constantes.CLAVE_ID_USUARIO)
-        contrasenya = request.GET.get(constantes.CLAVE_CONTRASENYA)
+        idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+        contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
 
         # Validates the user
         status = usuarios.ValidateUser(r, idUsuario, contrasenya)
