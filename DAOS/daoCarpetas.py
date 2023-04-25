@@ -1,7 +1,8 @@
 import redis
 import Configuracion.constantesPrefijosClaves as constantes
 
-carpetasClaves = [constantes.CLAVE_ID_CARPETA, constantes.CLAVE_NOMBRE_CARPETA, constantes.CLAVE_PRIVACIDAD_CARPETA]
+listaClaves = [constantes.CLAVE_NOMBRE_CARPETA, 
+               constantes.CLAVE_PRIVACIDAD_CARPETA]
 
 def getIdContador(r):
     return constantes.PREFIJO_ID_CARPETA + ":" + str(r.incr(constantes.CLAVE_CONTADOR_CARPETAS))

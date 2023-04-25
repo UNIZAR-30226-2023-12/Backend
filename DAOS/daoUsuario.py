@@ -4,9 +4,9 @@ import Configuracion.constantesPrefijosClaves as constantes
 #Numero de elementos que se devuelven en cada iteración de sscan
 COUNT = 100
 
-listaClaves = [constantes.CLAVE_ID_USUARIO, constantes.CLAVE_EMAIL, 
-               constantes.CLAVE_ALIAS, constantes.CLAVE_CONTRASENYA, 
-               constantes.CLAVE_TIPO_USUARIO]
+# Lista de claves necesarias para crear un usuario
+listaClaves = [constantes.CLAVE_EMAIL, constantes.CLAVE_ALIAS, 
+               constantes.CLAVE_CONTRASENYA, constantes.CLAVE_TIPO_USUARIO]
 
 
 
@@ -42,7 +42,7 @@ def eliminarUsuario(r, idUsuario):
     return r.delete(idUsuario)
 
 def tipoUsuarioValido(tipoUsuario):
-    if(tipoUsuario == constantes.USUARIO_ADMINISTRADOR or tipoUsuario == constantes.USUARIO_NORMAL or tipoUsuario == constantes.constantesUsuario.USUARIO_ARTISTA):
+    if(tipoUsuario == constantes.USUARIO_ADMINISTRADOR or tipoUsuario == constantes.USUARIO_NORMAL or tipoUsuario == constantes.USUARIO_ARTISTA):
         return True
     else:
         return False

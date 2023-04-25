@@ -146,26 +146,35 @@ def SetSong(request):
 
 @csrf_exempt
 def SetUser(request):
-    if request.method == 'POST':
-        # Parse the JSON data from the request body
-        json_data = json.loads(request.body)
-        
-        # Stores the user in the database
-        respuesta = usuarios.setUser(r, json_data)
-        if respuesta["status"] != erroresHTTP.OK:
-            return JsonResponse({'error': 'Ha ocurrido un problema'}, status=respuesta["status"])
-
-        idUsuario = respuesta[constantes.CLAVE_ID_USUARIO]
-        diccionarioLista = {constantes.CLAVE_NOMBRE_LISTA : "Favoritos", 
-                            constantes.CLAVE_PRIVACIDAD_LISTA : constantes.LISTA_PRIVADA, 
-                            constantes.CLAVE_TIPO_LISTA : constantes.LISTA_TIPO_FAVORITOS}
-        usuarios.setLista(r, idUsuario, diccionarioLista)
-        
-        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
-    else:
-        # Return a 405 Method Not Allowed response for other HTTP methods
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-        
+    
+    # Parse the JSON data from the request body
+    json_data = json.loads(request.body)
+    
+    email = json_data[constantes.CLAVE_EMAIL]
+
+    # Control de errores
+    if(usuarios.existeUsuarioEmail(r, email)):
+        return JsonResponse({'error': 'El email ya existe'}, status=erroresHTTP.ERROR_USUARIO_EMAIL_YA_EXISTE)
+    
+    if(usuarios.correctoDiccionarioUsuario(json_data) == False):
+        return JsonResponse({'error': 'El diccionario no es correcto'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+    
+    if(usuarios.tipoUsuarioValido(json_data[constantes.CLAVE_TIPO_USUARIO]) == False):
+        return JsonResponse({'error': 'El tipo de usuario no es valido'}, status=erroresHTTP.ERROR_USUARIO_TIPO_NO_VALIDO)
+    
+    # No error, so add the user
+    idUsuario = usuarios.setUser(r, json_data)
+
+    diccionarioLista = {constantes.CLAVE_NOMBRE_LISTA : "Favoritos", 
+                        constantes.CLAVE_PRIVACIDAD_LISTA : constantes.LISTA_PRIVADA, 
+                        constantes.CLAVE_TIPO_LISTA : constantes.LISTA_TIPO_FAVORITOS}
+    usuarios.setLista(r, idUsuario, diccionarioLista)
+    
+    return JsonResponse({constantes.CLAVE_ID_USUARIO: idUsuario}, status=erroresHTTP.OK)
+    
+
 @csrf_exempt
 def ValidateUser(request):
     if request.method != 'POST':
@@ -176,6 +185,9 @@ def ValidateUser(request):
     email = json_data[constantes.CLAVE_EMAIL]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
 
+    if(usuarios.existeUsuarioEmail(r, email) == False):
+        return JsonResponse({'error': 'El email no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+
     respuesta = usuarios.validateUserEmail(r, email, contrasenya)
     if (respuesta["status"] != erroresHTTP.OK):
         return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
@@ -185,80 +197,95 @@ def ValidateUser(request):
     
 @csrf_exempt
 def SetLista(request):
-    if request.method == 'POST':
-        # Parse the JSON data from the request body
-        json_data = json.loads(request.body)
-        
-        idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
-        contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-
-        # Validates the user
-        status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-        if (status != erroresHTTP.OK):
-            return JsonResponse({'status': status}, status=status)
-        # Creamos el diccionario lista y quitamos los campos que no son necesarios
-        diccionarioLista = json_data.copy()
-        del diccionarioLista[constantes.CLAVE_ID_USUARIO]
-        del diccionarioLista[constantes.CLAVE_CONTRASENYA]
-        status = usuarios.setLista(r, idUsuario, diccionarioLista)
-        
-        return JsonResponse({'status': status}, status=status)
-    else:
-        # Return a 405 Method Not Allowed response for other HTTP methods
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body
+    json_data = json.loads(request.body)
+    
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    diccionarioLista = json_data.copy()
+    del diccionarioLista[constantes.CLAVE_ID_USUARIO]
+    del diccionarioLista[constantes.CLAVE_CONTRASENYA]
+
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    # Validates the user
+    if (usuarios.ValidateUser == False):
+        return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if (usuarios.correctoDiccionarioLista(diccionarioLista) == False):
+        return JsonResponse({'error': 'El diccionario no es correcto'}, status=erroresHTTP.ERROR_LISTA_PARAMETROS_INCORRECTOS)
+    if (usuarios.tipoListaValido(diccionarioLista[constantes.CLAVE_TIPO_LISTA]) == False):
+        return JsonResponse({'error': 'El tipo de lista no es valido'}, status=erroresHTTP.ERROR_LISTA_TIPO_NO_VALIDO)
+
+    idLista = usuarios.setLista(r, idUsuario, diccionarioLista)
+    return JsonResponse({constantes.CLAVE_ID_LISTA: idLista}, status=erroresHTTP.OK)
+    
     
 @csrf_exempt
 def ChangeNameListRepUsr(request):
-    if request.method == 'POST':
-        # Parse the JSON data from the request body
-        json_data = json.loads(request.body)
-
-        # Compruebo que el usuario sea válido
-        idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
-        contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-        status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-
-        # Si no es valido devuelvo el error
-        if (status != erroresHTTP.OK):
-            return JsonResponse({'status': status}, status=status)
-        
-        
-        idLista = json_data[constantes.CLAVE_ID_LISTA]
-        nombre = json_data[constantes.CLAVE_NOMBRE_LISTA]
-        # Stores the user in the database
-        status = usuarios.setNombreLista(r, idLista, nombre)
-        
-        return JsonResponse({'status': status}, status=status)
-    else:
-        # Return a 405 Method Not Allowed response for other HTTP methods
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body
+    json_data = json.loads(request.body)
+
+    # Compruebo que el usuario sea válido
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idLista = json_data[constantes.CLAVE_ID_LISTA]
+    nombre = json_data[constantes.CLAVE_NOMBRE_LISTA]
+
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.existeLista(r, idLista) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_LISTA_NO_ENCONTRADA}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
+    
+    if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    
+    if (usuarios.isListaFromUser(r, idUsuario, idLista) == False):
+        return JsonResponse({'status': erroresHTTP.FORBIDDEN}, status=erroresHTTP.FORBIDDEN)
+    
+    # No error, so change the name
+    usuarios.setNombreLista(r, idLista, nombre)
+    
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def SetSongLista(request):
-    if request.method == 'POST':
-        # Parse the JSON data from the request body
-        json_data = json.loads(request.body)
-
-        # Compruebo que el usuario sea válido
-        idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
-        contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-        status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-        # Si no es valido devuelvo el error
-        if (status != erroresHTTP.OK):
-            return JsonResponse({'status': status}, status=status)
-        
-        idAudio = json_data[constantes.CLAVE_ID_AUDIO]
-        if (moduloAudios.existeCancion(r, idAudio) == False):
-            return JsonResponse({'error': 'No existe el audio'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
-        
-        idLista = json_data[constantes.CLAVE_ID_LISTA]
-        # Stores the user in the database
-        status = usuarios.setSongLista(r, idLista, idAudio)
-        
-        return JsonResponse({'status': status}, status=status)
-    else:
-        # Return a 405 Method Not Allowed response for other HTTP methods
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+    # Parse the JSON data from the request body
+    json_data = json.loads(request.body)
+
+    # Compruebo que el usuario sea válido
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idLista = json_data[constantes.CLAVE_ID_LISTA]
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+    
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeLista(r, idLista) == False):
+        return JsonResponse({'error': 'La lista no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
+    if(moduloAudios.existeCancion(r, idAudio) == False):
+        return JsonResponse({'error': 'La cancion no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
+    if (moduloAudios.existeCancion(r, idAudio) == False):
+        return JsonResponse({'error': 'No existe el audio'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
+    if (usuarios.isListaFromUser(r, idUsuario, idLista) == False):
+        return JsonResponse({'error': 'La lista no pertenece al usuario'}, status=erroresHTTP.FORBIDDEN)
+    
+    # No error, so add the song to the list
+    usuarios.setSongLista(r, idLista, idAudio)
+    
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def GetLista(request):
@@ -271,19 +298,16 @@ def GetLista(request):
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     idLista = json_data[constantes.CLAVE_ID_LISTA]
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
-    
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeLista(r, idLista) == False):
-        return JsonResponse({'error': 'La lista no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
-    
-    respuesta = usuarios.getLista(r, idLista)
+        return JsonResponse({'status': erroresHTTP.ERROR_LISTA_NO_ENCONTRADA}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
 
-    if(respuesta["status"] != erroresHTTP.OK):
-        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
-    
-    return JsonResponse({constantes.PREFIJO_ID_LISTA : respuesta[constantes.PREFIJO_ID_LISTA]}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.PREFIJO_ID_LISTA: usuarios.getLista(r, idLista)}, status=erroresHTTP.OK)
+
 
 @csrf_exempt
 def GetListasUsr(request):
@@ -296,15 +320,14 @@ def GetListasUsr(request):
     # Compruebo que el usuario sea válido
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    # Si no es valido devuelvo el error
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
 
-    # Stores the user in the database
-    listas = usuarios.getListasUsr(r, idUsuario)
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     
-    return JsonResponse({constantes.CLAVE_LISTAS: listas}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.CLAVE_LISTAS: usuarios.getListasUsr(r, idUsuario)}, status=erroresHTTP.OK)
        
 @csrf_exempt 
 def GetAudiosLista(request):
@@ -313,21 +336,19 @@ def GetAudiosLista(request):
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     # Parse the JSON data from the request body
     json_data = json.loads(request.body)
-
-    # Compruebo que el usuario sea válido
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     idLista = json_data[constantes.CLAVE_ID_LISTA]
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    # Si no es valido devuelvo el error
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeLista(r, idLista) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_LISTA_NO_ENCONTRADA}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
 
-    # Stores the user in the database
-    listas = usuarios.getAudiosLista(r, idLista)
-    
-    return JsonResponse({constantes.CLAVE_LISTAS: listas}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.CLAVE_PREFIJO_AUDIO: usuarios.getAudiosLista}, status=erroresHTTP.OK)
        
 @csrf_exempt
 def RemoveSongLista(request):
@@ -338,13 +359,21 @@ def RemoveSongLista(request):
         # Compruebo que el usuario sea válido
         idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
         contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-        status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-        # Si no es valido devuelvo el error
-        if (status != erroresHTTP.OK):
-            return JsonResponse({'status': status}, status=status)
-        
         idAudio = json_data[constantes.CLAVE_ID_AUDIO]
         idLista = json_data[constantes.CLAVE_ID_LISTA]
+        
+        # Control de errores
+        if(usuarios.existeUsuario(r, idUsuario) == False):
+            return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+        if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+            return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+        if(usuarios.existeLista(r, idLista) == False):
+            return JsonResponse({'status': erroresHTTP.ERROR_LISTA_NO_ENCONTRADA}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
+        if(moduloAudios.existeCancion(r, idAudio) == False):
+            return JsonResponse({'status': erroresHTTP.ERROR_CANCION_NO_ENCONTRADA}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
+        if(usuarios.isAudioFromLista(r, idLista, idAudio) == False):
+            return JsonResponse({'status': erroresHTTP.ERROR_AUDIO_NOT_IN_LISTA}, status=erroresHTTP.ERROR_AUDIO_NOT_IN_LISTA)
+
         # Stores the user in the database
         status = usuarios.removeSongLista(r, idLista, idAudio)
         
@@ -362,16 +391,18 @@ def AskAdminToBeArtist(request):
     # Parse the JSON data from the request body to extract idUsuario
     json_data = json.loads(request.body)
     
-    # Primero valido que el usuario que me están pasando sea válido
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
     
-    status = usuarios.AskAdminToBeArtist(r, idUsuario)
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    
+    usuarios.AskAdminToBeArtist(r, idUsuario)
 
-    return JsonResponse({'status': status}, status=status)
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 # View para aceptar a un usuario como artista
 @csrf_exempt
@@ -385,18 +416,25 @@ def AcceptArtist(request):
     # Primero valido que el usuario que me están pasando sea válido
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
-    
+    idNotificacion = json_data[constantes.CLAVE_ID_NOTIFICACION]
+   
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña es incorrecta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeNotificacion(r, idNotificacion) == False):
+        return JsonResponse({'error': 'La notificación no existe'}, status=erroresHTTP.ERROR_NOTIFICACION_NO_ENCONTRADA)
     if(usuarios.esAdministrador(r, idUsuario) == False):
         return JsonResponse({'error': 'El usuario no es administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
+    if(usuarios.getTipoNotificacion(r, idNotificacion) != constantes.NOTIFICACION_TIPO_SOLICITUD_ARTISTA):
+        return JsonResponse({'error': 'La notificación no es de tipo pedido de artista'}, status=erroresHTTP.ERROR_TIPO_NOTIFICACION_NO_VALIDA)
+    if (usuarios.existeUsuario(r, usuarios.getUsuarioEmisorNotificacion(r, idNotificacion)) == False):
+        return JsonResponse({'error': 'El usuario que ha enviado la notificación no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     
-    idNotificacion = json_data[constantes.CLAVE_ID_NOTIFICACION]
+    usuarios.acceptArtist(r, idNotificacion)
 
-    status = usuarios.acceptArtist(r, idNotificacion)
-
-    return JsonResponse({'status': status}, status=status)
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def ValidateUserEmail(request):
@@ -475,13 +513,17 @@ def SetFolder(request):
     diccionarioCarpeta = {constantes.CLAVE_NOMBRE_CARPETA: nombreCarpeta,
                           constantes.CLAVE_PRIVACIDAD_CARPETA: privacidad}
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
-    
-    status = usuarios.setFolder(r, idUsuario, diccionarioCarpeta)
+    #Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.correctoDiccionarioCarpeta(diccionarioCarpeta) == False):
+        return JsonResponse({'error': 'El diccionario de la carpeta no es correcto'}, status=erroresHTTP.ERROR_CARPETA_PARAMETROS_INCORRECTOS)
 
-    return JsonResponse({'status': status}, status=status)
+    usuarios.setFolder(r, idUsuario, diccionarioCarpeta)
+
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def AddListToFolder(request):
@@ -495,13 +537,19 @@ def AddListToFolder(request):
     idLista = json_data[constantes.CLAVE_ID_LISTA]
     idCarpeta = json_data[constantes.CLAVE_ID_CARPETA]
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeLista(r, idLista) == False):
+        return JsonResponse({'error': 'La lista no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
+    if(usuarios.existeCarpeta(r, idCarpeta) == False):
+        return JsonResponse({'error': 'La carpeta no existe'}, status=erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA)
     
-    status = usuarios.addListToFolder(r, idLista, idCarpeta)
+    usuarios.addListToFolder(r, idLista, idCarpeta)
 
-    return JsonResponse({'status': status}, status=status)
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def RemoveListFromFolder(request):
@@ -515,13 +563,21 @@ def RemoveListFromFolder(request):
     idLista = json_data[constantes.CLAVE_ID_LISTA]
     idCarpeta = json_data[constantes.CLAVE_ID_CARPETA]
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeLista(r, idLista) == False):
+        return JsonResponse({'error': 'La lista no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
+    if(usuarios.existeCarpeta(r, idCarpeta) == False):
+        return JsonResponse({'error': 'La carpeta no existe'}, status=erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA)
+    if(usuarios.isListaFromCarpeta(r, idCarpeta, idLista) == False):
+        return JsonResponse({'error': 'La lista no existe en la carpeta'}, status=erroresHTTP.ERROR_LISTA_NOT_IN_CARPETA)
     
-    status = usuarios.removeListFromFolder(r, idLista, idCarpeta)
+    usuarios.removeListFromFolder(r, idLista, idCarpeta)
 
-    return JsonResponse({'status': status}, status=status)
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def RemoveFolder(request):
@@ -534,13 +590,19 @@ def RemoveFolder(request):
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     idCarpeta = json_data[constantes.CLAVE_ID_CARPETA]
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
-    
-    status = usuarios.removeFolder(r, idUsuario, idCarpeta)
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeCarpeta(r, idCarpeta) == False):
+        return JsonResponse({'error': 'La carpeta no existe'}, status=erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA)
+    if(usuarios.isCarpetaFromUser(r, idUsuario, idCarpeta) == False):
+        return JsonResponse({'error': 'No tienes permiso'}, status=erroresHTTP.FORBIDDEN)
 
-    return JsonResponse({'status': status}, status=status)
+    usuarios.removeFolder(r, idUsuario, idCarpeta)
+
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def GetFolder(request):
@@ -553,16 +615,17 @@ def GetFolder(request):
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     idCarpeta = json_data[constantes.CLAVE_ID_CARPETA]
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeCarpeta(r, idCarpeta) == False):
+        return JsonResponse({'error': 'La carpeta no existe'}, status=erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA)
+    if(usuarios.isCarpetaFromUser(r, idUsuario, idCarpeta) == False and usuarios.isCarpetaPublica(r, idCarpeta) == False):
+        return JsonResponse({'error': 'No tienes permiso'}, status=erroresHTTP.FORBIDDEN)
     
-    respuesta = usuarios.getFolder(r, idCarpeta)
-
-    if(respuesta["status"] != erroresHTTP.OK):
-        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
-    
-    return JsonResponse({constantes.PREFIJO_ID_CARPETA : respuesta[constantes.PREFIJO_ID_CARPETA]}, status= respuesta["status"])
+    return JsonResponse({constantes.PREFIJO_CARPETAS : usuarios.getFolder(r, idCarpeta)}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def GetListasFolder(request):

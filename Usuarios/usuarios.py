@@ -22,18 +22,43 @@ def existeLista(r, id):
 def existeCarpeta(r, id):
     return daoCarpetas.existeCarpeta(r, id)
 
+def existeUsuarioEmail(r, email):
+    return daoUsuario.existeEmailId(r, email)
+
+def correctoDiccionarioUsuario(diccionario):
+    if(sorted(diccionario.keys()) != sorted(daoUsuario.listaClaves)):
+        return False
+    return True
+
+def correctoDiccionarioLista(diccionario):
+    if(sorted(diccionario.keys()) != sorted(daoListas.listaClaves)):
+        return False
+    return True
+
+def correctoDiccionarioCarpeta(diccionario):
+    if(sorted(diccionario.keys()) != sorted(daoCarpetas.listaClaves)):
+        return False
+    return True
+
+
+def tipoUsuarioValido(tipoUsuario):
+    return daoUsuario.tipoUsuarioValido(tipoUsuario)
+
+def getTipoNotificacion(r, id):
+    return daoNotificaciones.getTipoNotificacion(r, id)
+
+def isCarpetaPublica(r, id):
+    return daoCarpetas.getPrivacidadCarpeta(r, id) == constantes.CARPETA_PUBLICA
+
+def getUsuarioEmisorNotificacion(r, id):
+    return daoNotificaciones.getIdUsuarioEmisor(r, id)
+
+def tipoListaValido(tipoLista):
+    return daoListas.tipoListaValido(tipoLista)
 
 def setUser(r, usuarioDiccionario):
     id = daoUsuario.getIdContador(r)
     usuarioDiccionario[constantes.CLAVE_ID_USUARIO] = id
-
-    if(sorted(usuarioDiccionario.keys()) != sorted(daoUsuario.listaClaves)):
-        respuesta = {"status": erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS}
-        return respuesta
-    
-    if(daoUsuario.existeEmailId(r, usuarioDiccionario[constantes.CLAVE_EMAIL])):
-        respuesta = {"status": erroresHTTP.ERROR_USUARIO_EMAIL_YA_EXISTE}
-        return respuesta
 
     # Si el usuario es administrador lo añadimos a la lista de administradores
     if(usuarioDiccionario[constantes.CLAVE_TIPO_USUARIO] == constantes.USUARIO_ADMINISTRADOR):
@@ -44,8 +69,7 @@ def setUser(r, usuarioDiccionario):
 
     # Lo añadimos al hash con la clave como email y el valor como id
     daoUsuario.setEmailId(r, usuarioDiccionario[constantes.CLAVE_EMAIL], id)
-    respuesta = {"status": erroresHTTP.OK, constantes.CLAVE_ID_USUARIO: id}
-    return respuesta
+    return id
 
 def removeUser(r, id, contrasenya):
     if(r.exists(id) == 0):
@@ -69,9 +93,6 @@ def removeUser(r, id, contrasenya):
     return 1
 
 def AskAdminToBeArtist(r, idUsuario):
-    if(existeUsuario(r, idUsuario) == False):
-        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
-        
     idNotificacion = daoNotificaciones.getIdContador(r)
     diccionarioNotificaciones = {constantes.CLAVE_ID_NOTIFICACION: idNotificacion, 
                                  constantes.CLAVE_ID_USUARIO_EMISIOR: idUsuario, 
@@ -82,25 +103,16 @@ def AskAdminToBeArtist(r, idUsuario):
     administradores = daoUsuario.getAdministradores(r)
     for admin in administradores:
         daoUsuario.anyadirNotificacion(r, admin, idNotificacion)
-    return erroresHTTP.OK
     
 def ValidateUser(r, id, contrasenya):
-    if (existeUsuario(r, id) == False): 
-        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
-    
     if (daoUsuario.getContrasenya(r, id) == contrasenya):
-        return erroresHTTP.OK
+        return True
 
-    return erroresHTTP.ERROR_CONTRASENYA_INCORRECTA
+    return False
 
 def validateUserEmail(r, email, contrasenya):
-    if (daoUsuario.existeEmailId(r, email) == False):
-        respuesta = {"status": erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}
-        return respuesta
     idUsuario = daoUsuario.getIdEmailId(r, email)
-    status = ValidateUser(r, idUsuario, contrasenya)
-    respuesta = {"status": status, constantes.CLAVE_ID_USUARIO : idUsuario}
-    return respuesta
+    return ValidateUser(r, idUsuario, contrasenya)
 
 def setLastSecondHeard(r, idUsuario, idAudio, segundo):
     if (r.exists(idUsuario) == 0 or r.exists(idAudio) == 0):
@@ -124,10 +136,6 @@ def getLastSecondHeard(r, idUsuario, idAudio):
 # Funciones adcionales de administradores
 def acceptArtist(r, idNotificacion):
     idUsuario = daoNotificaciones.getIdUsuarioEmisor(r, idNotificacion)
-    if(existeUsuario(idUsuario)):
-        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
-    if(daoNotificaciones.getTipoNotificacion(r, idNotificacion) != constantes.NOTIFICACION_TIPO_SOLICITUD_ARTISTA):
-        return erroresHTTP.ERROR_NOTIFICACION_NO_SOLICITUD_ARTISTA
     
     # Eliminamos la notificación a los administradores
     administradores = daoUsuario.getAdministradores(r)
@@ -135,7 +143,6 @@ def acceptArtist(r, idNotificacion):
         daoUsuario.eliminarNotificacion(r, admin, idNotificacion)
     
     daoUsuario.setTipoUsuario(r, idUsuario, daoUsuario.constantes.USUARIO_ARTISTA)
-    return erroresHTTP.OK
 
 def esAdministrador(r, id):
     if (r.exists(id) == 0):
@@ -148,25 +155,47 @@ def setLista(r, idUsuario, diccionarioLista):
     id = daoListas.getIdContador(r)
     diccionarioLista[constantes.CLAVE_ID_LISTA] = id
 
-    if(sorted(diccionarioLista) != sorted(daoListas.listaClaves)):
-        return erroresHTTP.ERROR_LISTA_PARAMETROS_INCORRECTOS
-    
     daoListas.setLista(r, diccionarioLista) 
     daoUsuario.anyadirLista(r, idUsuario, id)
     return erroresHTTP.OK
 
+def isListaFromUser(r, idUsuario, idLista):
+    if (r.exists(idUsuario) == 0 or r.exists(idLista) == 0):
+        return False
+    listas = daoUsuario.getListas(r, idUsuario)
+    if(idLista not in listas):
+        return False
+    return True
+
+def isCarpetaFromUser(r, idUsuario, idCarpeta):
+    if (r.exists(idUsuario) == 0 or r.exists(idCarpeta) == 0):
+        return False
+    carpetas = daoUsuario.getCarpetas(r, idUsuario)
+    if(idCarpeta not in carpetas):
+        return False
+    return True
+
+def isAudioFromLista(r, idLista, idAudio):
+    if (r.exists(idLista) == 0 or r.exists(idAudio) == 0):
+        return False
+    audios = daoListas.getAudiosLista(r, idLista)
+    if(idAudio not in audios):
+        return False
+    return True
+
+def isListaFromCarpeta(r, idCarpeta, idLista):
+    if (r.exists(idCarpeta) == 0 or r.exists(idLista) == 0):
+        return False
+    listas = daoCarpetas.getListasCarpeta(r, idCarpeta)
+    if(idLista not in listas):
+        return False
+    return True
+
 def setNombreLista(r, idLista, nombre):
-    if (existeLista(r, idLista) == False):
-        return erroresHTTP.ERROR_LISTA_NO_ENCONTRADA
-    
-    return daoListas.setNombreLista(r, idLista, nombre)
+    daoListas.setNombreLista(r, idLista, nombre)
 
 def setSongLista(r, idLista, idAudio):
-    if(existeLista(r, idLista) == False):
-        return erroresHTTP.ERROR_LISTA_NO_ENCONTRADA
     daoListas.anyadirAudioLista(r, idLista, idAudio)
-
-    return erroresHTTP.OK
 
 def setPrivacyLista(r, idUsuario, idLista, publica):
     if (r.exists(idUsuario) == 0):
@@ -185,13 +214,8 @@ def removeLista(r, idUsuario, idLista):
     daoUsuario.eliminarLista(r, idUsuario, idLista)
     return 1
 
-def getLista(r, idLista):
-    if(existeLista(r, idLista) == False):
-        respuesta = {"status": erroresHTTP.ERROR_LISTA_NO_ENCONTRADA}
-        return respuesta
-    
-    respuesta = {"status": erroresHTTP.OK, constantes.PREFIJO_ID_LISTA : daoListas.getLista(r, idLista)}
-    return respuesta
+def getLista(r, idLista):   
+    return daoListas.getLista(r, idLista)
 
 def getListasUsr(r, idUsuario):
     return daoUsuario.getListas(r, idUsuario)
@@ -220,37 +244,19 @@ def removeSongLista(r, idLista, idAudio):
 def setFolder(r, idUsuario, diccionarioCarpeta):
     id = daoCarpetas.getIdContador(r)
     diccionarioCarpeta[constantes.CLAVE_ID_CARPETA] = id
-
-    if(sorted(diccionarioCarpeta) != sorted(daoCarpetas.carpetasClaves)):
-        return erroresHTTP.ERROR_CARPETA_PARAMETROS_INCORRECTOS
-    
     daoCarpetas.setCarpeta(r, diccionarioCarpeta) 
     daoUsuario.anyadirCarpeta(r, idUsuario, id)
     return erroresHTTP.OK
 
 def addListToFolder(r, idCarpeta, idLista):
-    if (existeCarpeta(r, idCarpeta) == False):
-        return erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA
-    if (existeLista(r, idLista) == False):
-        return erroresHTTP.ERROR_LISTA_NO_ENCONTRADA
     daoCarpetas.anyadirListaCarpeta(r, idCarpeta, idLista)
-    return erroresHTTP.OK
 
 def removeListFromFolder(r, idCarpeta, idLista):
-    if (existeCarpeta(r, idCarpeta) == False):
-        return erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA
-    if (existeLista(r, idLista) == False):
-        return erroresHTTP.ERROR_LISTA_NO_ENCONTRADA
-    if(daoCarpetas.eliminarListaCarpeta(r, idCarpeta, idLista) == 0):
-        return erroresHTTP.ERROR_CARPETA_NO_TIENE_LISTA
-    return erroresHTTP.OK
+    daoCarpetas.eliminarListaCarpeta(r, idCarpeta, idLista)
     
 def removeFolder(r, idUsuario, idCarpeta):
-    if (existeCarpeta(r, idCarpeta) == False):
-        return erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA
     daoCarpetas.eliminarCarpeta(r, idCarpeta)
     daoUsuario.eliminarCarpeta(r, idUsuario, idCarpeta)
-    return erroresHTTP.OK
 
 def getFolder(r, idCarpeta):
     if(existeCarpeta(r, idCarpeta) == False):
