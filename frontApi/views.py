@@ -414,7 +414,7 @@ def entrenar_recomendador(request):
     if(usuarios.esAdministrador(r, idUsuario) == False):
         return JsonResponse({'error': 'No eres administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
     
-    status = rec.create_model(r)
+    #status = rec.create_model(r)
 
     return JsonResponse({'status': status}, status=status)
 
