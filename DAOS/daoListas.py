@@ -46,11 +46,11 @@ def setTipoLista(r, idLista, tipo):
 
 # Funcion para añadir una o más canciones a una playlist
 def anyadirAudioLista(r, idLista, idAudio):
-    return r.sadd(constantes.CLAVE_AUDIOS + ":" + idLista, *idAudio)
+    return r.sadd(constantes.CLAVE_AUDIOS + ":" + idLista, idAudio)
 
 # Funcion para eliminar una o más canciones de una playlist
 def eliminarAudioLista(r, idLista, idAudio):
-    return r.srem(constantes.CLAVE_AUDIOS + ":" + idLista, *idAudio)
+    return r.srem(constantes.CLAVE_AUDIOS + ":" + idLista, idAudio)
 
 # Funcion para eliminar una playlist
 def eliminarLista(r, id):

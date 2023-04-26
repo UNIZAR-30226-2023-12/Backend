@@ -1,5 +1,5 @@
 # base image 
-FROM python:3.11
+FROM python:3.10
 MAINTAINER melodia
 
 RUN apt-get update; \
@@ -19,7 +19,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1  
 
 # install dependencies  
-RUN pip install --upgrade pip  
+RUN pip3 install --upgrade pip  
 
 # copy whole project to your docker home directory. 
 COPY ./requirements.txt $DOCKERHOME
@@ -29,13 +29,15 @@ COPY ./backend_melodia/ $DOCKERHOME/backend_melodia/
 COPY ./Configuracion/ $DOCKERHOME/Configuracion/
 COPY ./DAOS/ $DOCKERHOME/DAOS/
 COPY ./frontApi/ $DOCKERHOME/frontApi/
+COPY ./Global/ $DOCKERHOME/Global/
+COPY ./recomendador/ $DOCKERHOME/recomendador/
 COPY ./Usuarios/ $DOCKERHOME/Usuarios/
 
 # run this command to install all dependencies  
-RUN pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 # port where the Django app runs  
 EXPOSE 8081
 
 # start server
-CMD python manage.py runserver 8081
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:8081"]

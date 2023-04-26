@@ -231,6 +231,8 @@ def obtenerEsPodcast(r, id):
 
     return daoAudio.obtenerEsPodcast(r, id)
 
+# Función para obtener las canciones 
+
 
 ##############################################################################################################
 #

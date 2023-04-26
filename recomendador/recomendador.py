@@ -5,6 +5,37 @@ from tensorflow import keras
 import numpy as np
 
 
+def orderAudios(r, idUsr, audios):
+
+    # Cargar el recomendador
+    recomendador = keras.models.load_model('my_model.h5')
+    
+
+    ############## Obtener las predicciones de los audios ##############
+    predicciones = []
+
+    for audio in audios:
+        paquete_datos = data_gen.get_audio_prediction_state(r, idUsr, audio)
+
+        prediccion = recomendador.predict(paquete_datos)
+        predicciones.append(prediccion)
+
+
+
+    ############## Ordenar los audios por valoración ##############
+    
+    # pair the elements of the two lists
+    pairs = list(zip(audios, predicciones))
+
+    # sort the pairs based on the values in the second list (i.e. b)
+    sorted_pairs = sorted(pairs, key=lambda x: x[1])
+
+    # extract the first element of each pair (i.e. the elements of a) into a new list
+    audios_ordenados = [pair[0] for pair in sorted_pairs]
+
+
+    return audios_ordenados
+
 def create_model(conn):
     # Carga los datos de entrenamiento, 
     # cada Xtr compuesto por una pareja 
@@ -47,4 +78,7 @@ def create_model(conn):
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy", "Recall"])
 
     model.fit([Xtr, Xtr_temporal], ytr, epochs=10)
+
+    model.save("recomendador/modelo_recomendador.h5")
+
 

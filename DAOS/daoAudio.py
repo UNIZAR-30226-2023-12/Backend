@@ -52,10 +52,20 @@ def incrementarIDUltimoAudio(r):
 def guardarCancion(r, cancionDic):
     print("Guardando cancion")
     id = cancionDic['id']
+    ficheroAltaCalidad = cancionDic['ficheroAltaCalidad']
+    ficheroBajaCalidad = cancionDic['ficheroBajaCalidad']
+
     # Ahora quito el id del diccionario para que no se guarde en el hash
     del cancionDic['id']
+    del cancionDic['ficheroAltaCalidad']
+    del cancionDic['ficheroBajaCalidad']
+
     r.hmset(id, cancionDic)
-    
+    r.hmset(id+":ficheros", {'ficheroAltaCalidad': ficheroAltaCalidad, 
+                            'ficheroBajaCalidad': ficheroBajaCalidad})
+
+    r.sadd(constantes.PREFIJO_LISTA_GLOBAL_CANCIONES, id)
+
     return 0
 
 # Funcion para cambiar el nombre de una cancion
@@ -90,12 +100,12 @@ def cambiarGeneroCancion(r, id, genero):
 
 # Funcion para cambiar el fichero de alta calidad de una cancion
 def cambiarFicheroAltaCalidad(r, id, ficheroAltaCalidad):
-    r.hset(id, 'ficheroAltaCalidad', ficheroAltaCalidad)
+    r.hset(id+":ficheros", 'ficheroAltaCalidad', ficheroAltaCalidad)
     return 0
 
 # Funcion para cambiar el fichero de baja calidad de una cancion
 def cambiarFicheroBajaCalidad(r, id, ficheroBajaCalidad):
-    r.hset(id, 'ficheroBajaCalidad', ficheroBajaCalidad)     
+    r.hset(id+":ficheros", 'ficheroBajaCalidad', ficheroBajaCalidad)     
     return 0
 
 # Funcion para cambiar la longitud de una canción
@@ -128,7 +138,56 @@ def eliminarCancion(r, id):
 
 # Funcion para obtener una cancion
 def obtenerCancion(r, id):
+    datos_control = r.hgetall(id)
+    datos_control['ficheroAltaCalidad'] = obtenerFicheroAltaCalidad(r, id)
+    datos_control['ficheroBajaCalidad'] = obtenerFicheroBajaCalidad(r, id)
+
+    return datos_control
+
+# Devuelve los datos de control de un audio (sin los ficheros)
+def obtenerDatosCancion(r, id):
     return r.hgetall(id)
+
+def obtenerDatosCanciones(r, ids):
+    datosCanciones = []
+
+    for id in ids:
+        datos = obtenerDatosCancion(r, id)
+        datos['id'] = id
+        datosCanciones.append(datos)
+
+    return datosCanciones
+
+
+    
+
+
+def obtenerTodasLasCanciones(r):
+    return r.smembers(constantes.PREFIJO_LISTA_GLOBAL_CANCIONES)
+
+def buscarAudios(r, query):
+    canciones = obtenerTodasLasCanciones(r)
+    podcasts = obtenerTodosLosPodcasts(r)
+    datosCanciones = obtenerDatosCanciones(r, canciones)
+    datosPodcasts = obtenerDatosPodcasts(r, podcasts)
+    encontradas = []
+
+    for audio in datosCanciones:
+        if (query.lower() in audio['nombre'].lower() or 
+            query.lower() in audio['artista'].lower()):
+            encontradas.append(audio['id'])
+
+    for audio in datosCanciones:
+        if (query.lower() in audio['nombre'].lower() or 
+            query.lower() in audio['artista'].lower() or
+            query.lower() in audio['descripcion'].lower()):
+            encontradas.append(audio['id'])
+        
+
+    return encontradas
+
+    
+
 
 # Funcion para obtener el num de veces que se ha escuchado una cancion
 def obtenerVecesreproducidasCancion(r, id):
@@ -156,11 +215,11 @@ def obtenerCalidad(r, id):
 
 # Funcion para obtener el fichero de alta calidad de una cancion
 def obtenerFicheroAltaCalidad(r, id):
-    return r.hget(id, 'ficheroAltaCalidad')
+    return r.hget(id+":ficheros", 'ficheroAltaCalidad')
 
 # Funcion para obtener el fichero de baja calidad de una cancion
 def obtenerFicheroBajaCalidad(r, id):
-    return r.hget(id, 'ficheroBajaCalidad')
+    return r.hget(id+":ficheros", 'ficheroBajaCalidad')
     
 # Funcion para obtener la longitud de una cancion
 def obtenerLongitudCancion(r, id):
@@ -172,7 +231,6 @@ def obtenerNumFavoritosCancion(r, id):
 
 # Funcion para obtener el atributo esPodcast de un audio
 def obtenerEsPodcast(r, id):
-
     return r.hget(id, 'esPodcast') == 'True'
 
 #########################################################################################
@@ -205,13 +263,24 @@ def existePodcast(r, id):
 
 # Funcion para guardar un podcast en la base de datos
 def guardarPodcast(r, podcastDic):
+    print("Guardando cancion")
     id = podcastDic['id']
+    ficheroAltaCalidad = podcastDic['ficheroAltaCalidad']
+    ficheroBajaCalidad = podcastDic['ficheroBajaCalidad']
+
     # Ahora quito el id del diccionario para que no se guarde en el hash
     del podcastDic['id']
+    del podcastDic['ficheroAltaCalidad']
+    del podcastDic['ficheroBajaCalidad']
 
     r.hmset(id, podcastDic)
+    r.hmset(id+":ficheros", {'ficheroAltaCalidad': ficheroAltaCalidad, 
+                            'ficheroBajaCalidad': ficheroBajaCalidad})
     
+    r.sadd(constantes.PREFIJO_LISTA_GLOBAL_PODCASTS, id)
+
     return 0
+
 
 # Funcion para cambiar el nombre de un podcast
 def cambiarNombrePodcast(r, id, nombre):
@@ -245,12 +314,12 @@ def cambiarDescPodcast(r, id, desc):
 
 # Funcion para cambiar el fichero de alta calidad de un podcast
 def cambiarFicheroAltaCalidadPodcast(r, id, ficheroAltaCalidad):
-    r.hset(id, 'ficheroAltaCalidad', ficheroAltaCalidad)
+    r.hset(id+":ficheros", 'ficheroAltaCalidad', ficheroAltaCalidad)
     return 0
 
 # Funcion para cambiar el fichero de baja calidad de un podcast
 def cambiarFicheroBajaCalidadPodcast(r, id, ficheroBajaCalidad):
-    r.hset(id, 'ficheroBajaCalidad', ficheroBajaCalidad)
+    r.hset(id+":ficheros", 'ficheroBajaCalidad', ficheroBajaCalidad)
     return 0
 
 # Funcion para cambiar el genero de un podcast
@@ -283,7 +352,27 @@ def eliminarPodcast(r, id):
 
 # Funcion para obtener un podcast
 def obtenerPodcast(r, id):
+    datos_control = r.hgetall(id)
+    datos_control['ficheroAltaCalidad'] = obtenerFicheroAltaCalidadPodcast(r, id)
+    datos_control['ficheroBajaCalidad'] = obtenerFicheroBajaCalidadPodcast(r, id)
+
+    return datos_control
+
+# Devuelve los datos de control de un audio (sin los ficheros)
+def obtenerDatosPodcast(r, id):
     return r.hgetall(id)
+
+def obtenerTodosLosPodcasts(r):
+    return r.smembers(constantes.PREFIJO_LISTA_GLOBAL_PODCASTS)
+
+
+def obtenerDatosPodcasts(r, ids):
+    datosPodcasts = []
+
+    for id in ids:
+        datosPodcasts.append(obtenerDatosPodcast(r, id))
+
+    return datosPodcasts
 
 # Funcion para obtener el nombre de un podcast
 def obtenerNombrePodcast(r, id):
@@ -311,11 +400,11 @@ def obtenerDescPodcast(r, id):
 
 # Funcion para obtener el fichero de alta calidad de un podcast
 def obtenerFicheroAltaCalidadPodcast(r, id):
-    return r.hget(id, 'ficheroAltaCalidad')
+    return r.hget(id+"ficheros", 'ficheroAltaCalidad')
 
 # Funcion para obtener el fichero de baja calidad de un podcast
 def obtenerFicheroBajaCalidadPodcast(r, id):
-    return r.hget(id, 'ficheroBajaCalidad')
+    return r.hget(id+"ficheros", 'ficheroBajaCalidad')
     
 # Funcion para obtener el genero de un podcast
 def obtenerGeneroPodcast(r, id):
