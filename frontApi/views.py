@@ -438,19 +438,7 @@ def AcceptArtist(request):
 
 @csrf_exempt
 def ValidateUserEmail(request):
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
-    # Parse the JSON data from the request body to extract idUsuario
-    json_data = json.loads(request.body)
-    email = json_data[constantes.CLAVE_EMAIL]
-    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-
-    respuesta = usuarios.validateUserEmail(r, email, contrasenya)
-    if (respuesta["status"] != erroresHTTP.OK):
-        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
-
-    return JsonResponse({constantes.CLAVE_ID_USUARIO: respuesta[constantes.CLAVE_ID_USUARIO]}, status=respuesta["status"])
+    return ValidateUser(request)
 
 @csrf_exempt
 def GetTotRepTime(request):
@@ -638,16 +626,17 @@ def GetListasFolder(request):
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     idCarpeta = json_data[constantes.CLAVE_ID_CARPETA]
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeCarpeta(r, idCarpeta) == False):
+        return JsonResponse({'error': 'La carpeta no existe'}, status=erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA)
+    if(usuarios.isCarpetaFromUser(r, idUsuario, idCarpeta) == False and usuarios.isCarpetaPublica(r, idCarpeta) == False):
+        return JsonResponse({'error': 'No tienes permiso'}, status=erroresHTTP.FORBIDDEN)
     
-    respuesta = usuarios.getListasFolder(r, idCarpeta)
-
-    if(respuesta["status"] != erroresHTTP.OK):
-        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
-    
-    return JsonResponse({constantes.PREFIJO_ID_LISTA : respuesta[constantes.PREFIJO_ID_LISTA]}, status= respuesta["status"])
+    return JsonResponse({constantes.CLAVE_ID_LISTA : usuarios.getListasFolder(r, idCarpeta)}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def GetFoldersUsr(request):
@@ -659,24 +648,15 @@ def GetFoldersUsr(request):
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
 
-    if (contrasenya == None):
-        if(usuarios.existeUsuario(r, idUsuario) == False):
-            return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
-        respuesta = usuarios.getPublicFoldersUser(r, idUsuario)
-        if(respuesta["status"] != erroresHTTP.OK):
-            return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
-        return JsonResponse({constantes.PREFIJO_ID_CARPETA : respuesta[constantes.PREFIJO_ID_CARPETA]}, status= respuesta["status"])
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False) and contrasenya != None:
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
-    
-    respuesta = usuarios.getFoldersUser(r, idUsuario)
-
-    if(respuesta["status"] != erroresHTTP.OK):
-        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
-    
-    return JsonResponse({constantes.PREFIJO_ID_CARPETA : respuesta[constantes.PREFIJO_ID_CARPETA]}, status= respuesta["status"])
+    if contrasenya == None:
+        return JsonResponse({constantes.CLAVE_ID_CARPETA : usuarios.getPublicFoldersUser(r, idUsuario)}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.CLAVE_ID_CARPETA : usuarios.getFoldersUser(r, idUsuario)}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def AskFriend(request):
@@ -689,13 +669,19 @@ def AskFriend(request):
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     idAmigo = json_data[constantes.CLAVE_ID_AMIGO]
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeUsuario(r, idAmigo) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.isFriend(r, idUsuario, idAmigo) == True):
+        return JsonResponse({'error': 'Ya sois amigos'}, status=erroresHTTP.ERROR_USUARIO_YA_AMIGO)
     
-    status = usuarios.askFriend(r, idUsuario, idAmigo)
+    usuarios.askFriend(r, idUsuario, idAmigo)
 
-    return JsonResponse({'status': status}, status=status)
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def AcceptFriend(request):
@@ -708,13 +694,21 @@ def AcceptFriend(request):
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     idNotificacion = json_data[constantes.CLAVE_ID_NOTIFICACION]
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeNotificacion(r, idNotificacion) == False):
+        return JsonResponse({'error': 'La notificacion no existe'}, status=erroresHTTP.ERROR_NOTIFICACION_NO_ENCONTRADA)
+    if(usuarios.existeUsuario(r, usuarios.getUsuarioEmisorNotificacion(r, idNotificacion)) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.getTipoNotificacion(r, idNotificacion) != constantes.NOTIFICACION_TIPO_AMIGO):
+        return JsonResponse({'error': 'La notificacion no es de tipo amigo'}, status=erroresHTTP.ERROR_NOTIFICACION_NO_AMIGO)
     
-    status = usuarios.accpetFriend(r, idUsuario, idNotificacion)
+    usuarios.accpetFriend(r, idUsuario, idNotificacion)
 
-    return JsonResponse({'status': status}, status=status)
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def GetFriends(request):
@@ -726,16 +720,13 @@ def GetFriends(request):
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
-    
-    respuesta = usuarios.getFriends(r, idUsuario)
-
-    if(respuesta["status"] != erroresHTTP.OK):
-        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
-    
-    return JsonResponse({constantes.PREFIJO_ID_USUARIO : respuesta[constantes.PREFIJO_ID_USUARIO]}, status= respuesta["status"])
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+     
+    return JsonResponse({constantes.CLAVE_ID_AMIGO : usuarios.getFriends(r, idUsuario)}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def RemoveFriend(request):
@@ -748,13 +739,19 @@ def RemoveFriend(request):
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     idAmigo = json_data[constantes.CLAVE_ID_AMIGO]
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeUsuario(r, idAmigo) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.isFriend(r, idUsuario, idAmigo) == False):
+        return JsonResponse({'error': 'No sois amigos'}, status=erroresHTTP.ERROR_USUARIO_NO_AMIGO)
     
-    status = usuarios.removeFriend(r, idUsuario, idAmigo)
+    usuarios.removeFriend(r, idUsuario, idAmigo)
 
-    return JsonResponse({'status': status}, status=status)
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
     
 

@@ -259,47 +259,28 @@ def removeFolder(r, idUsuario, idCarpeta):
     daoUsuario.eliminarCarpeta(r, idUsuario, idCarpeta)
 
 def getFolder(r, idCarpeta):
-    if(existeCarpeta(r, idCarpeta) == False):
-        respuesta = {"status": erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA}
-        return respuesta
-    respuesta = {"status": erroresHTTP.OK, constantes.PREFIJO_ID_CARPETA : daoCarpetas.getCarpeta(r, idCarpeta)}
-    return respuesta
+    return daoCarpetas.getCarpeta(r, idCarpeta)
 
 def getListasFolder(r, idCarpeta):
-    if(existeCarpeta(r, idCarpeta) == False):
-        respuesta = {"status": erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA}
-        return respuesta
-    respuesta = {"status": erroresHTTP.OK, constantes.PREFIJO_ID_LISTA : daoCarpetas.getListasCarpeta(r, idCarpeta)}
-    return respuesta
+    return daoCarpetas.getListasCarpeta(r, idCarpeta)
 
 def getFoldersUser(r, idUsuario):
-    if(existeUsuario(r, idUsuario) == False):
-        respuesta = {"status": erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}
-        return respuesta
-    respuesta = {"status": erroresHTTP.OK, constantes.PREFIJO_ID_CARPETA : daoUsuario.getCarpetas(r, idUsuario)}
-    return respuesta
+    return daoUsuario.getCarpetas(r, idUsuario)
 
 def getPublicFoldersUser(r, idUsuario):
     folders = getFoldersUser(r, idUsuario)
-    if(folders["status"] != erroresHTTP.OK):
-        return folders
-    folders = folders[constantes.PREFIJO_ID_CARPETA]
-    publicFolders = []
     for folder in folders:
-        if(daoCarpetas.esPublica(r, folder)):
-            publicFolders.append(folder)
-    respuesta = {"status": erroresHTTP.OK, constantes.PREFIJO_ID_CARPETA : publicFolders}
-    return respuesta
+        if(daoCarpetas.getPrivacidadCarpeta(r, folder) == constantes.CARPETA_PRIVADA):
+            folders.remove(folder)
+    return folders
 
 # Funciones para gestionar amigos
-def askFriend(r, idUsuario, idUsuarioAmigo):
-    if(existeUsuario(r, idUsuario) == False):
-        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
-    if(existeUsuario(r, idUsuarioAmigo) == False):
-        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
+def isFriend(r, idUsuario, idUsuarioAmigo):
     if(idUsuario in daoUsuario.getAmigos(r, idUsuarioAmigo)):
-        return erroresHTTP.ERROR_USUARIO_YA_AMIGO
-    
+        return True
+    return False
+
+def askFriend(r, idUsuario, idUsuarioAmigo):
     idNotificacion = daoNotificaciones.getIdContador(r)
     diccionarioNotificacion = {constantes.CLAVE_ID_NOTIFICACION: idNotificacion,
                                constantes.CLAVE_ID_USUARIO_EMISIOR: idUsuario,
@@ -311,10 +292,6 @@ def askFriend(r, idUsuario, idUsuarioAmigo):
     return erroresHTTP.OK
 
 def accpetFriend(r, idUsuario, idNotificacion):
-    if(existeNotificacion(r, idNotificacion) == False):
-        return erroresHTTP.ERROR_NOTIFICACION_NO_ENCONTRADA
-    if(daoNotificaciones.getTipoNotificacion(r, idNotificacion) != constantes.NOTIFICACION_TIPO_AMIGO):
-        return erroresHTTP.ERROR_NOTIFICACION_NO_AMIGO
     idUsuarioAmigo = daoNotificaciones.getIdUsuarioEmisor(r, idNotificacion)    
     daoUsuario.anyadirAmigo(r, idUsuarioAmigo, idUsuario)
     daoUsuario.anyadirAmigo(r, idUsuario, idUsuarioAmigo)
@@ -323,20 +300,10 @@ def accpetFriend(r, idUsuario, idNotificacion):
     return erroresHTTP.OK
 
 def getFriends(r, idUsuario):
-    if(existeUsuario(r, idUsuario) == False):
-        respuesta = {"status": erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}
-        return respuesta
-    respuesta = {"status": erroresHTTP.OK, constantes.PREFIJO_ID_USUARIO : daoUsuario.getAmigos(r, idUsuario)}
-    return respuesta
+    return daoUsuario.getAmigos(r, idUsuario)
 
 
 def removeFriend(r, idUsuario, idUsuarioAmigo):
-    if(existeUsuario(r, idUsuario) == False):
-        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
-    if(existeUsuario(r, idUsuarioAmigo) == False):
-        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
-    if(idUsuarioAmigo not in daoUsuario.getAmigos(r, idUsuario)):
-        return erroresHTTP.ERROR_USUARIO_NO_AMIGO
     daoUsuario.eliminarAmigo(r, idUsuario, idUsuarioAmigo)
     daoUsuario.eliminarAmigo(r, idUsuarioAmigo, idUsuario)
     return erroresHTTP.OK
