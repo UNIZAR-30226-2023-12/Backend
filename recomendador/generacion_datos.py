@@ -36,7 +36,9 @@ def get_training_data(conn):
     users_with_training_data = daoGlobal.get_users_with_training_data(conn) 
 
     #datos_entrada = np.empty((0, 2))  # Arrays con los ejemplos de entrada
-    datos_entrada = []
+    datos_entrada = np.empty((0, 72)) 
+    datos_entrada_ventanas = np.empty((0, conf.RECOMENDADOR_TAMANYO_VENTANA_PREDICCION,
+                                        1+conf.GENERO_NUMERO_GENEROS))
     datos_salida = np.empty((0))   # Arrays con las salidas de cada ejemplo
 
     
@@ -53,15 +55,15 @@ def get_training_data(conn):
 
         for paquete in datos_entrenamiento:
 
-            inputs = paquete["inputs"]
-            datos_entrada_usr.append(inputs)
+            datos_entrada_usr.append(paquete["inputs"])
             datos_salida_usr.append(paquete["output"])
 
 
         ############ Preparar datos para la red neuronal ############
 
         datos_entrada_usr = limpiar_datos(datos_entrada_usr)
-
+        datos_entrada_usr = np.array(datos_entrada_usr)
+        datos_salida_usr = np.array(datos_salida_usr)
 
         window_size = min(conf.RECOMENDADOR_TAMANYO_VENTANA_PREDICCION, len(datos_entrada_usr))
         # Crea ventanas deslizantes con el histórico de cada ejemplos
@@ -74,19 +76,13 @@ def get_training_data(conn):
         datos_entrada_usr = datos_entrada_usr[window_size-1:] 
         datos_salida_usr = datos_salida_usr[window_size-1:]
 
-        # Hace un zip de los datos con las ventanas
-        inputs_usr = zip(datos_entrada_usr, ventana_inputs_usr.tolist())
-        
-        # Convierte los datos a numpy arrays
-        inputs_usr = list(inputs_usr)
-
-
         ############ Añadir datos a la lista de datos ############
 
         # Añade los datos de entrada y salida del usuario a la lista de datos
         #datos_entrada = np.append(datos_entrada, inputs_usr, axis=0)
         
-        datos_entrada.extend(inputs_usr)
+        datos_entrada = np.append(datos_entrada, datos_entrada_usr, axis=0)
+        datos_entrada_ventanas = np.append(datos_entrada_ventanas, ventana_inputs_usr, axis=0)
         datos_salida = np.append(datos_salida, datos_salida_usr, axis=0)
 
         # Elimina los datos de entrenamiento del usuario
@@ -94,7 +90,7 @@ def get_training_data(conn):
         daoGlobal.delete_usr_training_examples(conn, id_usr)
 
 
-    return datos_entrada, datos_salida
+    return datos_entrada, datos_entrada_ventanas, datos_salida
     
 
 

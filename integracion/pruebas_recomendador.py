@@ -4,15 +4,9 @@ import base64
 from django.middleware import csrf
 from django.http import HttpRequest
 
-ip = '127.0.0.1'
-port = '8000'
-
 # URL del endpoint SetSong
-url_set_song = 'http://'+ip+':'+port+'/SetSong/'
-url_set_usr = 'http://'+ip+':'+port+'/SetUser/'
-url_get_usr = 'http://'+ip+':'+port+'/GetUser/'
-url_get = 'http://'+ip+':'+port+'/GetSong/'
-url_busqueda = 'http://'+ip+':'+port+'/GlobalSearch/'
+url_train = 'http://127.0.0.1:8000/entrenar_recomendador/'
+url_add_examples = 'http://127.0.0.1:8000/AlmacenarEjemplo/'
 
 # Crear un objeto HttpRequest vacío
 # request = HttpRequest()
@@ -32,19 +26,10 @@ with open('STARSET-DIE FOR YOU.mp3', 'rb') as f:
     # Convertir el resultado a una cadena de texto
     resultado = codificado.decode('utf-8')
 
-# String idUsr, String email, String alias, String contrasenya, String tipoUsuario
-new_user_data = {
-    'idUsr': 'admin',
-    'email': 'admin@melodia.es',
-    'alias': 'admin',
-    'contrasenya': '1234',
-    'tipoUsuario': 'admin'
-}
-
 # Datos del cuerpo de la petición
 new_song_data = {
     'nombre': 'Die for you',
-    'idUsr': 'usuario:1',
+    'idUsuario': 'usuario:1',
     'contrasenya': '1234',
     'artista': 'Starset',
     'calidad': 'baja',
@@ -56,27 +41,24 @@ new_song_data = {
 
 params_example = {
     'idUsr': 'usuario:1',
-    'idSong': 'idAudio:1',
-    'calidadAlta': 'True',
-    'esCancion': 'True'
+    'idAudio': 'idAudio:10',
+    'valoracion': '1'
 }
 
-params_get_usr = {
+
+train_data = {
     'idUsr': 'usuario:1',
     'contrasenya': '1234'
 }
 
+train_data = json.dumps(train_data)
+
+for i in range(10):
+    response = requests.post(url_add_examples, data=params_example) # Pide canciones
 
 
 # Realizar la petición HTTP POST
-response = requests.post(url_set_song, json=new_song_data)
-response = requests.get(url_get, params=params_get_song)
-usr = requests.get(url_get_usr, params=params_get_usr)
-
-search = requests.get(url_busqueda, params={'query': 'Die for you'})
-
-print(search.json())
-
+response = requests.post(url_train, data=train_data)
 
 # Get the headers from the response
 response_headers = response.request.headers
@@ -86,6 +68,6 @@ headers_size = len(str(response_headers))
 
 # Imprimir el código de estado de la respuesta
 print(response.status_code)
-print(response.json())
+
 # prints de json content
 #print(response.json()['nombre'])

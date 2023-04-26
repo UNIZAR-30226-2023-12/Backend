@@ -10,7 +10,7 @@ from Audios import moduloAudios
 from Usuarios import usuarios
 
 from recomendador import generacion_datos as gen_datos
-#from recomendador import recomendador as rec
+from recomendador import recomendador as rec
 
 from Global import ModuloGlobal
 
@@ -64,7 +64,33 @@ def GetSong(request):
         
         # Gets the serialized audio
         return JsonResponse({'fichero': fichero})
+
+
+@csrf_exempt
+def AlmacenarEjemplo(request):
+    # Compruebo que el método sea GET
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
     
+    idUsr = request.POST.get('idUsr')
+    if idUsr == None:
+        return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+    
+    idAudio = request.POST.get('idAudio')
+    if idAudio == None:
+        return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+    
+    valoracion = request.POST.get('valoracion')
+    if valoracion == None:
+        return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+    
+    valoracion = float(valoracion)
+
+    gen_datos.store_training_example(r, idUsr, idAudio, valoracion)
+
+    return JsonResponse({'msg': 'Ejemplo almacenado correctamente'}, status=erroresHTTP.OK)
+
+
 # View que devuelve una lista de canciones
 @csrf_exempt
 def GetSongs(request):
@@ -368,6 +394,31 @@ def ValidateUserEmail(request):
 
     return JsonResponse({constantes.CLAVE_ID_USUARIO: respuesta[constantes.CLAVE_ID_USUARIO]}, status=respuesta["status"])
 
+
+
+@csrf_exempt
+def entrenar_recomendador(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    if(usuarios.esAdministrador(r, idUsuario) == False):
+        return JsonResponse({'error': 'No eres administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
+    
+    status = rec.create_model(r)
+
+    return JsonResponse({'status': status}, status=status)
+
+
+
 @csrf_exempt
 def GetTotRepTime(request):
     if request.method != 'GET':
@@ -657,7 +708,7 @@ def entrenar_recomendador(request):
     if(usuarios.esAdministrador(r, idUsuario) == False):
         return JsonResponse({'error': 'No eres administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
     
-    #status = rec.create_model(r)
+    status = rec.create_model(r)
 
     return JsonResponse({'status': status}, status=status)
 
