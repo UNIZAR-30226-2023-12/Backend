@@ -11,7 +11,7 @@ def store_training_example(conn, id_usr, id_audio, output):
 
     # Obtiene los datos de entrada actuales para la predicción
     paquete_entradas = get_audio_prediction_state(conn, id_usr, id_audio)
-
+    
     # Construye el paquete de datos para la predicción
     paquete_prediccion = {
         "inputs": paquete_entradas,
@@ -219,6 +219,50 @@ def get_audio_prediction_state(conn, id_usr, id_audio):
     paquete_datos += porcentaje_favoritos_por_genero_amigos
 
     return paquete_datos
+
+
+def get_state_for_prediction(r, id_usr, id_audio):
+    paquete_datos = np.array(get_audio_prediction_state(r, id_usr, id_audio), np.float32)
+    paquete_datos = np.reshape(paquete_datos, (1, np.shape(paquete_datos)[0]))
+
+    paquete_datos = limpiar_datos(paquete_datos)
+    return np.array(paquete_datos, np.float32)
+
+
+
+
+def get_audio_prediction_temporal(r, id_usr):
+    paquete_temporal = np.array(daoGlobal.get_temporal_data(r, id_usr))
+    nGeneros = conf.GENERO_NUMERO_GENEROS
+
+    len_temporal = len(paquete_temporal)
+    limpio = np.empty((len_temporal, nGeneros+1), np.float32)
+
+    for i in range(len_temporal):    
+        limpio[i, 0] = (paquete_temporal[i, 0] == "True")            # esPodcast
+
+        id_genero = paquete_temporal[i, 1]
+        generos_one_hot = np.zeros(conf.GENERO_NUMERO_GENEROS, np.float32)
+        generos_one_hot[id_genero] = 1
+
+        limpio[i, 1:1+nGeneros] = generos_one_hot   # Genero del audio
+
+    limpio = np.reshape(limpio, (1, np.shape(limpio)[0], np.shape(limpio)[1]))
+
+    return limpio
+
+def add_audio_prediction_temporal(r, id_usr, id_audio):
+
+    es_podcast = audios.obtenerEsPodcast(r, id_audio)            # 1 si es podcast, 0 si no
+
+    if es_podcast:
+        id_genero = audios.obtenerGenerosPodcast(r, id_audio)                     # Genero del audio, un entero
+    else:
+        id_genero = audios.obtenerGenCancion(r, id_audio)                       # Genero del audio, un entero
+
+    paquete_temporal = [es_podcast, id_genero]
+    daoGlobal.add_temporal_data(r, id_usr, paquete_temporal)
+
 
 
 

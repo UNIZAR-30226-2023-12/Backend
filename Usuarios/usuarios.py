@@ -319,7 +319,7 @@ def estaGuardado(r, idUsuario, idAudio):
     listas = daoUsuario.getListas(r, idUsuario)
     for idLista in listas:
         if(daoListas.getTipoLista(r, idLista) != constantes.LISTA_TIPO_FAVORITOS):
-            if(idAudio in daoListas.getAudios(r, idLista)):
+            if(idAudio in daoListas.getAudiosLista(r, idLista)):
                 return 1
     return 0
 
@@ -356,7 +356,7 @@ def getAudiosFavoritos(r, idUsuario):
     audios = []
     for idLista in listas:
         if(daoListas.getTipoLista(r, idLista) == constantes.LISTA_TIPO_FAVORITOS):
-            audios = daoListas.getAudios(r, idLista)
+            audios = daoListas.getAudiosLista(r, idLista)
     return audios
 
 
