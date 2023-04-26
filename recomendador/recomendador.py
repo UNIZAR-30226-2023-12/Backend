@@ -8,22 +8,25 @@ import numpy as np
 def orderAudios(r, idUsr, audios):
 
     # Cargar el recomendador
-    recomendador = keras.models.load_model('my_model.h5')
+    recomendador = keras.models.load_model("recomendador/modelo_recomendador.h5")
     
 
     ############## Obtener las predicciones de los audios ##############
     predicciones = []
 
     for audio in audios:
-        paquete_datos = data_gen.get_audio_prediction_state(r, idUsr, audio)
+        paquete_datos = data_gen.get_state_for_prediction(r, idUsr, audio)
+        paquete_temporal = data_gen.get_audio_prediction_temporal(r, idUsr)
 
-        prediccion = recomendador.predict(paquete_datos)
+        input = [paquete_datos, paquete_temporal]
+        
+        prediccion = recomendador.predict(input)
         predicciones.append(prediccion)
 
-
+    print(predicciones)
 
     ############## Ordenar los audios por valoración ##############
-    
+
     # pair the elements of the two lists
     pairs = list(zip(audios, predicciones))
 
@@ -32,7 +35,6 @@ def orderAudios(r, idUsr, audios):
 
     # extract the first element of each pair (i.e. the elements of a) into a new list
     audios_ordenados = [pair[0] for pair in sorted_pairs]
-
 
     return audios_ordenados
 

@@ -37,4 +37,5 @@ urlpatterns = [
     path('echo/', viewsApi.echo, name='echo'),
     path('entrenar_recomendador/', viewsApi.entrenar_recomendador, name='entrenar_recomendador'),
     path('AlmacenarEjemplo/', viewsApi.AlmacenarEjemplo, name='AlmacenarEjemplo'),
+    path('GetRecomendedAudio/', viewsApi.GetRecomendedAudio, name='GetRecomendedAudio'),
 ]

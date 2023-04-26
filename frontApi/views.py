@@ -10,7 +10,7 @@ from Audios import moduloAudios
 from Usuarios import usuarios
 
 from recomendador import generacion_datos as gen_datos
-from recomendador import recomendador as rec
+#from recomendador import recomendador as rec
 
 from Global import ModuloGlobal
 
@@ -40,8 +40,8 @@ def GetSong(request):
     if request.method != 'GET':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    id = request.GET.get('idSong')
-    calidadAlta = request.GET.get('calidadAlta')
+    id = request.GET.get(constantes.CLAVE_ID_AUDIO)
+    calidadAlta = request.GET.get(constantes.CLAVE_FICHERO_ALTA_CALIDAD)
     esCancion = request.GET.get('esCancion')
 
     if esCancion == "True":
@@ -62,6 +62,7 @@ def GetSong(request):
         if idUsr == None:
             return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
         
+        gen_datos.add_audio_prediction_temporal(r, idUsr, id)
         # Gets the serialized audio
         return JsonResponse({'fichero': fichero})
 
@@ -671,10 +672,13 @@ def GlobalSearch(request):
 
 @csrf_exempt
 def GetRecomendedAudio(request):
+
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
+    # Parse the JSON data from the request body to extract idUsuario
     json_data = json.loads(request.body)
+
     idUsr = json_data[constantes.CLAVE_ID_USUARIO]
     passwd = json_data[constantes.CLAVE_CONTRASENYA]
 
@@ -682,11 +686,21 @@ def GetRecomendedAudio(request):
     if (status != erroresHTTP.OK):
         return JsonResponse({'status': status}, status=status)
     
-    allAudios = list(moduloAudios.obtenerTodasLasCanciones(r))
-    allAudios.append(list(moduloAudios.obtenerTodosLosPodcasts(r)))
+    canciones = list(moduloAudios.obtenerTodasLasCanciones(r))
+    podcasts = list(moduloAudios.obtenerTodosLosPodcasts(r))
+    
+    allAudios = []
+    if len(canciones) > 0:
+        allAudios.extend(canciones)
+    if len(podcasts) > 0:
+        allAudios.extend(podcasts)
 
-    idAudios = rec.orderAudios(r, idUsr, allAudios)     # Pide al recomendador que ordene los audios por relevancia
-
+    if len(allAudios) > 0:
+        None
+        #idAudios = rec.orderAudios(r, idUsr, allAudios)     # Pide al recomendador que ordene los audios por relevancia
+    else:
+        idAudios = []
+    
     #return JsonResponse({'status': status}, status=status)
     return JsonResponse({'idAudio': idAudios[0]}, status=200)
 
@@ -708,7 +722,7 @@ def entrenar_recomendador(request):
     if(usuarios.esAdministrador(r, idUsuario) == False):
         return JsonResponse({'error': 'No eres administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
     
-    status = rec.create_model(r)
+    #status = rec.create_model(r)
 
     return JsonResponse({'status': status}, status=status)
 
