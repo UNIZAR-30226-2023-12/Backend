@@ -107,6 +107,13 @@ def obtenerDiccionarioCancion(r, id):
     return controlAudios.obtenerTodosCancion(r, id)
 
 
+def obtenerTodasLasCanciones(r):
+    return dao.obtenerTodasLasCanciones(r)
+
+def obtenerTodosLosPodcasts(r):
+    return dao.obtenerTodosLosPodcasts(r)
+
+
 # Función de búsqueda de canciones
 def buscarCanciones(r, query, n):
     respuesta = dao.buscarAudios(r, query)

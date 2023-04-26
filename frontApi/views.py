@@ -614,11 +614,31 @@ def GlobalSearch(request):
     n = request.GET.get(constantes.CLAVE_N)    
 
     respuesta = moduloAudios.buscarCanciones(r, query, n)
-    print(respuesta)
+
     #return JsonResponse({'status': status}, status=status)
     return JsonResponse({'datos': respuesta}, status=200)
 
- 
+@csrf_exempt
+def GetRecomendedAudio(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    json_data = json.loads(request.body)
+    idUsr = json_data[constantes.CLAVE_ID_USUARIO]
+    passwd = json_data[constantes.CLAVE_CONTRASENYA]
+
+    status = usuarios.ValidateUser(r, idUsr, passwd)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    allAudios = list(moduloAudios.obtenerTodasLasCanciones(r))
+    allAudios.append(list(moduloAudios.obtenerTodosLosPodcasts(r)))
+
+    idAudios = rec.orderAudios(r, idUsr, allAudios)     # Pide al recomendador que ordene los audios por relevancia
+
+    #return JsonResponse({'status': status}, status=status)
+    return JsonResponse({'idAudio': idAudios[0]}, status=200)
+
 
 @csrf_exempt
 def entrenar_recomendador(request):
