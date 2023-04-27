@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./rm.sh
+#./rm.sh
 
 if docker images melodia/redis:latest | grep -q melodia/redis; then
     echo "La imagen docker de redis está instalada en su equipo. Se va a utilizar la imagen encontrada para generar el contenedor."

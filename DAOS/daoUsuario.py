@@ -35,6 +35,9 @@ def setContrasenya(r, idUsuario, contrasenya):
 def setTipoUsuario(r, idUsuario, tipoUsuario):
     return r.hset(idUsuario, constantes.CLAVE_TIPO_USUARIO, tipoUsuario)
 
+def setImagenPerfil(r, idUsuario, imagenPerfil):
+    return r.hset(idUsuario, constantes.CLAVE_IMAGEN_PERFIL, imagenPerfil)
+
 def setUltimaCancion(r, idUsuario, idAudio):
     return r.hset(idUsuario, constantes.CLAVE_ID_ULTIMO_AUDIO, idAudio)
 
@@ -61,6 +64,9 @@ def getContrasenya(r, idUsuario):
 
 def getTipoUsuario(r, idUsuario):
     return r.hget(idUsuario, constantes.CLAVE_TIPO_USUARIO)
+
+def getImagenPerfil(r, idUsuario):
+    return r.hget(idUsuario, constantes.CLAVE_IMAGEN_PERFIL)
 
 def getUltimaCancion(r, idUsuario):
     return r.hget(idUsuario, constantes.CLAVE_ID_ULTIMO_AUDIO)
