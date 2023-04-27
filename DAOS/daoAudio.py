@@ -134,6 +134,9 @@ def eliminarCancion(r, id):
     r.delete(id)     
     return 0
 
+def setLastSecondHeared(r, idUsuario, idAudio, second):
+    r.set('lastSecondHeared:'+idUsuario+':'+idAudio, second)
+
 #########################################################################################
 #
 #

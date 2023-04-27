@@ -260,6 +260,25 @@ def SetLista(request):
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
+@csrf_exempt
+def SetLastSecondHeared(request):
+    # String idUsr, String contrasenya, String idAudio, int second
+    if request.method == 'POST':
+        # Parse the JSON data from the request body
+        json_data = json.loads(request.body)
+        
+        idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+        contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+        idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+        second = json_data[constantes.CLAVE_SECOND]
+
+        # Validates the user
+        status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+        if (status != erroresHTTP.OK):
+            return JsonResponse({'status': status}, status=status)
+        
+        status = moduloAudios.setLastSecondHeared(r, idUsuario, idAudio, second)
+        return JsonResponse({'status': status}, status=status)
 
 @csrf_exempt
 def GetTopReproducciones(request):

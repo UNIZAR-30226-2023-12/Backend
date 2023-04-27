@@ -184,6 +184,9 @@ def anyadirPodcast(r, dic):
     return 0
 
 
+def setLastSecondHeared(r, idUsuario, idAudio, second):
+    return dao.setLastSecondHeared(r, idUsuario, idAudio, second)
+
 def getReproducciones(r, id):
     return controlAudios.getReproducciones(r, id)
 
