@@ -47,6 +47,12 @@ def incrementarIDUltimoAudio(r):
     id = r.incr('idUltimoAudio')
     return id
 
+def incrementarReproduccion(r, id):
+    id = r.incr('reproducciones:'+id)
+
+def getReproducciones(r, id):
+    return r.get('reproducciones:'+id)
+
 
 # Funcion para guardar una cancion en la base de datos, modificada para trabajar con diccionarios
 def guardarCancion(r, cancionDic):

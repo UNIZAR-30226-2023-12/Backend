@@ -135,6 +135,7 @@ CLAVE_CALIDAD_AUDIO = "calidad"
 CLAVE_FICHERO_ALTA_CALIDAD = "ficheroAltaCalidad"
 CLAVE_FICHERO_BAJA_CALIDAD = "ficheroBajaCalidad"
 CLAVE_PREFIJO_AUDIO = "audio"
+CLAVE_ES_PODCAST = "esPodcast"
 
 CLAVE_ID_AMIGO = "idAmigo"
 

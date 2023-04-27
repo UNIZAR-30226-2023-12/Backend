@@ -35,7 +35,6 @@ def echo(request):
 # Create your views here.
 @csrf_exempt
 def GetSong(request):
-    fichero = -1
     # Compruebo que el método sea GET
     if request.method != 'GET':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -261,6 +260,49 @@ def SetLista(request):
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
+
+@csrf_exempt
+def GetTopReproducciones(request):
+
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+
+    n = int(json_data[constantes.CLAVE_N])
+    esPodcast = json_data[constantes.CLAVE_ES_PODCAST] == "1"
+ 
+
+    if esPodcast:
+        audios  = list(moduloAudios.obtenerTodosLosPodcasts(r))
+    else:
+        audios = moduloAudios.obtenerTodasLasCanciones(r)
+        print(audios)
+        audios  = list(audios)
+
+
+    reproducciones = []
+
+    # Obtiene las reproducciones de cada audio
+    for audio in audios:
+        reproducciones.append(moduloAudios.getReproducciones(r, audio))
+
+    # pair the elements of the two lists
+    pairs = list(zip(audios, reproducciones))
+
+    # sort the pairs based on the values in the second list (i.e. b)
+    sorted_pairs = sorted(pairs, key=lambda x: x[1])
+
+    # extract the first element of each pair (i.e. the elements of a) into a new list
+    audios_ordenados = [pair[0] for pair in sorted_pairs]
+
+    return JsonResponse({'topAudios': audios_ordenados[0:n]}, status=200)
+
+
+
+    
+
 @csrf_exempt
 def ChangeNameListRepUsr(request):
     if request.method == 'POST':
@@ -790,6 +832,25 @@ def GlobalSearch(request):
 
     #return JsonResponse({'status': status}, status=status)
     return JsonResponse({'datos': respuesta}, status=200)
+
+
+@csrf_exempt
+def ByWordSearch(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    querys = request.GET.get(constantes.CLAVE_QUERY)
+    n = request.GET.get(constantes.CLAVE_N)    
+
+    respuestas = []
+
+    for query in querys:
+        respuesta = moduloAudios.buscarCanciones(r, query, n)
+        respuestas.append(respuesta)
+
+    return JsonResponse({'datos': respuestas}, status=200)
+
+
 
 @csrf_exempt
 def GetRecomendedAudio(request):
