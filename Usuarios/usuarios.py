@@ -50,6 +50,7 @@ def getTipoNotificacion(r, id):
 def isCarpetaPublica(r, id):
     return daoCarpetas.getPrivacidadCarpeta(r, id) == constantes.CARPETA_PUBLICA
 
+
 def getUsuarioEmisorNotificacion(r, id):
     return daoNotificaciones.getIdUsuarioEmisor(r, id)
 
@@ -137,6 +138,19 @@ def getLastSecondHeard(r, idUsuario, idAudio):
         return 0
     return segundo
 
+def subscribeToArtist(r, idUsuario, idArtista):
+    daoUsuario.anyadirArtista(r, idUsuario, idArtista)
+
+def getNotificationsUsr(r, idUsuario):
+    return daoUsuario.getNotificaciones(r, idUsuario)
+
+def getNotification(r, idNotificacion):
+    return daoNotificaciones.getNotificacion(r, idNotificacion)
+
+def removeNotification(r, idUsuario, idNotificacion):
+    daoUsuario.eliminarNotificacion(r, idUsuario, idNotificacion)
+    daoNotificaciones.eliminarNotificacion(r, idNotificacion)
+
 # Funciones adicionales de artistas
 
 
@@ -195,6 +209,14 @@ def isListaFromCarpeta(r, idCarpeta, idLista):
         return False
     listas = daoCarpetas.getListasCarpeta(r, idCarpeta)
     if(idLista not in listas):
+        return False
+    return True
+
+def isNotificactionFromUser(r, idUsuario, idNotificacion):
+    if (r.exists(idUsuario) == 0 or r.exists(idNotificacion) == 0):
+        return False
+    notificaciones = daoUsuario.getNotificaciones(r, idUsuario)
+    if(idNotificacion not in notificaciones):
         return False
     return True
 
@@ -330,7 +352,7 @@ def estaGuardado(r, idUsuario, idAudio):
                 return 1
     return 0
 
-def estaSuscrito(r, idUsuario, idArtista):
+def isSubscribedToArtist(r, idUsuario, idArtista):
     artistas = daoUsuario.getArtistas(r, idUsuario)
     if(idArtista in artistas):
         return 1

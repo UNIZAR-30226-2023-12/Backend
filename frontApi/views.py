@@ -785,6 +785,118 @@ def RemoveFriend(request):
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
+@csrf_exempt
+def SubscribeToArtist(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idArtista = json_data[constantes.CLAVE_ID_USUARIO + "Artista"]
+
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeUsuario(r, idArtista) == False):
+        return JsonResponse({'error': 'El artista no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.isSubscribedToArtist(r, idUsuario, idArtista) == True):
+        return JsonResponse({'error': 'Ya estas suscrito a este artista'}, status=erroresHTTP.ERROR_USUARIO_YA_SUSCRITO)
+    
+    usuarios.subscribeToArtist(r, idUsuario, idArtista)
+
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
+
+@csrf_exempt
+def UnsubscribeToArtist(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idArtista = json_data[constantes.CLAVE_ID_USUARIO + "Artista"]
+
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeUsuario(r, idArtista) == False):
+        return JsonResponse({'error': 'El artista no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.isSubscribedToArtist(r, idUsuario, idArtista) == False):
+        return JsonResponse({'error': 'No estas suscrito a este artista'}, status=erroresHTTP.ERROR_USUARIO_NO_SUSCRITO)
+
+@csrf_exempt
+def GetNotificationsUsr(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+     
+    return JsonResponse({constantes.CLAVE_ID_NOTIFICACION : usuarios.getNotificationsUsr(r, idUsuario)}, status=erroresHTTP.OK)
+
+@csrf_exempt
+def GetNotification(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idNotificacion = json_data[constantes.CLAVE_ID_NOTIFICACION]
+
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeNotificacion(r, idNotificacion) == False):
+        return JsonResponse({'error': 'La notificacion no existe'}, status=erroresHTTP.ERROR_NOTIFICACION_NO_ENCONTRADA)
+    if(usuarios.isNotificactionFromUser(r, idUsuario, idNotificacion) == False):
+        return JsonResponse({'error': 'La notificacion no es tuya'}, status=erroresHTTP.FORBIDDEN)
+     
+    return JsonResponse({constantes.PREFIJO_NOTIFICACIONES : usuarios.getNotification(r, idNotificacion)}, status=erroresHTTP.OK)
+
+@csrf_exempt
+def RemoveNotification(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idNotificacion = json_data[constantes.CLAVE_ID_NOTIFICACION]
+
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeNotificacion(r, idNotificacion) == False):
+        return JsonResponse({'error': 'La notificacion no existe'}, status=erroresHTTP.ERROR_NOTIFICACION_NO_ENCONTRADA)
+    if(usuarios.isNotificactionFromUser(r, idUsuario, idNotificacion) == False):
+        return JsonResponse({'error': 'La notificacion no es tuya'}, status=erroresHTTP.FORBIDDEN)
+    
+    usuarios.removeNotification(r, idNotificacion)
+
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
+
 
 @csrf_exempt
 def GlobalSearch(request):

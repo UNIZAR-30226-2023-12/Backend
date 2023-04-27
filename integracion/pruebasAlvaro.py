@@ -1,4 +1,7 @@
 import requests
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0)
 
 url = 'http://127.0.0.1:8081/SetUser/'
 urlValidateUser = 'http://127.0.0.1:8081/ValidateUser/'
@@ -41,17 +44,13 @@ usuarioTipoErroneo = {
     'tipoUsuario': 'erroneo',
 }
 
-response1 = requests.post(url, json=nuevoUsuario)
-response5 = requests.post(url, json=nuevoUsuario2)
-response2 = requests.post(url, json=usuarioMismoEmail)
-response3 = requests.post(url, json=usuarioDatosErroneos)
-response4 = requests.post(url, json=usuarioTipoErroneo)
-print('Pruebas set user')
-print(response1.status_code)
-print(response1.status_code)
-print(response2.status_code)
-print(response3.status_code)
-print(response4.status_code)
+print("Pruebas set user")
+print(requests.post(url, json=nuevoUsuario).status_code)
+print(requests.post(url, json=nuevoUsuario2).status_code)
+print(requests.post(url, json=usuarioMismoEmail).status_code)
+print(requests.post(url, json=usuarioDatosErroneos).status_code)
+print(requests.post(url, json=usuarioTipoErroneo).status_code)
+
 
 # Pruebas validateUser
 validateUser = {
@@ -74,6 +73,8 @@ validateUserDatosErroneos = {
 validateUserDatosErroneos2 = {
     'emasil': 'as'
 }
+
+r.flushall()
 print("Pruebas validateUser")
 print(requests.post(urlValidateUser, json=validateUser).status_code)
 print(requests.post(urlValidateUser, json=validateUserEmailErroneo).status_code)
