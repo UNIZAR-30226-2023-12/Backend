@@ -84,7 +84,7 @@ examples = [
 
 new_user = json.dumps(new_user)
 new_song_data = json.dumps(new_song_data)
-#params_example = json.dumps(params_example)
+get_audio_params = json.dumps(get_audio_params)
 train_data = json.dumps(train_data)
 
 #response = requests.post(url_set_usr, data=new_user) # Añade ejemplos de entrenamiento
@@ -101,7 +101,7 @@ response = requests.post(url_train, data=train_data)    # Entrena al recomendado
 
 
 for i in range(100):
-    response = requests.get(url_get_song, params=get_audio_params) # Genera un estado de sesión del usuario
+    response = requests.get(url_get_song, data=get_audio_params) # Genera un estado de sesión del usuario
 
 response = requests.post(url_recomend_song, data=train_data) # Obtiene una canción recomendada
 

@@ -36,7 +36,6 @@ urlpatterns = [
     path('AskAdminToBeArtist/', viewsApi.AskAdminToBeArtist, name='AskAdminToBeArtist'),
     path('AcceptArtist/', viewsApi.AcceptArtist, name='AcceptArtist'),
     path('ValidateUserEmail/', viewsApi.ValidateUserEmail, name='ValidateUserEmail'),
-<<<<<<< HEAD
     path('GetTotRepTime/', viewsApi.GetTotRepTime, name='GetTotRepTime'),
     path('AddSecondsToSong/', viewsApi.AddSecondsToSong, name='AddSecondsToSong'),
     path('SetFolder/', viewsApi.SetFolder, name='SetFolder'),
@@ -50,9 +49,7 @@ urlpatterns = [
     path('AcceptFriend/', viewsApi.AcceptFriend, name='AcceptFriend'),
     path('GetFriends/', viewsApi.GetFriends, name='GetFriends'),
     path('RemoveFriend/', viewsApi.RemoveFriend, name='RemoveFriend'),
-=======
     path('GlobalSearch/', viewsApi.GlobalSearch, name='GlobalSearch'),
->>>>>>> main
     path('echo/', viewsApi.echo, name='echo'),
     path('entrenar_recomendador/', viewsApi.entrenar_recomendador, name='entrenar_recomendador'),
     path('AlmacenarEjemplo/', viewsApi.AlmacenarEjemplo, name='AlmacenarEjemplo'),
