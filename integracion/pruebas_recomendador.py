@@ -74,6 +74,13 @@ train_data = {
     'contrasenya': '1234'
 }
 
+examples = [
+{
+    'idUsr': 'usuario:1',
+    'idAudio': 'idAudio:1',
+    'valoracion': '1'
+},
+]
 
 new_user = json.dumps(new_user)
 new_song_data = json.dumps(new_song_data)
