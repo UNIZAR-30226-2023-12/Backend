@@ -68,9 +68,6 @@ def getTipoUsuario(r, idUsuario):
 def getImagenPerfil(r, idUsuario):
     return r.hget(idUsuario, constantes.CLAVE_IMAGEN_PERFIL)
 
-def getSegundosAudio(r, idUsuario):
-    return r.hget(idUsuario, constantes.CLAVE_ID_ULTIMO_AUDIO)
-
 def anyadirAmigo(r, idUsuario, idAmigo):
     return anyadirRelacion(r, idUsuario, idAmigo, constantes.PREFIJO_AMIGOS)
     
@@ -169,10 +166,10 @@ def getAdministradores(r):
 
 # Funciones para crear set de ulimos Audios escuchados)
 def setSegundosAudio(r, idUsuario, idAudio, segundos):
-    return r.set(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS, segundos)
+    return r.set(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio, segundos)
 
 def getSegundosAudio(r, idUsuario, idAudio):
-    return r.get(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS)
+    return r.get(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
 
 def eliminarSegundosAudio(r, idUsuario, idAudio):
     return r.delete(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
