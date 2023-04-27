@@ -279,6 +279,8 @@ def SetLastSecondHeared(request):
         
         status = moduloAudios.setLastSecondHeared(r, idUsuario, idAudio, second)
         return JsonResponse({'status': status}, status=status)
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 @csrf_exempt
 def GetTopReproducciones(request):
