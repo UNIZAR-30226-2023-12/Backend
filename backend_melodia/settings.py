@@ -31,6 +31,9 @@ ALLOWED_HOSTS = ['*']
 # la peticion SetSong necesita esta memoria
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600 # 100MB
 
+# SECURITY WARNING: No se debe permitir intercambio cruzado para todas las IPs
+CORS_ORIGIN_ALLOW_ALL=True
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -39,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -49,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'backend_melodia.urls'

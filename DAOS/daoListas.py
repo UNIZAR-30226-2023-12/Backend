@@ -71,7 +71,7 @@ def eliminarLista(r, id):
 
 # Funcion para obtener una playlist
 def getLista(r, id):
-    return r.hmget(id)
+    return r.hgetall(id)
 
 # Funcion para obtener el nombre de una playlist
 def getNombreLista(r, id):

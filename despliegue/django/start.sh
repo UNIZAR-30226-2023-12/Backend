@@ -1,5 +1,7 @@
 #!/bin/bash
 
+./rm.sh
+
 if docker images melodia/django:latest | grep -q melodia/django
 then
     echo "La imagen docker de django está instalada en su equipo. Se va a utilizar la imagen encontrada para generar el contenedor."

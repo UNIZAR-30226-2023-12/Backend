@@ -40,6 +40,30 @@ def GetSong(request):
     if request.method != 'GET':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
+    jsonData = json.loads(request.body)
+    idAudio = jsonData['idSong']
+    idUsuario = jsonData[constantes.CLAVE_ID_USUARIO]
+    contrasenya = jsonData[constantes.CLAVE_CONTRASENYA]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+
+    # Si no es valido devuelvo el error
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    audio = moduloAudios.obtenerDiccionarioCancion(r, idAudio)
+    del audio[constantes.CLAVE_FICHERO_ALTA_CALIDAD]
+    del audio[constantes.CLAVE_FICHERO_BAJA_CALIDAD]
+
+    return JsonResponse({constantes.CLAVE_ID_AUDIO: audio}, status=erroresHTTP.OK)
+    
+@csrf_exempt
+def GetFicheroSong(request):
+    fichero = -1
+    # Compruebo que el método sea GET
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
     id = request.GET.get(constantes.CLAVE_ID_AUDIO)
     calidadAlta = request.GET.get(constantes.CLAVE_FICHERO_ALTA_CALIDAD)
     esCancion = request.GET.get('esCancion')
@@ -152,17 +176,17 @@ def SetUser(request):
         json_data = json.loads(request.body)
         
         # Stores the user in the database
-        response = usuarios.setUser(r, json_data)
-        if response == 532 or response == 539:
-            return JsonResponse({'error': 'Ha ocurrido un problema'}, status=response)
-        else:
-            idUsuario = response.split(",")[1]
-            diccionarioLista = {constantes.CLAVE_NOMBRE_LISTA : "Favoritos", 
-                                constantes.CLAVE_PRIVACIDAD_LISTA : constantes.LISTA_PRIVADA, 
-                                constantes.CLAVE_TIPO_LISTA : constantes.LISTA_TIPO_FAVORITOS}
-            usuarios.setLista(r, idUsuario, diccionarioLista)
+        respuesta = usuarios.setUser(r, json_data)
+        if respuesta["status"] != erroresHTTP.OK:
+            return JsonResponse({'error': 'Ha ocurrido un problema'}, status=respuesta["status"])
+
+        idUsuario = respuesta[constantes.CLAVE_ID_USUARIO]
+        diccionarioLista = {constantes.CLAVE_NOMBRE_LISTA : "Favoritos", 
+                            constantes.CLAVE_PRIVACIDAD_LISTA : constantes.LISTA_PRIVADA, 
+                            constantes.CLAVE_TIPO_LISTA : constantes.LISTA_TIPO_FAVORITOS}
+        usuarios.setLista(r, idUsuario, diccionarioLista)
         
-        return JsonResponse({'status': 200}, status=200)
+        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
     else:
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -288,28 +312,75 @@ def SetSongLista(request):
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-@csrf_exempt 
-def GetListaRepUsr(request):
-    if request.method == 'POST':
-        # Parse the JSON data from the request body
-        json_data = json.loads(request.body)
-
-        # Compruebo que el usuario sea válido
-        idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
-        contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-        status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-        # Si no es valido devuelvo el error
-        if (status != erroresHTTP.OK):
-            return JsonResponse({'status': status}, status=status)
-
-        # Stores the user in the database
-        lista = usuarios.getListasUsr(r, idUsuario)
-        
-        return JsonResponse({constantes.CLAVE_LISTAS: lista}, status=erroresHTTP.OK)
-    else:
-        # Return a 405 Method Not Allowed response for other HTTP methods
+@csrf_exempt
+def GetLista(request):
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idLista = json_data[constantes.CLAVE_ID_LISTA]
 
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    if(usuarios.existeLista(r, idLista) == False):
+        return JsonResponse({'error': 'La lista no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
+    
+    respuesta = usuarios.getLista(r, idLista)
+
+    if(respuesta["status"] != erroresHTTP.OK):
+        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
+    
+    return JsonResponse({constantes.PREFIJO_ID_LISTA : respuesta[constantes.PREFIJO_ID_LISTA]}, status=erroresHTTP.OK)
+
+@csrf_exempt
+def GetListasUsr(request):
+    if request.method != 'POST':
+         # Return a 405 Method Not Allowed response for other HTTP methods
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    # Parse the JSON data from the request body
+    json_data = json.loads(request.body)
+
+    # Compruebo que el usuario sea válido
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    # Si no es valido devuelvo el error
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+
+    # Stores the user in the database
+    listas = usuarios.getListasUsr(r, idUsuario)
+    
+    return JsonResponse({constantes.CLAVE_LISTAS: listas}, status=erroresHTTP.OK)
+       
+@csrf_exempt 
+def GetAudiosLista(request):
+    if request.method != 'POST':
+         # Return a 405 Method Not Allowed response for other HTTP methods
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    # Parse the JSON data from the request body
+    json_data = json.loads(request.body)
+
+    # Compruebo que el usuario sea válido
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idLista = json_data[constantes.CLAVE_ID_LISTA]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    # Si no es valido devuelvo el error
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+
+    # Stores the user in the database
+    listas = usuarios.getAudiosLista(r, idLista)
+    
+    return JsonResponse({constantes.CLAVE_LISTAS: listas}, status=erroresHTTP.OK)
+       
 @csrf_exempt
 def RemoveSongLista(request):
     if request.method == 'POST':
@@ -465,30 +536,7 @@ def AddSecondsToSong(request):
 
     return JsonResponse({'status': status}, status=status)
 
-@csrf_exempt
-def GetLista(request):
-    if request.method != 'GET':
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
-    # Parse the JSON data from the request body to extract idUsuario
-    json_data = json.loads(request.body)
-    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
-    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idLista = json_data[constantes.CLAVE_ID_LISTA]
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
-    
-    if(usuarios.existeLista(r, idLista) == False):
-        return JsonResponse({'error': 'La lista no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
-    
-    respuesta = usuarios.getListaRepUsr(r, idLista)
-
-    if(respuesta["status"] != erroresHTTP.OK):
-        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
-    
-    return JsonResponse({constantes.PREFIJO_ID_LISTA : respuesta[constantes.PREFIJO_ID_LISTA]}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def SetFolder(request):
@@ -508,7 +556,7 @@ def SetFolder(request):
     if (status != erroresHTTP.OK):
         return JsonResponse({'status': status}, status=status)
     
-    status = usuarios.setFolder(r, diccionarioCarpeta)
+    status = usuarios.setFolder(r, idUsuario, diccionarioCarpeta)
 
     return JsonResponse({'status': status}, status=status)
 
@@ -567,7 +615,7 @@ def RemoveFolder(request):
     if (status != erroresHTTP.OK):
         return JsonResponse({'status': status}, status=status)
     
-    status = usuarios.removeFolder(r, idCarpeta)
+    status = usuarios.removeFolder(r, idUsuario, idCarpeta)
 
     return JsonResponse({'status': status}, status=status)
 
@@ -594,6 +642,28 @@ def GetFolder(request):
     return JsonResponse({constantes.PREFIJO_ID_CARPETA : respuesta[constantes.PREFIJO_ID_CARPETA]}, status= respuesta["status"])
 
 @csrf_exempt
+def GetListasFolder(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idCarpeta = json_data[constantes.CLAVE_ID_CARPETA]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    respuesta = usuarios.getListasFolder(r, idCarpeta)
+
+    if(respuesta["status"] != erroresHTTP.OK):
+        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
+    
+    return JsonResponse({constantes.PREFIJO_ID_LISTA : respuesta[constantes.PREFIJO_ID_LISTA]}, status= respuesta["status"])
+
+@csrf_exempt
 def GetFoldersUsr(request):
     if request.method != 'GET':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -603,6 +673,14 @@ def GetFoldersUsr(request):
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
 
+    if (contrasenya == None):
+        if(usuarios.existeUsuario(r, idUsuario) == False):
+            return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+        respuesta = usuarios.getPublicFoldersUser(r, idUsuario)
+        if(respuesta["status"] != erroresHTTP.OK):
+            return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
+        return JsonResponse({constantes.PREFIJO_ID_CARPETA : respuesta[constantes.PREFIJO_ID_CARPETA]}, status= respuesta["status"])
+    
     status = usuarios.ValidateUser(r, idUsuario, contrasenya)
     if (status != erroresHTTP.OK):
         return JsonResponse({'status': status}, status=status)
@@ -657,6 +735,47 @@ def AcceptFriend(request):
 
 
 # Devuelve un set con n ids de audios recuperadas mediante una búsqueda global
+@csrf_exempt
+def GetFriends(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    respuesta = usuarios.getFriends(r, idUsuario)
+
+    if(respuesta["status"] != erroresHTTP.OK):
+        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
+    
+    return JsonResponse({constantes.PREFIJO_ID_USUARIO : respuesta[constantes.PREFIJO_ID_USUARIO]}, status= respuesta["status"])
+
+@csrf_exempt
+def RemoveFriend(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idAmigo = json_data[constantes.CLAVE_ID_AMIGO]
+
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    status = usuarios.removeFriend(r, idUsuario, idAmigo)
+
+    return JsonResponse({'status': status}, status=status)
+
+
 @csrf_exempt
 def GlobalSearch(request):
     if request.method != 'GET':

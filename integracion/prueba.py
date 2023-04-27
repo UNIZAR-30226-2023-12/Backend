@@ -8,11 +8,17 @@ ip = '127.0.0.1'
 port = '8000'
 
 # URL del endpoint SetSong
+<<<<<<< HEAD
+url_set_song = 'http://127.0.0.1:8081/SetSong/'
+url_set_usr = 'http://127.0.0.1:8081/SetUser/'
+url_get = 'http://127.0.0.1:8081/GetSong/'
+=======
 url_set_song = 'http://'+ip+':'+port+'/SetSong/'
 url_set_usr = 'http://'+ip+':'+port+'/SetUser/'
 url_get_usr = 'http://'+ip+':'+port+'/GetUser/'
 url_get = 'http://'+ip+':'+port+'/GetSong/'
 url_busqueda = 'http://'+ip+':'+port+'/GlobalSearch/'
+>>>>>>> main
 
 # Crear un objeto HttpRequest vacío
 # request = HttpRequest()
@@ -21,6 +27,7 @@ url_busqueda = 'http://'+ip+':'+port+'/GlobalSearch/'
 # Configurar la cabecera HTTP con el token CSRF
 # headers = {'X-CSRFToken': token}
 
+"""
 # Abrir el archivo MP3 en modo binario
 with open('STARSET-DIE FOR YOU.mp3', 'rb') as f:
     # Leer el contenido del archivo
@@ -31,6 +38,7 @@ with open('STARSET-DIE FOR YOU.mp3', 'rb') as f:
 
     # Convertir el resultado a una cadena de texto
     resultado = codificado.decode('utf-8')
+    """
 
 # String idUsr, String email, String alias, String contrasenya, String tipoUsuario
 new_user_data = {
@@ -60,6 +68,7 @@ params_example = {
     'calidadAlta': 'True',
     'esCancion': 'True'
 }
+response = requests.post(url_set_usr, json=new_user_data)
 
 params_get_usr = {
     'idUsr': 'usuario:1',
@@ -67,7 +76,7 @@ params_get_usr = {
 }
 
 
-
+"""
 # Realizar la petición HTTP POST
 response = requests.post(url_set_song, json=new_song_data)
 response = requests.get(url_get, params=params_get_song)
@@ -89,3 +98,4 @@ print(response.status_code)
 print(response.json())
 # prints de json content
 #print(response.json()['nombre'])
+"""
