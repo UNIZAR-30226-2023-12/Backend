@@ -38,7 +38,7 @@ def setTipoUsuario(r, idUsuario, tipoUsuario):
 def setImagenPerfil(r, idUsuario, imagenPerfil):
     return r.hset(idUsuario, constantes.CLAVE_IMAGEN_PERFIL, imagenPerfil)
 
-def setUltimaCancion(r, idUsuario, idAudio):
+def setUltimoAudio(r, idUsuario, idAudio):
     return r.hset(idUsuario, constantes.CLAVE_ID_ULTIMO_AUDIO, idAudio)
 
 def eliminarUsuario(r, idUsuario):
@@ -68,7 +68,7 @@ def getTipoUsuario(r, idUsuario):
 def getImagenPerfil(r, idUsuario):
     return r.hget(idUsuario, constantes.CLAVE_IMAGEN_PERFIL)
 
-def getUltimaCancion(r, idUsuario):
+def getSegundosAudio(r, idUsuario):
     return r.hget(idUsuario, constantes.CLAVE_ID_ULTIMO_AUDIO)
 
 def anyadirAmigo(r, idUsuario, idAmigo):
@@ -167,30 +167,15 @@ def getAdministradores(r):
             parar = True
     return administradores
 
-# Funciones para crear set de ulimos Audios escuchados
-def anyadirUltimoAudio(r, idUsuario, idAudio):
-    return anyadirRelacion(r, idUsuario, idAudio, constantes.PREFIJO_ULTIMOS_AUDIOS)
+# Funciones para crear set de ulimos Audios escuchados)
+def setSegundosAudio(r, idUsuario, idAudio, segundos):
+    return r.set(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS, segundos)
 
-def eliminarUltimoAudio(r, idUsuario, idAudio):
-    return eliminarRelacion(r, idUsuario, idAudio, constantes.PREFIJO_ULTIMOS_AUDIOS)
+def getSegundosAudio(r, idUsuario, idAudio):
+    return r.get(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS)
 
-def getIDSUltimosAudios(r, idUsuario):
-    return getRelaciones(r, idUsuario, constantes.PREFIJO_ULTIMOS_AUDIOS)
-
-def setUltimoAuido(r, idUsuario, idAudio, diccionarioUltimoAudio):
-    return r.hmset(constantes.PREFIJO_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, diccionarioUltimoAudio)
-
-def setSegundosUltimoAudio(r, idUsuario, idAudio, segundos):
-    return r.hset(constantes.PREFIJO_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS, segundos)
-
-def getUltimoAudio(r, idUsuario, idAudio):
-    return r.hgetall(constantes.PREFIJO_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
-
-def getSegundosUltimoAudio(r, idUsuario, idAudio):
-    return r.hget(constantes.PREFIJO_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS)
-
-def eliminarUltimoAudio(r, idUsuario, idAudio):
-    return r.delete(constantes.PREFIJO_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
+def eliminarSegundosAudio(r, idUsuario, idAudio):
+    return r.delete(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
 
 # Daos para crear tabla hash email | idUsuario para agilizar el inicio de sesion
 def setEmailId(r, email, idUsuario):

@@ -108,7 +108,7 @@ PREFIJO_AMIGOS = "amigos"
 PREFIJO_ARTISTAS_SUSCRITOS = "artistas"
 PREFIJO_NOTIFICACIONES = "notificaciones"
 PREFIJO_CARPETAS = "carpetas"
-PREFIJO_ULTIMOS_AUDIOS = "ultimosAudios"
+PREFIJO_SEGUNDOS_AUDIOS = "segundosAudios"
 # Claves para hash de ultimosAudios
 CLAVE_SEGUNDOS = "segundos"
 

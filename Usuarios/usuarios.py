@@ -123,15 +123,12 @@ def validateUserEmail(r, email, contrasenya):
     return ValidateUser(r, idUsuario, contrasenya)
 
 def setLastSecondHeard(r, idUsuario, idAudio, segundo):
-    if (r.exists(idUsuario) == 0 or r.exists(idAudio) == 0):
-        return -2
-    daoUsuario.setUltimoSegundo(r, idUsuario, idAudio, segundo)
-    return 1
-
-def getLastSecondHeard(r, idUsuario, idAudio):
-    if (r.exists(idUsuario) == 0 or r.exists(idAudio) == 0):
-        return -2
-    segundo = daoUsuario.getUltimoSegundo(r, idUsuario, idAudio)
+    # Ponemos que el ultimo audio escuchado es el que nos pasan
+    daoUsuario.setUltimoAudio(r, idUsuario, idAudio)
+    # Creamos el clave valor con el id del audio y el usuario, el segundo como valor
+    daoUsuario.setSegundosAudio(r, idUsuario, idAudio, segundo)
+def getLastSecondHeared(r, idUsuario, idAudio):
+    segundo = daoUsuario.getSegundosAudio(r, idUsuario, idAudio)
 
     # En caso de que no exista devolvemos que va por el segundo 0
     if (segundo == None):

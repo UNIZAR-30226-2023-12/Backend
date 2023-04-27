@@ -897,6 +897,51 @@ def RemoveNotification(request):
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
+@csrf_exempt
+def SetLastSecondHeared(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idAudio = json_data[constantes.CLAVE_ID_CANCION]
+    segundo = json_data[constantes.CLAVE_SEGUNDO]
+
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(moduloAudios.existeCancion(r, idAudio) == False):
+        return JsonResponse({'error': 'La cancion no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
+    
+    usuarios.setLastSecondHeard(r, idUsuario,idAudio, segundo)
+
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
+
+@csrf_exempt
+def GetLastSecondHeared(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idAudio = json_data[constantes.CLAVE_ID_CANCION]
+
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(moduloAudios.existeCancion(r, idAudio) == False):
+        return JsonResponse({'error': 'La cancion no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
+    
+    return JsonResponse({constantes.CLAVE_SEGUNDOS : usuarios.getLastSecondHeared(r, idUsuario,idAudio)}, status=erroresHTTP.OK)
+
 
 @csrf_exempt
 def GlobalSearch(request):
