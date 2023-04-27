@@ -10,7 +10,7 @@ from Audios import moduloAudios
 from Usuarios import usuarios
 
 from recomendador import generacion_datos as gen_datos
-#from recomendador import recomendador as rec
+from recomendador import recomendador as rec
 
 from Global import ModuloGlobal
 
@@ -697,7 +697,7 @@ def GetRecomendedAudio(request):
 
     if len(allAudios) > 0:
         None
-        #idAudios = rec.orderAudios(r, idUsr, allAudios)     # Pide al recomendador que ordene los audios por relevancia
+        idAudios = rec.orderAudios(r, idUsr, allAudios)     # Pide al recomendador que ordene los audios por relevancia
     else:
         idAudios = []
     
@@ -722,7 +722,7 @@ def entrenar_recomendador(request):
     if(usuarios.esAdministrador(r, idUsuario) == False):
         return JsonResponse({'error': 'No eres administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
     
-    #status = rec.create_model(r)
+    status = rec.train_model(r, nuevo_modelo=True)
 
     return JsonResponse({'status': status}, status=status)
 
