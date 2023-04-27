@@ -10,7 +10,7 @@ from Audios import moduloAudios
 from Usuarios import usuarios
 
 from recomendador import generacion_datos as gen_datos
-#from recomendador import recomendador as rec
+from recomendador import recomendador as rec
 
 from Global import ModuloGlobal
 
@@ -41,7 +41,7 @@ def GetSong(request):
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     jsonData = json.loads(request.body)
-    idAudio = jsonData['idSong']
+    idAudio = jsonData[constantes.CLAVE_ID_AUDIO]
     idUsuario = jsonData[constantes.CLAVE_ID_USUARIO]
     contrasenya = jsonData[constantes.CLAVE_CONTRASENYA]
 
@@ -55,6 +55,8 @@ def GetSong(request):
     del audio[constantes.CLAVE_FICHERO_ALTA_CALIDAD]
     del audio[constantes.CLAVE_FICHERO_BAJA_CALIDAD]
 
+    gen_datos.add_audio_prediction_temporal(r, idUsuario, idAudio)
+
     return JsonResponse({constantes.CLAVE_ID_AUDIO: audio}, status=erroresHTTP.OK)
     
 @csrf_exempt
@@ -63,9 +65,9 @@ def GetFicheroSong(request):
     # Compruebo que el método sea GET
     if request.method != 'GET':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
-    id = request.GET.get('idSong')
-    calidadAlta = request.GET.get('calidadAlta')
+
+    id = request.GET.get(constantes.CLAVE_ID_AUDIO)
+    calidadAlta = request.GET.get(constantes.CLAVE_FICHERO_ALTA_CALIDAD)
     esCancion = request.GET.get('esCancion')
 
     if esCancion == "True":
@@ -86,11 +88,36 @@ def GetFicheroSong(request):
         if idUsr == None:
             return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
         
+        gen_datos.add_audio_prediction_temporal(r, idUsr, id)
         # Gets the serialized audio
         return JsonResponse({'fichero': fichero})
-    
 
+
+@csrf_exempt
+def AlmacenarEjemplo(request):
+    # Compruebo que el método sea GET
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
     
+    idUsr = request.POST.get('idUsr')
+    if idUsr == None:
+        return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+    
+    idAudio = request.POST.get('idAudio')
+    if idAudio == None:
+        return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+    
+    valoracion = request.POST.get('valoracion')
+    if valoracion == None:
+        return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+    
+    valoracion = float(valoracion)
+
+    gen_datos.store_training_example(r, idUsr, idAudio, valoracion)
+
+    return JsonResponse({'msg': 'Ejemplo almacenado correctamente'}, status=erroresHTTP.OK)
+
+
 # View que devuelve una lista de canciones
 @csrf_exempt
 def GetSongs(request):
@@ -710,6 +737,11 @@ def AcceptFriend(request):
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
+#@csrf_exempt
+#def GetDataSong(r, idAudio):
+
+
+# Devuelve un set con n ids de audios recuperadas mediante una búsqueda global
 @csrf_exempt
 def GetFriends(request):
     if request.method != 'GET':
@@ -753,7 +785,54 @@ def RemoveFriend(request):
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
+
+@csrf_exempt
+def GlobalSearch(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
     
+    query = request.GET.get(constantes.CLAVE_QUERY)
+    n = request.GET.get(constantes.CLAVE_N)    
+
+    respuesta = moduloAudios.buscarCanciones(r, query, n)
+
+    #return JsonResponse({'status': status}, status=status)
+    return JsonResponse({'datos': respuesta}, status=200)
+
+@csrf_exempt
+def GetRecomendedAudio(request):
+
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+
+    idUsr = json_data[constantes.CLAVE_ID_USUARIO]
+    passwd = json_data[constantes.CLAVE_CONTRASENYA]
+
+    status = usuarios.ValidateUser(r, idUsr, passwd)
+    if (status != erroresHTTP.OK):
+        return JsonResponse({'status': status}, status=status)
+    
+    canciones = list(moduloAudios.obtenerTodasLasCanciones(r))
+    podcasts = list(moduloAudios.obtenerTodosLosPodcasts(r))
+    
+    allAudios = []
+    if len(canciones) > 0:
+        allAudios.extend(canciones)
+    if len(podcasts) > 0:
+        allAudios.extend(podcasts)
+
+    if len(allAudios) > 0:
+        None
+        idAudios = rec.orderAudios(r, idUsr, allAudios)     # Pide al recomendador que ordene los audios por relevancia
+    else:
+        idAudios = []
+    
+    #return JsonResponse({'status': status}, status=status)
+    return JsonResponse({'idAudio': idAudios[0]}, status=200)
+
 
 @csrf_exempt
 def entrenar_recomendador(request):
@@ -772,7 +851,7 @@ def entrenar_recomendador(request):
     if(usuarios.esAdministrador(r, idUsuario) == False):
         return JsonResponse({'error': 'No eres administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
     
-    #status = rec.create_model(r)
+    status = rec.train_model(r, nuevo_modelo=True)
 
     return JsonResponse({'status': status}, status=status)
 

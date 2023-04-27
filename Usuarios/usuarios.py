@@ -71,6 +71,13 @@ def setUser(r, usuarioDiccionario):
     daoUsuario.setEmailId(r, usuarioDiccionario[constantes.CLAVE_EMAIL], id)
     return id
 
+
+def getUser(r, id):
+    if(daoUsuario.existeUsuario(r, id) == False):
+        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
+    return daoUsuario.getUsuario(r, id)
+
+
 def removeUser(r, id, contrasenya):
     if(r.exists(id) == 0):
         return -1
@@ -319,7 +326,7 @@ def estaGuardado(r, idUsuario, idAudio):
     listas = daoUsuario.getListas(r, idUsuario)
     for idLista in listas:
         if(daoListas.getTipoLista(r, idLista) != constantes.LISTA_TIPO_FAVORITOS):
-            if(idAudio in daoListas.getAudios(r, idLista)):
+            if(idAudio in daoListas.getAudiosLista(r, idLista)):
                 return 1
     return 0
 
@@ -356,7 +363,7 @@ def getAudiosFavoritos(r, idUsuario):
     audios = []
     for idLista in listas:
         if(daoListas.getTipoLista(r, idLista) == constantes.LISTA_TIPO_FAVORITOS):
-            audios = daoListas.getAudios(r, idLista)
+            audios = daoListas.getAudiosLista(r, idLista)
     return audios
 
 

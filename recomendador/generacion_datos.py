@@ -11,7 +11,7 @@ def store_training_example(conn, id_usr, id_audio, output):
 
     # Obtiene los datos de entrada actuales para la predicción
     paquete_entradas = get_audio_prediction_state(conn, id_usr, id_audio)
-
+    
     # Construye el paquete de datos para la predicción
     paquete_prediccion = {
         "inputs": paquete_entradas,
@@ -36,7 +36,9 @@ def get_training_data(conn):
     users_with_training_data = daoGlobal.get_users_with_training_data(conn) 
 
     #datos_entrada = np.empty((0, 2))  # Arrays con los ejemplos de entrada
-    datos_entrada = []
+    datos_entrada = np.empty((0, 72)) 
+    datos_entrada_ventanas = np.empty((0, conf.RECOMENDADOR_TAMANYO_VENTANA_PREDICCION,
+                                        1+conf.GENERO_NUMERO_GENEROS))
     datos_salida = np.empty((0))   # Arrays con las salidas de cada ejemplo
 
     
@@ -53,15 +55,15 @@ def get_training_data(conn):
 
         for paquete in datos_entrenamiento:
 
-            inputs = paquete["inputs"]
-            datos_entrada_usr.append(inputs)
+            datos_entrada_usr.append(paquete["inputs"])
             datos_salida_usr.append(paquete["output"])
 
 
         ############ Preparar datos para la red neuronal ############
 
         datos_entrada_usr = limpiar_datos(datos_entrada_usr)
-
+        datos_entrada_usr = np.array(datos_entrada_usr)
+        datos_salida_usr = np.array(datos_salida_usr)
 
         window_size = min(conf.RECOMENDADOR_TAMANYO_VENTANA_PREDICCION, len(datos_entrada_usr))
         # Crea ventanas deslizantes con el histórico de cada ejemplos
@@ -74,19 +76,13 @@ def get_training_data(conn):
         datos_entrada_usr = datos_entrada_usr[window_size-1:] 
         datos_salida_usr = datos_salida_usr[window_size-1:]
 
-        # Hace un zip de los datos con las ventanas
-        inputs_usr = zip(datos_entrada_usr, ventana_inputs_usr.tolist())
-        
-        # Convierte los datos a numpy arrays
-        inputs_usr = list(inputs_usr)
-
-
         ############ Añadir datos a la lista de datos ############
 
         # Añade los datos de entrada y salida del usuario a la lista de datos
         #datos_entrada = np.append(datos_entrada, inputs_usr, axis=0)
         
-        datos_entrada.extend(inputs_usr)
+        datos_entrada = np.append(datos_entrada, datos_entrada_usr, axis=0)
+        datos_entrada_ventanas = np.append(datos_entrada_ventanas, ventana_inputs_usr, axis=0)
         datos_salida = np.append(datos_salida, datos_salida_usr, axis=0)
 
         # Elimina los datos de entrenamiento del usuario
@@ -94,7 +90,7 @@ def get_training_data(conn):
         daoGlobal.delete_usr_training_examples(conn, id_usr)
 
 
-    return datos_entrada, datos_salida
+    return datos_entrada, datos_entrada_ventanas, datos_salida
     
 
 
@@ -223,6 +219,50 @@ def get_audio_prediction_state(conn, id_usr, id_audio):
     paquete_datos += porcentaje_favoritos_por_genero_amigos
 
     return paquete_datos
+
+
+def get_state_for_prediction(r, id_usr, id_audio):
+    paquete_datos = np.array(get_audio_prediction_state(r, id_usr, id_audio), np.float32)
+    paquete_datos = np.reshape(paquete_datos, (1, np.shape(paquete_datos)[0]))
+
+    paquete_datos = limpiar_datos(paquete_datos)
+    return np.array(paquete_datos, np.float32)
+
+
+
+
+def get_audio_prediction_temporal(r, id_usr):
+    paquete_temporal = np.array(daoGlobal.get_temporal_data(r, id_usr))
+    nGeneros = conf.GENERO_NUMERO_GENEROS
+
+    len_temporal = len(paquete_temporal)
+    limpio = np.empty((len_temporal, nGeneros+1), np.float32)
+
+    for i in range(len_temporal):    
+        limpio[i, 0] = (paquete_temporal[i, 0] == "True")            # esPodcast
+
+        id_genero = paquete_temporal[i, 1]
+        generos_one_hot = np.zeros(conf.GENERO_NUMERO_GENEROS, np.float32)
+        generos_one_hot[id_genero] = 1
+
+        limpio[i, 1:1+nGeneros] = generos_one_hot   # Genero del audio
+
+    limpio = np.reshape(limpio, (1, np.shape(limpio)[0], np.shape(limpio)[1]))
+
+    return limpio
+
+def add_audio_prediction_temporal(r, id_usr, id_audio):
+
+    es_podcast = audios.obtenerEsPodcast(r, id_audio)            # 1 si es podcast, 0 si no
+
+    if es_podcast:
+        id_genero = audios.obtenerGenerosPodcast(r, id_audio)                     # Genero del audio, un entero
+    else:
+        id_genero = audios.obtenerGenCancion(r, id_audio)                       # Genero del audio, un entero
+
+    paquete_temporal = [es_podcast, id_genero]
+    daoGlobal.add_temporal_data(r, id_usr, paquete_temporal)
+
 
 
 

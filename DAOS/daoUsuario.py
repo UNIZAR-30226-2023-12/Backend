@@ -51,7 +51,7 @@ def tipoUsuarioValido(tipoUsuario):
         return False
     
 def getUsuario(r, idUsuario):
-    return r.hgetall(idUsuario, listaClaves)
+    return r.hgetall(idUsuario)
 
 def getEmail(r, id):
     return r.hget(id, constantes.CLAVE_EMAIL)

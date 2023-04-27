@@ -4,10 +4,21 @@ import base64
 from django.middleware import csrf
 from django.http import HttpRequest
 
+ip = '127.0.0.1'
+port = '8000'
+
 # URL del endpoint SetSong
+<<<<<<< HEAD
 url_set_song = 'http://127.0.0.1:8081/SetSong/'
 url_set_usr = 'http://127.0.0.1:8081/SetUser/'
 url_get = 'http://127.0.0.1:8081/GetSong/'
+=======
+url_set_song = 'http://'+ip+':'+port+'/SetSong/'
+url_set_usr = 'http://'+ip+':'+port+'/SetUser/'
+url_get_usr = 'http://'+ip+':'+port+'/GetUser/'
+url_get = 'http://'+ip+':'+port+'/GetSong/'
+url_busqueda = 'http://'+ip+':'+port+'/GlobalSearch/'
+>>>>>>> main
 
 # Crear un objeto HttpRequest vacío
 # request = HttpRequest()
@@ -41,7 +52,7 @@ new_user_data = {
 # Datos del cuerpo de la petición
 new_song_data = {
     'nombre': 'Die for you',
-    'idUsr': 'usuario:2',
+    'idUsr': 'usuario:1',
     'contrasenya': '1234',
     'artista': 'Starset',
     'calidad': 'baja',
@@ -51,19 +62,30 @@ new_song_data = {
     'longitud': 318
 }
 
-params_get_song = {
-    'idUsr': 'usuario:2',
+params_example = {
+    'idUsr': 'usuario:1',
     'idSong': 'idAudio:1',
     'calidadAlta': 'True',
     'esCancion': 'True'
 }
 response = requests.post(url_set_usr, json=new_user_data)
 
+params_get_usr = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234'
+}
+
 
 """
 # Realizar la petición HTTP POST
-#response = requests.post(url_set_song, json=new_song_data)
+response = requests.post(url_set_song, json=new_song_data)
 response = requests.get(url_get, params=params_get_song)
+usr = requests.get(url_get_usr, params=params_get_usr)
+
+search = requests.get(url_busqueda, params={'query': 'Die for you'})
+
+print(search.json())
+
 
 # Get the headers from the response
 response_headers = response.request.headers

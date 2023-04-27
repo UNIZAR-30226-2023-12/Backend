@@ -23,6 +23,7 @@ urlpatterns = [
     path('GetFicheroSong/', viewsApi.GetFicheroSong, name='GetFicheroSong'),
     path('SetSong/', viewsApi.SetSong, name='SetSong'),
     path('SetUser/', viewsApi.SetUser, name='SetUser'),
+    path('GetUser/', viewsApi.GetUser, name='GetUser'),
     path('ValidateUser/', viewsApi.ValidateUser, name='ValidateUser'),
     path('SetLista/', viewsApi.SetLista, name='SetLista'),
     path('GetListasUsr/', viewsApi.GetListasUsr, name='GetListasUsr'),
@@ -48,6 +49,9 @@ urlpatterns = [
     path('AcceptFriend/', viewsApi.AcceptFriend, name='AcceptFriend'),
     path('GetFriends/', viewsApi.GetFriends, name='GetFriends'),
     path('RemoveFriend/', viewsApi.RemoveFriend, name='RemoveFriend'),
+    path('GlobalSearch/', viewsApi.GlobalSearch, name='GlobalSearch'),
     path('echo/', viewsApi.echo, name='echo'),
     path('entrenar_recomendador/', viewsApi.entrenar_recomendador, name='entrenar_recomendador'),
+    path('AlmacenarEjemplo/', viewsApi.AlmacenarEjemplo, name='AlmacenarEjemplo'),
+    path('GetRecomendedAudio/', viewsApi.GetRecomendedAudio, name='GetRecomendedAudio'),
 ]

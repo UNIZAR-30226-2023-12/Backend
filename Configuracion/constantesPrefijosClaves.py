@@ -98,6 +98,9 @@ CLAVE_CONTRASENYA = "contrasenya"
 CLAVE_TIPO_USUARIO = "tipoUsuario"
 CLAVE_ID_ULTIMO_AUDIO = "idUltimoAudio"
 CLAVE_IMAGEN_PERFIL = "imagenPerfil"
+CLAVE_QUERY = "query"
+CLAVE_N = "n"
+CLAVE_TEMPORAL_ENTRENAMIENTO = "datos_temporales"
 
 # Prefijos de las claves relacionadas con los usuarios
 PREFIJO_ID_USUARIO = "usuario"
