@@ -41,7 +41,7 @@ def GetSong(request):
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     jsonData = json.loads(request.body)
-    idAudio = jsonData['idSong']
+    idAudio = jsonData[constantes.CLAVE_ID_AUDIO]
     idUsuario = jsonData[constantes.CLAVE_ID_USUARIO]
     contrasenya = jsonData[constantes.CLAVE_CONTRASENYA]
 
@@ -54,6 +54,8 @@ def GetSong(request):
     audio = moduloAudios.obtenerDiccionarioCancion(r, idAudio)
     del audio[constantes.CLAVE_FICHERO_ALTA_CALIDAD]
     del audio[constantes.CLAVE_FICHERO_BAJA_CALIDAD]
+
+    gen_datos.add_audio_prediction_temporal(r, idUsuario, idAudio)
 
     return JsonResponse({constantes.CLAVE_ID_AUDIO: audio}, status=erroresHTTP.OK)
     
@@ -485,7 +487,7 @@ def entrenar_recomendador(request):
     if(usuarios.esAdministrador(r, idUsuario) == False):
         return JsonResponse({'error': 'No eres administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
     
-    #status = rec.create_model(r)
+    status = rec.train_model(r, nuevo_modelo=False)
 
     return JsonResponse({'status': status}, status=status)
 
