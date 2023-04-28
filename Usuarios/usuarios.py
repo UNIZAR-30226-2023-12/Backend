@@ -79,8 +79,6 @@ def setUser(r, usuarioDiccionario):
 
 
 def getUser(r, id):
-    if(daoUsuario.existeUsuario(r, id) == False):
-        return erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
     return daoUsuario.getUsuario(r, id)
 
 

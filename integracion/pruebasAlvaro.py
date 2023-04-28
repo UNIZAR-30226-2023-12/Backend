@@ -6,11 +6,13 @@ r = redis.Redis(host='localhost', port=6379, db=0, username='melodia', password 
 
 urlFlushDB = 'http://127.0.0.1:8081/FlushDB/'
 urlSetUser = 'http://127.0.0.1:8081/SetUser/'
+urlGetUser = 'http://127.0.0.1:8081/GetUser/'
 urlSetSong = 'http://127.0.0.1:8081/SetSong/'
 urlValidateUser = 'http://127.0.0.1:8081/ValidateUser/'
 urlSetLista = 'http://127.0.0.1:8081/SetLista/'
 urlChangeNameListRepUsr = 'http://127.0.0.1:8081/ChangeNameListRepUsr/'
 urlSetSongLista = 'http://127.0.0.1:8081/SetSongLista/'
+urlGetLista = 'http://127.0.0.1:8081/GetLista/'
 
 
 #Pruebas set user
@@ -58,6 +60,16 @@ print(requests.post(urlSetUser, json=usuarioCorrecto2).status_code)
 print(requests.post(urlSetUser, json=usuarioMismoEmail).status_code)
 print(requests.post(urlSetUser, json=usuarioDatosErroneos).status_code)
 print(requests.post(urlSetUser, json=usuarioTipoErroneo).status_code)
+
+# Pruebas GetUser
+getUser = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234'
+}
+
+print("Pruebas get user")
+print(requests.post(urlGetUser, json=getUser).json())
+
 
 # Pruebas validateUser
 validateUser = {
@@ -211,6 +223,34 @@ setSongLista = {
     'idAudio': 'audio:1'
 }
 
+setSongListaErrorUsuario = {
+    'idUsr': 'usuario:3',
+    'contrasenya': '1234',
+    'idLista': 'lista:3',
+    'idAudio': 'audio:1'
+}
+
+setSongListaErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345',
+    'idLista': 'lista:3',
+    'idAudio': 'audio:1'
+}
+
+setSongListaErrorLista = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idLista': 'lista:6',
+    'idAudio': 'audio:1'
+}
+
+setSongListaErrorAudio = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idLista': 'lista:3',
+    'idAudio': 'audio:2'
+}
+
 setSongListaForbidden = {
     'idUsr': 'usuario:2',
     'contrasenya': '1234',
@@ -222,4 +262,51 @@ r.set('audio:1', 'audio:1')
 
 print("Pruebas SetSongLista")
 print(requests.post(urlSetSongLista, json=setSongLista).status_code)
+print(requests.post(urlSetSongLista, json=setSongListaErrorUsuario).status_code)
+print(requests.post(urlSetSongLista, json=setSongListaErrorContrasenya).status_code)
+print(requests.post(urlSetSongLista, json=setSongListaErrorLista).status_code)
+print(requests.post(urlSetSongLista, json=setSongListaErrorAudio).status_code)
 print(requests.post(urlSetSongLista, json=setSongListaForbidden).status_code)
+
+# Pruebas getLista
+getLista = {   
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idLista': 'lista:3'
+}
+
+getListaErrorUsuario = {
+    'idUsr' : 'usuario:3',
+    'contrasenya' : '1234',
+    'idLista' : 'lista:3'
+}
+
+getListaErrorContrasenya = {
+    'idUsr' : 'usuario:1',
+    'contrasenya' : '12345',
+    'idLista' : 'lista:3'
+}
+
+getListaErrorLista = {
+    'idUsr' : 'usuario:1',
+    'contrasenya' : '1234',
+    'idLista' : 'lista:6'
+}
+
+getListaForbidden = {
+    'idUsr' : 'usuario:2',
+    'contrasenya' : '1234',
+    'idLista' : 'lista:3'
+}
+
+print("Pruebas getLista")
+respuesta = requests.post(urlGetLista, json=getLista)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetLista, json=getListaErrorUsuario)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetLista, json=getListaErrorContrasenya)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetLista, json=getListaErrorLista)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetLista, json=getListaForbidden)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))

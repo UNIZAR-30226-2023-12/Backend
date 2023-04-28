@@ -212,16 +212,18 @@ def GetUser(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    idUsuario = request.GET.get('idUsuario')
-    contrasenya = request.GET.get('contrasenya')
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
 
-    if status == erroresHTTP.OK:
-        usuario = usuarios.getUser(r, idUsuario)
-        return JsonResponse(usuario, status=erroresHTTP.OK)
-    else:
-        return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=status)
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña es incorrecta'}, status=erroresHTTP.ERROR_USUARIO_CONTRASENYA_INCORRECTA)
     
+    return JsonResponse(usuarios.getUser(r, idUsuario), status=erroresHTTP.OK)
 
 @csrf_exempt
 def ValidateUser(request):
