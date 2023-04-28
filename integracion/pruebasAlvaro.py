@@ -1,20 +1,23 @@
 import requests
-import redis
 
-r = redis.Redis(host='localhost', port=6379, db=0)
-
-url = 'http://127.0.0.1:8081/SetUser/'
+urlFlushDB = 'http://127.0.0.1:8081/FlushDB/'
+urlSetUser = 'http://127.0.0.1:8081/SetUser/'
+urlSetSong = 'http://127.0.0.1:8081/SetSong/'
 urlValidateUser = 'http://127.0.0.1:8081/ValidateUser/'
+urlSetLista = 'http://127.0.0.1:8081/SetLista/'
+urlChangeNameListRepUsr = 'http://127.0.0.1:8081/ChangeNameListRepUsr/'
+urlSetSongLista = 'http://127.0.0.1:8081/SetSongLista/'
+
 
 #Pruebas set user
 
-nuevoUsuario = {
+usuarioCorrecto1 = {
     'email': 'admin@melodia.es',
     'alias': 'admin',
     'contrasenya': '1234',
     'tipoUsuario': 'admin'
 }
-nuevoUsuario2 = {
+usuarioCorrecto2 = {
     'email': 'admin2@melodia.es',
     'alias': 'admin',
     'contrasenya': '1234',
@@ -29,7 +32,7 @@ usuarioMismoEmail = {
 }
 
 usuarioDatosErroneos = {
-    'email': 'admin@melodia.es',
+    'email': 'admin3@melodia.es',
     'alias': 'admin',
     'contrasenya': '1234',
     'tipoUsuario': 'admin',
@@ -44,13 +47,13 @@ usuarioTipoErroneo = {
     'tipoUsuario': 'erroneo',
 }
 
+requests.post(urlFlushDB)
 print("Pruebas set user")
-print(requests.post(url, json=nuevoUsuario).status_code)
-print(requests.post(url, json=nuevoUsuario2).status_code)
-print(requests.post(url, json=usuarioMismoEmail).status_code)
-print(requests.post(url, json=usuarioDatosErroneos).status_code)
-print(requests.post(url, json=usuarioTipoErroneo).status_code)
-
+print(requests.post(urlSetUser, json=usuarioCorrecto1).status_code)
+print(requests.post(urlSetUser, json=usuarioCorrecto2).status_code)
+print(requests.post(urlSetUser, json=usuarioMismoEmail).status_code)
+print(requests.post(urlSetUser, json=usuarioDatosErroneos).status_code)
+print(requests.post(urlSetUser, json=usuarioTipoErroneo).status_code)
 
 # Pruebas validateUser
 validateUser = {
@@ -74,7 +77,7 @@ validateUserDatosErroneos2 = {
     'emasil': 'as'
 }
 
-r.flushall()
+
 print("Pruebas validateUser")
 print(requests.post(urlValidateUser, json=validateUser).status_code)
 print(requests.post(urlValidateUser, json=validateUserEmailErroneo).status_code)
@@ -82,8 +85,10 @@ print(requests.post(urlValidateUser, json=validateUserContrasenyaErronea).status
 print(requests.post(urlValidateUser, json=validateUserDatosErroneos).status_code)
 print(requests.post(urlValidateUser, json=validateUserDatosErroneos2).status_code)
 
+exit(0)
+
 # Pruebas  SetLista
-urlSetLista = 'http://127.0.0.1:8081/SetLista/'
+
 setLista = {
     'idUsr': 'usuario:1',
     'contrasenya': '1234',
@@ -113,7 +118,7 @@ print(requests.post(urlSetLista, json=setLista).status_code)
 print(requests.post(urlSetLista, json=setListaErrorTipo).status_code)
 
 # Pruebas ChangeNameListRepUsr
-urlChangeNameListRepUsr = 'http://127.0.0.1:8081/ChangeNameListRepUsr/'
+
 
 
 changeNameListRepUsrError = {
@@ -133,8 +138,8 @@ print("Pruebas ChangeNameListRepUsr")
 print(requests.post(urlChangeNameListRepUsr, json=changeNameListRepUsr).status_code)
 print(requests.post(urlChangeNameListRepUsr, json=changeNameListRepUsrError).status_code)
 
-# Pruebas SetSongLista
-urlSetSongLista = 'http://127.0.0.1:8081/SetSongLista/'
+
+
 setSongLista = {
     'idUsr': 'usuario:1',
     'contrasenya': '1234',

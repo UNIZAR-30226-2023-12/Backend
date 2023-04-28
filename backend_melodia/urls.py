@@ -61,4 +61,5 @@ urlpatterns = [
     path('entrenar_recomendador/', viewsApi.entrenar_recomendador, name='entrenar_recomendador'),
     path('AlmacenarEjemplo/', viewsApi.AlmacenarEjemplo, name='AlmacenarEjemplo'),
     path('GetRecomendedAudio/', viewsApi.GetRecomendedAudio, name='GetRecomendedAudio'),
+    path('FlushDB/', viewsApi.FlushDB, name='FlushDB'),
 ]

@@ -10,7 +10,7 @@ from Audios import moduloAudios
 from Usuarios import usuarios
 
 from recomendador import generacion_datos as gen_datos
-from recomendador import recomendador as rec
+#from recomendador import recomendador as rec
 
 from Global import ModuloGlobal
 
@@ -19,6 +19,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
 r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
+
+# View para pruebas
+@csrf_exempt
+def FlushDB(request):
+    r.flushdb()
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 # echo request
 @csrf_exempt
@@ -200,6 +206,21 @@ def SetUser(request):
     usuarios.setLista(r, idUsuario, diccionarioLista)
     
     return JsonResponse({constantes.CLAVE_ID_USUARIO: idUsuario}, status=erroresHTTP.OK)
+
+@csrf_exempt
+def GetUser(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    idUsuario = request.GET.get('idUsuario')
+    contrasenya = request.GET.get('contrasenya')
+    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+
+    if status == erroresHTTP.OK:
+        usuario = usuarios.getUser(r, idUsuario)
+        return JsonResponse(usuario, status=erroresHTTP.OK)
+    else:
+        return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=status)
     
 
 @csrf_exempt
@@ -215,11 +236,10 @@ def ValidateUser(request):
     if(usuarios.existeUsuarioEmail(r, email) == False):
         return JsonResponse({'error': 'El email no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
 
-    respuesta = usuarios.validateUserEmail(r, email, contrasenya)
-    if (respuesta["status"] != erroresHTTP.OK):
-        return JsonResponse({'status': respuesta["status"]}, status=respuesta["status"])
-
-    return JsonResponse({constantes.CLAVE_ID_USUARIO: respuesta[constantes.CLAVE_ID_USUARIO]}, status=respuesta["status"])
+    if(usuarios.validateUserEmail(r, email, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña es incorrecta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    
+    return JsonResponse({'msg': 'Usuario validado correctamente'}, status=erroresHTTP.OK)
 
     
 @csrf_exempt
