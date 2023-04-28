@@ -83,7 +83,7 @@ validateUserDatosErroneos2 = {
 
 
 print("Pruebas validateUser")
-print(requests.post(urlValidateUser, json=validateUser).status_code)
+print(requests.post(urlValidateUser, json=validateUser).json())
 print(requests.post(urlValidateUser, json=validateUserEmailErroneo).status_code)
 print(requests.post(urlValidateUser, json=validateUserContrasenyaErronea).status_code)
 print(requests.post(urlValidateUser, json=validateUserDatosErroneos).status_code)

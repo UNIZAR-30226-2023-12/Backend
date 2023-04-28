@@ -120,12 +120,11 @@ def AskAdminToBeArtist(r, idUsuario):
 def ValidateUser(r, id, contrasenya):
     if (daoUsuario.getContrasenya(r, id) == contrasenya):
         return True
-
     return False
 
-def validateUserEmail(r, email, contrasenya):
-    idUsuario = daoUsuario.getIdEmailId(r, email)
-    return ValidateUser(r, idUsuario, contrasenya)
+def getIdEmailId(r, email):
+    return daoUsuario.getIdEmailId(r, email)
+   
 
 def setLastSecondHeard(r, idUsuario, idAudio, segundo):
     # Ponemos que el ultimo audio escuchado es el que nos pasan
