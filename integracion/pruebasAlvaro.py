@@ -1,4 +1,8 @@
 import requests
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0, username='melodia', password ='melodia_Proyecto_Software_Grupo_12')
+
 
 urlFlushDB = 'http://127.0.0.1:8081/FlushDB/'
 urlSetUser = 'http://127.0.0.1:8081/SetUser/'
@@ -199,8 +203,7 @@ print(requests.post(urlChangeNameListRepUsr, json=changeNameListRepUsrContraseny
 print(requests.post(urlChangeNameListRepUsr, json=changeNameListRepUsrListaErronea).status_code)
 print(requests.post(urlChangeNameListRepUsr, json=changeNameListRepUsrListaForbidden).status_code)
 
-exit(0)
-
+# Pruebas SetSongLista
 setSongLista = {
     'idUsr': 'usuario:1',
     'contrasenya': '1234',
@@ -208,12 +211,15 @@ setSongLista = {
     'idAudio': 'audio:1'
 }
 
-setSongLista = {
+setSongListaForbidden = {
     'idUsr': 'usuario:2',
     'contrasenya': '1234',
     'idLista': 'lista:3',
     'idAudio': 'audio:1'
 }
 
+r.set('audio:1', 'audio:1')
+
 print("Pruebas SetSongLista")
 print(requests.post(urlSetSongLista, json=setSongLista).status_code)
+print(requests.post(urlSetSongLista, json=setSongListaForbidden).status_code)

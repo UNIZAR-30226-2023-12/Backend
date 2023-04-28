@@ -232,14 +232,15 @@ def ValidateUser(request):
     json_data = json.loads(request.body)
     email = json_data[constantes.CLAVE_EMAIL]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idUsuario = usuarios.getIdEmailId(r, email)
 
     if(usuarios.existeUsuarioEmail(r, email) == False):
         return JsonResponse({'error': 'El email no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
 
-    if(usuarios.validateUserEmail(r, email, contrasenya) == False):
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
         return JsonResponse({'error': 'La contraseña es incorrecta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     
-    return JsonResponse({'msg': 'Usuario validado correctamente'}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.CLAVE_ID_USUARIO: idUsuario}, status=erroresHTTP.OK)
 
     
 @csrf_exempt
