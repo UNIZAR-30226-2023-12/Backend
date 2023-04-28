@@ -85,7 +85,6 @@ print(requests.post(urlValidateUser, json=validateUserContrasenyaErronea).status
 print(requests.post(urlValidateUser, json=validateUserDatosErroneos).status_code)
 print(requests.post(urlValidateUser, json=validateUserDatosErroneos2).status_code)
 
-exit(0)
 
 # Pruebas  SetLista
 
@@ -105,6 +104,22 @@ setLista2 = {
     'tipoLista' : 'listaReproduccion'
 }
 
+setListaErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345',
+    'nombreLista': 'lista POP',
+    'privada' : 'publica',
+    'tipoLista' : 'listaReproduccion'
+}
+
+setListaErrorUsuario = {
+    'idUsr': 'usuario:3',
+    'contrasenya': '1234',
+    'nombreLista': 'lista POP',
+    'privada' : 'publica',
+    'tipoLista' : 'listaReproduccion'
+}
+
 setListaErrorTipo = {
     'idUsr': 'usuario:1',
     'contrasenya': '1234',
@@ -113,20 +128,35 @@ setListaErrorTipo = {
     'tipoLista' : 'listaRara'
 }
 
+setListaPrivacidadErronea = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'nombreLista': 'lista POP',
+    'privada' : 'asdf',
+    'tipoLista' : 'listaReproduccion'
+}
+
+setListaErrorParametros = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'nombreLista': 'lista POP',
+    'privada' : 'asdf',
+    'tipoLista' : 'listaReproduccion',
+    'asdf' : 'asdf'
+}
+
 print("Pruebas SetLista")
 print(requests.post(urlSetLista, json=setLista).status_code)
+print(requests.post(urlSetLista, json=setLista2).status_code)
+print(requests.post(urlSetLista, json=setListaErrorContrasenya).status_code)
+print(requests.post(urlSetLista, json=setListaErrorUsuario).status_code)
 print(requests.post(urlSetLista, json=setListaErrorTipo).status_code)
+print(requests.post(urlSetLista, json=setListaPrivacidadErronea).status_code)
+print(requests.post(urlSetLista, json=setListaErrorParametros).status_code)
 
 # Pruebas ChangeNameListRepUsr
 
 
-
-changeNameListRepUsrError = {
-    'idUsr': 'usuario:1',
-    'contrasenya': '1234',
-    'idLista': 'lista:4',
-    'nombreLista': 'lista ROCK'
-}
 changeNameListRepUsr = {
     'idUsr': 'usuario:1',
     'contrasenya': '1234',
@@ -134,11 +164,42 @@ changeNameListRepUsr = {
     'nombreLista': 'lista ROCK'
 }
 
+changeNameListRepUsrUserErroneo = {
+    'idUsr': 'usuario:3',
+    'contrasenya': '1234',
+    'idLista': 'lista:3',
+    'nombreLista': 'lista ROCK'
+}
+
+changeNameListRepUsrContrasenyaErronea = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345',
+    'idLista': 'lista:3',
+    'nombreLista': 'lista ROCK'
+}
+
+changeNameListRepUsrListaErronea = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idLista': 'lista:6',
+    'nombreLista': 'lista ROCK'
+}
+
+changeNameListRepUsrListaForbidden = {
+    'idUsr': 'usuario:2',
+    'contrasenya': '1234',
+    'idLista': 'lista:3',
+    'nombreLista': 'lista ROCK'
+}
+
 print("Pruebas ChangeNameListRepUsr")
 print(requests.post(urlChangeNameListRepUsr, json=changeNameListRepUsr).status_code)
-print(requests.post(urlChangeNameListRepUsr, json=changeNameListRepUsrError).status_code)
+print(requests.post(urlChangeNameListRepUsr, json=changeNameListRepUsrUserErroneo).status_code)
+print(requests.post(urlChangeNameListRepUsr, json=changeNameListRepUsrContrasenyaErronea).status_code)
+print(requests.post(urlChangeNameListRepUsr, json=changeNameListRepUsrListaErronea).status_code)
+print(requests.post(urlChangeNameListRepUsr, json=changeNameListRepUsrListaForbidden).status_code)
 
-
+exit(0)
 
 setSongLista = {
     'idUsr': 'usuario:1',

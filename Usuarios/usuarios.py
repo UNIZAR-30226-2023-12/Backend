@@ -57,6 +57,11 @@ def getUsuarioEmisorNotificacion(r, id):
 def tipoListaValido(tipoLista):
     return daoListas.tipoListaValido(tipoLista)
 
+def listaPrivacidadValida(privacidad):
+    if(privacidad == constantes.LISTA_PRIVADA or privacidad == constantes.LISTA_PUBLICA):
+        return True
+    return False
+
 def setUser(r, usuarioDiccionario):
     id = daoUsuario.getIdContador(r)
     usuarioDiccionario[constantes.CLAVE_ID_USUARIO] = id

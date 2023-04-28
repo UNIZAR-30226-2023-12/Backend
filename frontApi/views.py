@@ -260,12 +260,14 @@ def SetLista(request):
     if(usuarios.existeUsuario(r, idUsuario) == False):
         return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     # Validates the user
-    if (usuarios.ValidateUser == False):
+    if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
         return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if (usuarios.correctoDiccionarioLista(diccionarioLista) == False):
         return JsonResponse({'error': 'El diccionario no es correcto'}, status=erroresHTTP.ERROR_LISTA_PARAMETROS_INCORRECTOS)
+    if (usuarios.listaPrivacidadValida(diccionarioLista[constantes.CLAVE_PRIVACIDAD_LISTA]) == False):
+        return JsonResponse({'error': 'La privacidad no es valida'}, status=erroresHTTP.ERROR_LISTA_PRIVACIDAD_INCORRECTA)
     if (usuarios.tipoListaValido(diccionarioLista[constantes.CLAVE_TIPO_LISTA]) == False):
-        return JsonResponse({'error': 'El tipo de lista no es valido'}, status=erroresHTTP.ERROR_LISTA_TIPO_NO_VALIDO)
+        return JsonResponse({'error': 'El tipo de lista no es valido'}, status=erroresHTTP.ERROR_LISTA_TIPO_INCORRECTO)
 
     idLista = usuarios.setLista(r, idUsuario, diccionarioLista)
     return JsonResponse({constantes.CLAVE_ID_LISTA: idLista}, status=erroresHTTP.OK)
@@ -324,8 +326,6 @@ def SetSongLista(request):
         return JsonResponse({'error': 'La lista no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
     if(moduloAudios.existeCancion(r, idAudio) == False):
         return JsonResponse({'error': 'La cancion no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
-    if (moduloAudios.existeCancion(r, idAudio) == False):
-        return JsonResponse({'error': 'No existe el audio'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
     if (usuarios.isListaFromUser(r, idUsuario, idLista) == False):
         return JsonResponse({'error': 'La lista no pertenece al usuario'}, status=erroresHTTP.FORBIDDEN)
     
