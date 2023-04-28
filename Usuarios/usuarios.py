@@ -44,12 +44,17 @@ def correctoDiccionarioCarpeta(diccionario):
 def tipoUsuarioValido(tipoUsuario):
     return daoUsuario.tipoUsuarioValido(tipoUsuario)
 
+def getTipoUser(r, id):
+    return daoUsuario.getTipoUsuario(r, id)
+
 def getTipoNotificacion(r, id):
     return daoNotificaciones.getTipoNotificacion(r, id)
 
 def isCarpetaPublica(r, id):
     return daoCarpetas.getPrivacidadCarpeta(r, id) == constantes.CARPETA_PUBLICA
 
+def isListaPublica(r, id):
+    return daoListas.getPrivacidadLista(r, id) == constantes.LISTA_PUBLICA
 
 def getUsuarioEmisorNotificacion(r, id):
     return daoNotificaciones.getIdUsuarioEmisor(r, id)
@@ -109,7 +114,7 @@ def AskAdminToBeArtist(r, idUsuario):
                                  constantes.CLAVE_ID_USUARIO_EMISIOR: idUsuario, 
                                  constantes.CLAVE_TIPO_NOTIFICACION: constantes.NOTIFICACION_TIPO_SOLICITUD_ARTISTA,
                                  constantes.CLAVE_TITULO_NOTIFICACION: constantes.TITULO_NOTIFICACION_ARTISTA,
-                                 constantes.CLAVE_MENSAJE_NOTIFICACION: daoUsuario.getAlias(r,) + constantes.MENSAJE_NOTIFICACION_ARTISTA}
+                                 constantes.CLAVE_MENSAJE_NOTIFICACION: daoUsuario.getAlias(r,idUsuario) + constantes.MENSAJE_NOTIFICACION_ARTISTA}
     daoNotificaciones.setNotificacion(r, diccionarioNotificaciones)
     administradores = daoUsuario.getAdministradores(r)
     for admin in administradores:
@@ -161,7 +166,7 @@ def acceptArtist(r, idNotificacion):
     administradores = daoUsuario.getAdministradores(r)
     for admin in administradores:
         daoUsuario.eliminarNotificacion(r, admin, idNotificacion)
-    
+    daoNotificaciones.eliminarNotificacion(r, idNotificacion)
     daoUsuario.setTipoUsuario(r, idUsuario, daoUsuario.constantes.USUARIO_ARTISTA)
 
 def esAdministrador(r, id):
@@ -247,6 +252,15 @@ def getLista(r, idLista):
 
 def getListasUsr(r, idUsuario):
     return daoUsuario.getListas(r, idUsuario)
+
+def getListasUsrPublicas(r, idUsuario):
+    listas = getListasUsr(r, idUsuario)
+    listasPublicas = []
+    for lista in listas:
+        if(isListaPublica(r, lista)):
+            listasPublicas.append(lista)
+
+    return listasPublicas
 
 def getAudiosLista(r, idLista):
     return daoListas.getAudiosLista(r, idLista)

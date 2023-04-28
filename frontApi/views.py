@@ -221,7 +221,7 @@ def GetUser(request):
     if(usuarios.existeUsuario(r, idUsuario) == False):
         return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
-        return JsonResponse({'error': 'La contraseña es incorrecta'}, status=erroresHTTP.ERROR_USUARIO_CONTRASENYA_INCORRECTA)
+        return JsonResponse({'error': 'La contraseña es incorrecta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     
     return JsonResponse(usuarios.getUser(r, idUsuario), status=erroresHTTP.OK)
 
@@ -355,6 +355,8 @@ def GetLista(request):
         return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeLista(r, idLista) == False):
         return JsonResponse({'status': erroresHTTP.ERROR_LISTA_NO_ENCONTRADA}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
+    if (usuarios.isListaFromUser(r, idUsuario, idLista) == False and usuarios.isListaPublica(r, idLista) == False):
+        return JsonResponse({'status': erroresHTTP.FORBIDDEN}, status=erroresHTTP.FORBIDDEN)
 
     return JsonResponse({constantes.PREFIJO_ID_LISTA: usuarios.getLista(r, idLista)}, status=erroresHTTP.OK)
 
@@ -374,9 +376,11 @@ def GetListasUsr(request):
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
         return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
-    if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+    if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False and contrasenya != None):
         return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     
+    if (contrasenya == None):
+        return JsonResponse({constantes.CLAVE_LISTAS: usuarios.getListasUsrPublicas(r, idUsuario)}, status=erroresHTTP.OK)
     return JsonResponse({constantes.CLAVE_LISTAS: usuarios.getListasUsr(r, idUsuario)}, status=erroresHTTP.OK)
        
 @csrf_exempt 
@@ -397,16 +401,16 @@ def GetAudiosLista(request):
         return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeLista(r, idLista) == False):
         return JsonResponse({'status': erroresHTTP.ERROR_LISTA_NO_ENCONTRADA}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
+    if(usuarios.isListaFromUser(r, idUsuario, idLista) == False and usuarios.isListaPublica(r, idLista) == False):
+        return JsonResponse({'status': erroresHTTP.FORBIDDEN}, status=erroresHTTP.FORBIDDEN)
 
-    return JsonResponse({constantes.CLAVE_PREFIJO_AUDIO: usuarios.getAudiosLista}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.CLAVE_PREFIJO_AUDIO: usuarios.getAudiosLista(r, idLista)}, status=erroresHTTP.OK)
        
 @csrf_exempt
 def RemoveSongLista(request):
     if request.method == 'POST':
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
-
-        # Compruebo que el usuario sea válido
         idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
         contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
         idAudio = json_data[constantes.CLAVE_ID_AUDIO]
@@ -423,6 +427,8 @@ def RemoveSongLista(request):
             return JsonResponse({'status': erroresHTTP.ERROR_CANCION_NO_ENCONTRADA}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
         if(usuarios.isAudioFromLista(r, idLista, idAudio) == False):
             return JsonResponse({'status': erroresHTTP.ERROR_AUDIO_NOT_IN_LISTA}, status=erroresHTTP.ERROR_AUDIO_NOT_IN_LISTA)
+        if(usuarios.isListaFromUser(r, idUsuario, idLista) == False):
+            return JsonResponse({'status': erroresHTTP.FORBIDDEN}, status=erroresHTTP.FORBIDDEN)
 
         # Stores the user in the database
         status = usuarios.removeSongLista(r, idLista, idAudio)
@@ -449,7 +455,11 @@ def AskAdminToBeArtist(request):
         return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
         return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
-    
+    if(usuarios.getTipoUser(r, idUsuario) == constantes.USUARIO_ARTISTA):
+        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_YA_ES_ARTISTA}, status=erroresHTTP.ERROR_USUARIO_YA_ES_ARTISTA)
+    if(usuarios.getTipoUser(r, idUsuario) == constantes.USUARIO_ADMINISTRADOR):
+        return JsonResponse({'status': erroresHTTP.FORBIDDEN}, status=erroresHTTP.FORBIDDEN)
+
     usuarios.AskAdminToBeArtist(r, idUsuario)
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
