@@ -502,7 +502,7 @@ def ValidateUserEmail(request):
 
 @csrf_exempt
 def GetTotRepTime(request):
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     # Parse the JSON data from the request body to extract idUsuario
@@ -510,9 +510,12 @@ def GetTotRepTime(request):
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+   
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña es incorrecta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     
     if(usuarios.esAdministrador(r, idUsuario) == False):
         return JsonResponse({'error': 'No eres administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
@@ -534,13 +537,19 @@ def AddSecondsToSong(request):
     idAudio = json_data[constantes.CLAVE_ID_AUDIO]
     segundos = json_data[constantes.CLAVE_SEGUNDOS]
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña es incorrecta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     
     if(moduloAudios.existeCancion(r, idAudio) == False):
         return JsonResponse({'error': 'La canción no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
     
+    if (segundos < 0):
+        return JsonResponse({'error': 'Los segundos no pueden ser negativos'}, status=erroresHTTP.ERROR_SEGUNDOS_NEGATIVOS)
+
     status = ModuloGlobal.addSecondsToSong(r, idAudio, segundos)
 
     return JsonResponse({'status': status}, status=status)
@@ -568,7 +577,8 @@ def SetFolder(request):
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.correctoDiccionarioCarpeta(diccionarioCarpeta) == False):
         return JsonResponse({'error': 'El diccionario de la carpeta no es correcto'}, status=erroresHTTP.ERROR_CARPETA_PARAMETROS_INCORRECTOS)
-
+    if(usuarios.carpetaPrivacidadValida(privacidad) == False):
+        return JsonResponse({'error': 'La privacidad no es correcta'}, status=erroresHTTP.ERROR_CARPETA_PRIVACIDAD_NO_VALIDA)
     usuarios.setFolder(r, idUsuario, diccionarioCarpeta)
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
@@ -594,8 +604,12 @@ def AddListToFolder(request):
         return JsonResponse({'error': 'La lista no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
     if(usuarios.existeCarpeta(r, idCarpeta) == False):
         return JsonResponse({'error': 'La carpeta no existe'}, status=erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA)
-    
-    usuarios.addListToFolder(r, idLista, idCarpeta)
+    if(usuarios.isCarpetaFromUser(r, idUsuario, idCarpeta) == False):
+        return JsonResponse({'error': 'La carpeta no pertenece al usuario'}, status=erroresHTTP.ERROR_CARPETA_NOT_IN_USER)
+    if(usuarios.isListaFromUser(r, idUsuario, idLista) == False and usuarios.isListaPublica(r, idLista) == False):
+        return JsonResponse({'error': 'La lista no pertenece al usuario'}, status=erroresHTTP.FORBIDDEN)
+
+    usuarios.addListToFolder(r, idCarpeta, idLista)
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 

@@ -18,6 +18,10 @@ urlGetAudiosLista = 'http://127.0.0.1:8081/GetAudiosLista/'
 urlRemoveSongLista = 'http://127.0.0.1:8081/RemoveSongLista/'
 urlAskAdminToBeArtist = 'http://127.0.0.1:8081/AskAdminToBeArtist/'
 urlAcceptArtist = 'http://127.0.0.1:8081/AcceptArtist/'
+urlGetTotRepTime = 'http://127.0.0.1:8081/GetTotRepTime/'
+urlAddSecondsToSong = 'http://127.0.0.1:8081/AddSecondsToSong/'
+urlSetFolder = 'http://127.0.0.1:8081/SetFolder/'
+urlAddListToFolder = 'http://127.0.0.1:8081/AddListToFolder/'
 
 
 #Pruebas set user
@@ -546,5 +550,246 @@ acceptArtist = {
     'idNotificacion': 'notificacion:1'
 }
 
+acceptArtistErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234',
+    'idNotificacion': 'notificacion:1'
+}
+
+acceptArtistErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345',
+    'idNotificacion': 'notificacion:1'
+}
+
+acceptArtistErrorNotificacion = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idNotificacion': 'notificacion:10'
+}
+
+acceptArtistErrorUsuarioEmisor = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idNotificacion': 'notificacion:2'
+}
+
+acceptArtistErrorTipo = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idNotificacion': 'notificacion:3'
+}
+
+acceptArtistErrorAdmin = {
+    'idUsr': 'usuario:3',
+    'contrasenya': '1234',
+    'idNotificacion': 'notificacion:1'
+}
+
+notificacionErrorUsuarioEmisor = {
+    'idUsuarioEmisor': 'usuario:6',
+    'tipoNotificacion': 'quieroArtista'
+}
+
+notificacionErrorTipo = {
+    'idUsuarioEmisor': 'usuario:1',
+    'tipoNotificacion': 'quieroArtista2'
+}
+
+
+
+r.hmset('notificacion:2', notificacionErrorUsuarioEmisor)
+r.hmset('notificacion:3', notificacionErrorTipo)
+
 print("Pruebas acceptArtist")
+
+print(requests.post(urlAcceptArtist, json=acceptArtistErrorUsuario).status_code)
+print(requests.post(urlAcceptArtist, json=acceptArtistErrorContrasenya).status_code)
+print(requests.post(urlAcceptArtist, json=acceptArtistErrorNotificacion).status_code)
+print(requests.post(urlAcceptArtist, json=acceptArtistErrorUsuarioEmisor).status_code)
+print(requests.post(urlAcceptArtist, json=acceptArtistErrorTipo).status_code)
+print(requests.post(urlAcceptArtist, json=acceptArtistErrorAdmin).status_code)
 print(requests.post(urlAcceptArtist, json=acceptArtist).status_code)
+
+r.delete('notificacion:2')
+r.delete('notificacion:3')
+
+# Pruebas GetTotRepTime
+GetTotRepTime = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234'
+}
+
+GetTotRepTimeErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234'
+}
+
+GetTotRepTimeErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345'
+}
+
+GetTotRepTimeErrorAdmin = {
+    'idUsr': 'usuario:3',
+    'contrasenya': '1234'
+}
+
+print("Pruebas GetTotRepTime")
+
+respuesta = requests.post(urlGetTotRepTime, json=GetTotRepTime)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetTotRepTime, json=GetTotRepTimeErrorUsuario)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetTotRepTime, json=GetTotRepTimeErrorContrasenya)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetTotRepTime, json=GetTotRepTimeErrorAdmin)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+
+# Pruebas AddSecondsToSong
+AddSecondsToSong = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idAudio': 'audio:1',
+    'segundos': 10
+}
+
+AddSecondsToSongErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234',
+    'idAudio': 'audio:1',
+    'segundos': 10
+}
+
+AddSecondsToSongErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345',
+    'idAudio': 'audio:1',
+    'segundos': 10
+}
+
+AddSecondsToSongErrorAudio = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idAudio': 'audio:10',
+    'segundos': 10
+}
+
+AddSecondsToSongErrorSeconds = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idAudio': 'audio:1',
+    'segundos': -10
+}
+
+print("Pruebas AddSecondsToSong")
+print(requests.post(urlAddSecondsToSong, json=AddSecondsToSong).status_code)
+print(requests.post(urlAddSecondsToSong, json=AddSecondsToSongErrorUsuario).status_code)
+print(requests.post(urlAddSecondsToSong, json=AddSecondsToSongErrorContrasenya).status_code)
+print(requests.post(urlAddSecondsToSong, json=AddSecondsToSongErrorAudio).status_code)
+print(requests.post(urlAddSecondsToSong, json=AddSecondsToSongErrorSeconds).status_code)
+print(requests.post(urlAddSecondsToSong, json=AddSecondsToSong).status_code)
+respuesta = requests.post(urlGetTotRepTime, json=GetTotRepTime)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+
+# Pruebas SetFolder
+SetFolder = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'nombreCarpeta': 'carpeta:1',
+    'privacidadCarpeta': 'publica'
+}
+
+SetFolderErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234',
+    'nombreCarpeta': 'carpeta:1',
+    'privacidadCarpeta': 'publica'
+}
+
+SetFolderErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345',
+    'nombreCarpeta': 'carpeta:1',
+    'privacidadCarpeta': 'publica'
+}
+
+SetFolderErrorCarpeta = {
+    'idUsr': 'usuario:2',
+    'contrasenya': '1234',
+    'nombreCarpeta': 'carpeta:2',
+    'privacidadCarpeta': 'publica',
+}
+
+SetFolderErrorPrivacidad = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'nombreCarpeta': 'carpeta:1',
+    'privacidadCarpeta': 'publica2'
+}
+
+print("Pruebas SetFolder")
+print(requests.post(urlSetFolder, json=SetFolder).status_code)
+print(requests.post(urlSetFolder, json=SetFolderErrorUsuario).status_code)
+print(requests.post(urlSetFolder, json=SetFolderErrorContrasenya).status_code)
+print(requests.post(urlSetFolder, json=SetFolderErrorCarpeta).status_code)
+print(requests.post(urlSetFolder, json=SetFolderErrorPrivacidad).status_code)
+
+# Pruebas AddListToFolder
+AddListToFolder = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:1',
+    'idLista': 'lista:1'
+}
+
+AddListToFolderErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:1',
+    'idLista': 'lista:1'
+}
+
+AddListToFolderErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345',
+    'idCarpeta': 'carpeta:1',
+    'idLista': 'lista:1'
+}
+
+AddListToFolderErrorCarpeta = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:10',
+    'idLista': 'lista:1'
+}
+
+AddListToFolderErrorLista = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:1',
+    'idLista': 'lista:10'
+}
+
+AddListToFolderErrorNoInUser = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:2',
+    'idLista': 'lista:2'
+}
+
+AddListToFolderListPrivate = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:1',
+    'idLista': 'lista:4'
+}
+
+print("Pruebas AddListToFolder")
+print(requests.post(urlAddListToFolder, json=AddListToFolder).status_code)
+print(requests.post(urlAddListToFolder, json=AddListToFolderErrorUsuario).status_code)
+print(requests.post(urlAddListToFolder, json=AddListToFolderErrorContrasenya).status_code)
+print(requests.post(urlAddListToFolder, json=AddListToFolderErrorCarpeta).status_code)
+print(requests.post(urlAddListToFolder, json=AddListToFolderErrorLista).status_code)
+print(requests.post(urlAddListToFolder, json=AddListToFolderErrorNoInUser).status_code)
+print(requests.post(urlAddListToFolder, json=AddListToFolderListPrivate).status_code)

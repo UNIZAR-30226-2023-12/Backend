@@ -67,6 +67,11 @@ def listaPrivacidadValida(privacidad):
         return True
     return False
 
+def carpetaPrivacidadValida(privacidad):
+    if(privacidad == constantes.CARPETA_PRIVADA or privacidad == constantes.CARPETA_PUBLICA):
+        return True
+    return False
+
 def setUser(r, usuarioDiccionario):
     id = daoUsuario.getIdContador(r)
     usuarioDiccionario[constantes.CLAVE_ID_USUARIO] = id
@@ -197,6 +202,16 @@ def isCarpetaFromUser(r, idUsuario, idCarpeta):
         return False
     carpetas = daoUsuario.getCarpetas(r, idUsuario)
     if(idCarpeta not in carpetas):
+        return False
+    return True
+
+def isListaFromUser(r, idUsuario, idLista):
+    if (r.exists(idUsuario) == 0 or r.exists(idLista) == 0):
+        return False
+    listas = daoUsuario.getListas(r, idUsuario)
+    listas.append(daoCarpetas.getListasCarpeta(r, idUsuario))
+    
+    if(idLista not in listas):
         return False
     return True
 
