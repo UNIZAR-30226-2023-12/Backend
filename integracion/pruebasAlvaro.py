@@ -22,6 +22,16 @@ urlGetTotRepTime = 'http://127.0.0.1:8081/GetTotRepTime/'
 urlAddSecondsToSong = 'http://127.0.0.1:8081/AddSecondsToSong/'
 urlSetFolder = 'http://127.0.0.1:8081/SetFolder/'
 urlAddListToFolder = 'http://127.0.0.1:8081/AddListToFolder/'
+urlRemoveListFromFolder = 'http://127.0.0.1:8081/RemoveListFromFolder/'
+urlRemoveFolder = 'http://127.0.0.1:8081/RemoveFolder/'
+urlGetFolder = 'http://127.0.0.1:8081/GetFolder/'
+urlGetFoldersUsr = 'http://127.0.0.1:8081/GetFoldersUsr/'
+urlAskFriend = 'http://127.0.0.1:8081/AskFriend/'
+urlAcceptFriend = 'http://127.0.0.1:8081/AcceptFriend/'
+urlGetFriends = 'http://127.0.0.1:8081/GetFriends/'
+urlRemoveFriend = 'http://127.0.0.1:8081/RemoveFriend/'
+urlSubscribeToArtist = 'http://127.0.0.1:8081/SubscribeToArtist/'
+urlUnsubscribeToArtist = 'http://127.0.0.1:8081/UnsubscribeToArtist/'
 
 
 #Pruebas set user
@@ -785,11 +795,434 @@ AddListToFolderListPrivate = {
     'idLista': 'lista:4'
 }
 
+AddListToFolderPublicList = {
+    'idUsr': 'usuario:2',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:2',
+    'idLista': 'lista:3'
+}
+
 print("Pruebas AddListToFolder")
 print(requests.post(urlAddListToFolder, json=AddListToFolder).status_code)
+print(requests.post(urlAddListToFolder, json=AddListToFolderPublicList).status_code)
 print(requests.post(urlAddListToFolder, json=AddListToFolderErrorUsuario).status_code)
 print(requests.post(urlAddListToFolder, json=AddListToFolderErrorContrasenya).status_code)
 print(requests.post(urlAddListToFolder, json=AddListToFolderErrorCarpeta).status_code)
 print(requests.post(urlAddListToFolder, json=AddListToFolderErrorLista).status_code)
 print(requests.post(urlAddListToFolder, json=AddListToFolderErrorNoInUser).status_code)
 print(requests.post(urlAddListToFolder, json=AddListToFolderListPrivate).status_code)
+
+# Pruebas RemoveListFromFolder
+
+RemoveListFromFolder = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:1',
+    'idLista': 'lista:1'
+}
+
+RemoveListFromFolderErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:1',
+    'idLista': 'lista:1'
+}
+
+RemoveListFromFolderErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345',
+    'idCarpeta': 'carpeta:1',
+    'idLista': 'lista:1'
+}
+
+RemoveListFromFolderErrorCarpeta = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:10',
+    'idLista': 'lista:1'
+}
+
+RemoveListFromFolderErrorLista = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:1',
+    'idLista': 'lista:10'
+}
+
+RemoveListFromFolderErrorNoInUser = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:2',
+    'idLista': 'lista:3'
+}
+
+RemoveListFromFolderListNotInFolder = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:1',
+    'idLista': 'lista:4'
+}
+
+print("Pruebas RemoveListFromFolder")
+print(requests.post(urlRemoveListFromFolder, json=RemoveListFromFolderErrorUsuario).status_code)
+print(requests.post(urlRemoveListFromFolder, json=RemoveListFromFolderErrorContrasenya).status_code)
+print(requests.post(urlRemoveListFromFolder, json=RemoveListFromFolderErrorCarpeta).status_code)
+print(requests.post(urlRemoveListFromFolder, json=RemoveListFromFolderErrorLista).status_code)
+print(requests.post(urlRemoveListFromFolder, json=RemoveListFromFolderErrorNoInUser).status_code)
+print(requests.post(urlRemoveListFromFolder, json=RemoveListFromFolderListNotInFolder).status_code)
+print(requests.post(urlRemoveListFromFolder, json=RemoveListFromFolder).status_code)
+
+# Pruebas RemoveFolder
+
+RemoveFolder = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:1'
+}
+
+RemoveFolder2 = {
+    'idUsr': 'usuario:2',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:2'
+}
+
+RemoveFolderErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:1'
+}
+
+RemoveFolderErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345',
+    'idCarpeta': 'carpeta:1'
+}
+
+RemoveFolderErrorCarpeta = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:10'
+}
+
+RemoveFolderErrorForbidden = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:2'
+}
+
+print("Pruebas RemoveFolder")
+print(requests.post(urlRemoveFolder, json=RemoveFolderErrorUsuario).status_code)
+print(requests.post(urlRemoveFolder, json=RemoveFolderErrorContrasenya).status_code)
+print(requests.post(urlRemoveFolder, json=RemoveFolderErrorCarpeta).status_code)
+print(requests.post(urlRemoveFolder, json=RemoveFolderErrorForbidden).status_code)
+print(requests.post(urlRemoveFolder, json=RemoveFolder).status_code)
+print(requests.post(urlRemoveFolder, json=RemoveFolder2).status_code)
+
+# Pruebas GetFolder
+
+GetFolder = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:3'
+}
+
+GetFolderErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:3'
+}
+
+GetFolderErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345',
+    'idCarpeta': 'carpeta:3'
+}
+
+GetFolderErrorCarpeta = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:10'
+}
+
+GetFolderErrorForbidden = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:4'
+}
+
+GetFolder2 = {
+    'idUsr': 'usuario:2',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:3'
+}
+
+SetFolder = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'nombreCarpeta': 'Carpeta X',
+    'privacidadCarpeta': 'publica'
+}
+
+SetFolder2 = {
+    'idUsr': 'usuario:2',
+    'contrasenya': '1234',
+    'nombreCarpeta': 'Carpeta Y',
+    'privacidadCarpeta': 'privada'
+}
+
+print("Pruebas GetFolder")
+
+print(requests.post(urlSetFolder, json=SetFolder).status_code)
+print(requests.post(urlSetFolder, json=SetFolder2).status_code)
+respuesta = requests.post(urlGetFolder, json=GetFolder)
+print(str(respuesta.status_code) + " " + str(respuesta.text))
+respuesta = requests.post(urlGetFolder, json=GetFolderErrorUsuario)
+print(str(respuesta.status_code) + " " + str(respuesta.text))
+respuesta = requests.post(urlGetFolder, json=GetFolderErrorContrasenya)
+print(str(respuesta.status_code) + " " + str(respuesta.text))
+respuesta = requests.post(urlGetFolder, json=GetFolderErrorCarpeta)
+print(str(respuesta.status_code) + " " + str(respuesta.text))
+respuesta = requests.post(urlGetFolder, json=GetFolderErrorForbidden)
+print(str(respuesta.status_code) + " " + str(respuesta.text))
+respuesta = requests.post(urlGetFolder, json=GetFolder2)
+print(str(respuesta.status_code) + " " + str(respuesta.text))
+
+# Pruebas GetFoldersUsr
+
+GetFoldersUsr = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234'
+}
+
+GetFoldersUsrErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234'
+}
+
+GetFoldersUsrErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345'
+}
+
+GetFoldersUsrPublica = {
+    'idUsr': 'usuario:1',
+    'contrasenya': None
+}
+
+GetFoldersUsrPublica2 = {
+    'idUsr': 'usuario:2',
+    'contrasenya': None
+}
+
+print("Pruebas GetFoldersUsr")
+
+respuesta = requests.post(urlGetFoldersUsr, json=GetFoldersUsr)
+print(str(respuesta.status_code) + " " + str(respuesta.text))
+respuesta = requests.post(urlGetFoldersUsr, json=GetFoldersUsrErrorUsuario)
+print(str(respuesta.status_code) + " " + str(respuesta.text))
+respuesta = requests.post(urlGetFoldersUsr, json=GetFoldersUsrErrorContrasenya)
+print(str(respuesta.status_code) + " " + str(respuesta.text))
+respuesta = requests.post(urlGetFoldersUsr, json=GetFoldersUsrPublica)
+print(str(respuesta.status_code) + " " + str(respuesta.text))
+respuesta = requests.post(urlGetFoldersUsr, json=GetFoldersUsrPublica2)
+print(str(respuesta.status_code) + " " + str(respuesta.text))
+
+# Pruebas AskFriend
+
+AskFriend = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idAmigo': 'usuario:2'
+}
+
+AskFriendErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234',
+    'idAmigo': 'usuario:2'
+}
+
+AskFriendErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345',
+    'idAmigo': 'usuario:2'
+}
+
+AskFriendErrorAmigo = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idAmigo': 'usuario:10'
+}
+
+AskFriendAlready = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idAmigo': 'usuario:2'
+}
+
+print("Pruebas AskFriend")
+
+print(requests.post(urlAskFriend, json=AskFriend).status_code)
+print(requests.post(urlAskFriend, json=AskFriendErrorUsuario).status_code)
+print(requests.post(urlAskFriend, json=AskFriendErrorContrasenya).status_code)
+print(requests.post(urlAskFriend, json=AskFriendErrorAmigo).status_code)
+r.sadd("amigos:usuario:1", "usuario:2")
+r.sadd("amigos:usuario:2", "usuario:1")
+print(requests.post(urlAskFriend, json=AskFriendAlready).status_code)
+r.srem("amigos:usuario:1", "usuario:2")
+r.srem("amigos:usuario:2", "usuario:1")
+
+# Pruebas acceptFriend
+
+AcceptFriend = {
+    'idUsr': 'usuario:2',
+    'contrasenya': '1234',
+    'idNotificacion': 'notificacion:2'
+}
+
+AcceptFriendErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234',
+    'idNotificacion': 'notificacion:2'
+}
+
+AcceptFriendErrorContrasenya = {
+    'idUsr': 'usuario:2',
+    'contrasenya': '12345',
+    'idNotificacion': 'notificacion:2'
+}
+
+AcceptFriendErrorNotificacion = {
+    'idUsr': 'usuario:2',
+    'contrasenya': '1234',
+    'idNotificacion': 'notificacion:10'
+}
+
+print("Pruebas acceptFriend")
+
+print(requests.post(urlAcceptFriend, json=AcceptFriendErrorUsuario).status_code)
+print(requests.post(urlAcceptFriend, json=AcceptFriendErrorContrasenya).status_code)
+print(requests.post(urlAcceptFriend, json=AcceptFriendErrorNotificacion).status_code)
+print(requests.post(urlAcceptFriend, json=AcceptFriend).status_code)
+
+# Pruebas GetFriends
+
+GetFriends = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234'
+}
+
+GetFriendsErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234'
+}
+
+GetFriendsErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345'
+}
+
+print("Pruebas GetFriends")
+respuesta = requests.post(urlGetFriends, json=GetFriends)
+print(str(respuesta.status_code) + " " + str(respuesta.text))
+respuesta = requests.post(urlGetFriends, json=GetFriendsErrorUsuario)
+print(str(respuesta.status_code) + " " + str(respuesta.text))
+respuesta = requests.post(urlGetFriends, json=GetFriendsErrorContrasenya)
+print(str(respuesta.status_code) + " " + str(respuesta.text))
+
+# Prueba RemoveFriend
+
+RemoveFriend = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idAmigo': 'usuario:2'
+}
+
+RemoveFriendErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234',
+    'idAmigo': 'usuario:2'
+}
+
+RemoveFriendErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345',
+    'idAmigo': 'usuario:2'
+}
+
+RemoveFriendErrorAmigo = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idAmigo': 'usuario:10'
+}
+
+RemoveFriendNotFriend = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idAmigo': 'usuario:3'
+}
+
+print("Pruebas RemoveFriend")
+
+print(requests.post(urlRemoveFriend, json=RemoveFriendErrorUsuario).status_code)
+print(requests.post(urlRemoveFriend, json=RemoveFriendErrorContrasenya).status_code)
+print(requests.post(urlRemoveFriend, json=RemoveFriendErrorAmigo).status_code)
+print(requests.post(urlRemoveFriend, json=RemoveFriendNotFriend).status_code)
+print(requests.post(urlRemoveFriend, json=RemoveFriend).status_code)
+
+# Pruebas SubscribeToArtist
+
+SubscribeToArtist = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idUsrArtista': 'usuario:3'
+}
+
+SubscribeToArtistErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234',
+    'idUsrArtista': 'usuario:3'
+}
+
+SubscribeToArtistErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345',
+    'idUsrArtista': 'usuario:3'
+}
+
+SubscribeToArtistErrorArtista = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idUsrArtista': 'usuario:10'
+}
+
+SubscribeToArtistNotArtist = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idUsrArtista': 'usuario:2'
+}
+
+SubscribeToArtistAlready = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idUsrArtista': 'usuario:3'
+}
+
+print("Pruebas SubscribeToArtist")
+
+print(requests.post(urlSubscribeToArtist, json=SubscribeToArtistErrorUsuario).status_code)
+print(requests.post(urlSubscribeToArtist, json=SubscribeToArtistErrorContrasenya).status_code)
+print(requests.post(urlSubscribeToArtist, json=SubscribeToArtistErrorArtista).status_code)
+print(requests.post(urlSubscribeToArtist, json=SubscribeToArtistNotArtist).status_code)
+print(requests.post(urlSubscribeToArtist, json=SubscribeToArtist).status_code)
+print(requests.post(urlSubscribeToArtist, json=SubscribeToArtistAlready).status_code)
+
+# Pruebas UnsubscribeToArtist
+
+UnsubscribeToArtist = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idUsrArtista': 'usuario:3'
+}
+
+print("Pruebas UnsubscribeToArtist")
+print(requests.post(urlUnsubscribeToArtist, json=UnsubscribeToArtist).status_code)

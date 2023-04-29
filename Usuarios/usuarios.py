@@ -150,6 +150,9 @@ def getLastSecondHeared(r, idUsuario, idAudio):
 def subscribeToArtist(r, idUsuario, idArtista):
     daoUsuario.anyadirArtista(r, idUsuario, idArtista)
 
+def unsubscribeToArtist(r, idUsuario, idArtista):
+    daoUsuario.eliminarArtista(r, idUsuario, idArtista)
+
 def getNotificationsUsr(r, idUsuario):
     return daoUsuario.getNotificaciones(r, idUsuario)
 
@@ -314,6 +317,7 @@ def removeListFromFolder(r, idCarpeta, idLista):
 def removeFolder(r, idUsuario, idCarpeta):
     daoCarpetas.eliminarCarpeta(r, idCarpeta)
     daoUsuario.eliminarCarpeta(r, idUsuario, idCarpeta)
+    
 
 def getFolder(r, idCarpeta):
     return daoCarpetas.getCarpeta(r, idCarpeta)
@@ -348,7 +352,7 @@ def askFriend(r, idUsuario, idUsuarioAmigo):
     daoUsuario.anyadirNotificacion(r, idUsuarioAmigo, idNotificacion)
     return erroresHTTP.OK
 
-def accpetFriend(r, idUsuario, idNotificacion):
+def acceptFriend(r, idUsuario, idNotificacion):
     idUsuarioAmigo = daoNotificaciones.getIdUsuarioEmisor(r, idNotificacion)    
     daoUsuario.anyadirAmigo(r, idUsuarioAmigo, idUsuario)
     daoUsuario.anyadirAmigo(r, idUsuario, idUsuarioAmigo)
@@ -363,7 +367,6 @@ def getFriends(r, idUsuario):
 def removeFriend(r, idUsuario, idUsuarioAmigo):
     daoUsuario.eliminarAmigo(r, idUsuario, idUsuarioAmigo)
     daoUsuario.eliminarAmigo(r, idUsuarioAmigo, idUsuario)
-    return erroresHTTP.OK
 
 
 # Funciones para recomendador

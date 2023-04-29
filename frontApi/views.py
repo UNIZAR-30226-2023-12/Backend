@@ -530,7 +530,7 @@ def AddSecondsToSong(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    # Parse the JSON data from the request body to extract idUsuario
+    # Parse the JSON data from the request bdoy to extract idUsuario
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
@@ -634,10 +634,13 @@ def RemoveListFromFolder(request):
         return JsonResponse({'error': 'La lista no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
     if(usuarios.existeCarpeta(r, idCarpeta) == False):
         return JsonResponse({'error': 'La carpeta no existe'}, status=erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA)
+    if(usuarios.isCarpetaFromUser(r, idUsuario, idCarpeta) == False):
+        return JsonResponse({'error': 'La carpeta no pertenece al usuario'}, status=erroresHTTP.FORBIDDEN)
     if(usuarios.isListaFromCarpeta(r, idCarpeta, idLista) == False):
         return JsonResponse({'error': 'La lista no existe en la carpeta'}, status=erroresHTTP.ERROR_LISTA_NOT_IN_CARPETA)
     
-    usuarios.removeListFromFolder(r, idLista, idCarpeta)
+
+    usuarios.removeListFromFolder(r, idCarpeta, idCarpeta)
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
@@ -668,7 +671,7 @@ def RemoveFolder(request):
 
 @csrf_exempt
 def GetFolder(request):
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     # Parse the JSON data from the request body to extract idUsuario
@@ -687,7 +690,7 @@ def GetFolder(request):
     if(usuarios.isCarpetaFromUser(r, idUsuario, idCarpeta) == False and usuarios.isCarpetaPublica(r, idCarpeta) == False):
         return JsonResponse({'error': 'No tienes permiso'}, status=erroresHTTP.FORBIDDEN)
     
-    return JsonResponse({constantes.PREFIJO_CARPETAS : usuarios.getFolder(r, idCarpeta)}, status=erroresHTTP.OK)
+    return JsonResponse(usuarios.getFolder(r, idCarpeta), status=erroresHTTP.OK)
 
 @csrf_exempt
 def GetListasFolder(request):
@@ -714,7 +717,7 @@ def GetListasFolder(request):
 
 @csrf_exempt
 def GetFoldersUsr(request):
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     # Parse the JSON data from the request body to extract idUsuario
@@ -728,7 +731,7 @@ def GetFoldersUsr(request):
     if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False) and contrasenya != None:
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     
-    if contrasenya == None:
+    if(contrasenya == None):
         return JsonResponse({constantes.CLAVE_ID_CARPETA : usuarios.getPublicFoldersUser(r, idUsuario)}, status=erroresHTTP.OK)
     return JsonResponse({constantes.CLAVE_ID_CARPETA : usuarios.getFoldersUser(r, idUsuario)}, status=erroresHTTP.OK)
 
@@ -779,8 +782,10 @@ def AcceptFriend(request):
         return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     if(usuarios.getTipoNotificacion(r, idNotificacion) != constantes.NOTIFICACION_TIPO_AMIGO):
         return JsonResponse({'error': 'La notificacion no es de tipo amigo'}, status=erroresHTTP.ERROR_NOTIFICACION_NO_AMIGO)
-    
-    usuarios.accpetFriend(r, idUsuario, idNotificacion)
+    if(usuarios.isFriend(r, idUsuario, usuarios.getUsuarioEmisorNotificacion(r, idNotificacion)) == True):
+        return JsonResponse({'error': 'Ya sois amigos'}, status=erroresHTTP.ERROR_USUARIO_YA_AMIGO)
+
+    usuarios.acceptFriend(r, idUsuario, idNotificacion)
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
@@ -791,7 +796,7 @@ def AcceptFriend(request):
 # Devuelve un set con n ids de audios recuperadas mediante una búsqueda global
 @csrf_exempt
 def GetFriends(request):
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     # Parse the JSON data from the request body to extract idUsuario
@@ -852,7 +857,9 @@ def SubscribeToArtist(request):
         return JsonResponse({'error': 'El artista no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     if(usuarios.isSubscribedToArtist(r, idUsuario, idArtista) == True):
         return JsonResponse({'error': 'Ya estas suscrito a este artista'}, status=erroresHTTP.ERROR_USUARIO_YA_SUSCRITO)
-    
+    if(usuarios.getTipoUser(r, idArtista) != constantes.USUARIO_ARTISTA):
+        return JsonResponse({'error': 'El usuario no es un artista'}, status=erroresHTTP.ERROR_USUARIO_NO_ARTISTA)
+
     usuarios.subscribeToArtist(r, idUsuario, idArtista)
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
@@ -877,6 +884,9 @@ def UnsubscribeToArtist(request):
         return JsonResponse({'error': 'El artista no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     if(usuarios.isSubscribedToArtist(r, idUsuario, idArtista) == False):
         return JsonResponse({'error': 'No estas suscrito a este artista'}, status=erroresHTTP.ERROR_USUARIO_NO_SUSCRITO)
+
+    usuarios.unsubscribeToArtist(r, idUsuario, idArtista)
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def GetNotificationsUsr(request):
