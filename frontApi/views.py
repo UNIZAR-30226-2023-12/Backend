@@ -950,7 +950,7 @@ def RemoveNotification(request):
     if(usuarios.isNotificactionFromUser(r, idUsuario, idNotificacion) == False):
         return JsonResponse({'error': 'La notificacion no es tuya'}, status=erroresHTTP.FORBIDDEN)
     
-    usuarios.removeNotification(r, idNotificacion)
+    usuarios.removeNotification(r, idUsuario, idNotificacion)
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
@@ -963,8 +963,8 @@ def SetLastSecondHeared(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idAudio = json_data[constantes.CLAVE_ID_CANCION]
-    segundo = json_data[constantes.CLAVE_SEGUNDO]
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+    segundo = json_data[constantes.CLAVE_SEGUNDOS]
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -973,8 +973,10 @@ def SetLastSecondHeared(request):
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(moduloAudios.existeCancion(r, idAudio) == False):
         return JsonResponse({'error': 'La cancion no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
-    
-    usuarios.setLastSecondHeard(r, idUsuario,idAudio, segundo)
+    if(segundo < 0):
+        return JsonResponse({'error': 'El segundo no puede ser negativo'}, status=erroresHTTP.ERROR_SEGUNDOS_NEGATIVOS)
+
+    usuarios.setLastSecondHeared(r, idUsuario,idAudio, segundo)
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
@@ -987,7 +989,7 @@ def GetLastSecondHeared(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idAudio = json_data[constantes.CLAVE_ID_CANCION]
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):

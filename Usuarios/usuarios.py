@@ -134,11 +134,12 @@ def getIdEmailId(r, email):
     return daoUsuario.getIdEmailId(r, email)
    
 
-def setLastSecondHeard(r, idUsuario, idAudio, segundo):
+def setLastSecondHeared(r, idUsuario, idAudio, segundo):
     # Ponemos que el ultimo audio escuchado es el que nos pasan
     daoUsuario.setUltimoAudio(r, idUsuario, idAudio)
     # Creamos el clave valor con el id del audio y el usuario, el segundo como valor
     daoUsuario.setSegundosAudio(r, idUsuario, idAudio, segundo)
+
 def getLastSecondHeared(r, idUsuario, idAudio):
     segundo = daoUsuario.getSegundosAudio(r, idUsuario, idAudio)
 
