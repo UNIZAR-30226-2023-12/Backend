@@ -32,6 +32,11 @@ urlGetFriends = 'http://127.0.0.1:8081/GetFriends/'
 urlRemoveFriend = 'http://127.0.0.1:8081/RemoveFriend/'
 urlSubscribeToArtist = 'http://127.0.0.1:8081/SubscribeToArtist/'
 urlUnsubscribeToArtist = 'http://127.0.0.1:8081/UnsubscribeToArtist/'
+urlGetNotificationsUsr = 'http://127.0.0.1:8081/GetNotificationsUsr/'
+urlGetNotification = 'http://127.0.0.1:8081/GetNotification/'
+urlRemoveNotification = 'http://127.0.0.1:8081/RemoveNotification/'
+urlSetLastSecondHeared = 'http://127.0.0.1:8081/SetLastSecondHeared/'
+urlGetLastSecondHeared = 'http://127.0.0.1:8081/GetLastSecondHeared/'
 
 
 #Pruebas set user
@@ -1224,5 +1229,229 @@ UnsubscribeToArtist = {
     'idUsrArtista': 'usuario:3'
 }
 
+UnsubscribeToArtistErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234',
+    'idUsrArtista': 'usuario:3'
+}
+
+UnsubscribeToArtistErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345',
+    'idUsrArtista': 'usuario:3'
+}
+
+UnsubscribeToArtistErrorArtista = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idUsrArtista': 'usuario:10'
+}
+
+UnsubscribeToArtistNotSubscribed = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idUsrArtista': 'usuario:3'
+}
+
+
 print("Pruebas UnsubscribeToArtist")
+
+print(requests.post(urlUnsubscribeToArtist, json=UnsubscribeToArtistErrorUsuario).status_code)
+print(requests.post(urlUnsubscribeToArtist, json=UnsubscribeToArtistErrorContrasenya).status_code)
+print(requests.post(urlUnsubscribeToArtist, json=UnsubscribeToArtistErrorArtista).status_code)
 print(requests.post(urlUnsubscribeToArtist, json=UnsubscribeToArtist).status_code)
+print(requests.post(urlUnsubscribeToArtist, json=UnsubscribeToArtistNotSubscribed).status_code)
+
+# Pruebas GetNotificationsUsr
+
+GetNotificationsUsr = {
+    'idUsr': 'usuario:2',
+    'contrasenya': '1234'
+}
+
+GetNotificationsUsrErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234'
+}
+
+GetNotificationsUsrErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345'
+}
+
+print("Pruebas GetNotificationsUsr")
+print(requests.post(urlAskFriend, json=AskFriend).status_code)
+
+respuesta = requests.post(urlGetNotificationsUsr, json=GetNotificationsUsr)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetNotificationsUsr, json=GetNotificationsUsrErrorUsuario)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetNotificationsUsr, json=GetNotificationsUsrErrorContrasenya)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+
+# Pruebas GetNotification
+
+GetNotification = {
+    'idUsr' : 'usuario:2',
+    'idNotificacion': 'notificacion:3',
+    'contrasenya': '1234'
+}
+
+GetNotificationErrorUsuario = {
+    'idUsr' : 'usuario:10',
+    'idNotificacion': 'notificacion:3',
+    'contrasenya': '1234'
+}
+
+GetNotificationErrorContrasenya = {
+    'idUsr' : 'usuario:2',
+    'idNotificacion': 'notificacion:3',
+    'contrasenya': '12345'
+}
+
+GetNotificationErrorNotificacion = {
+    'idUsr' : 'usuario:2',
+    'idNotificacion': 'notificacion:10',
+    'contrasenya': '1234'
+}
+
+GetNotificationForbbiden = {
+    'idUsr' : 'usuario:1',
+    'idNotificacion': 'notificacion:3',
+    'contrasenya': '1234'
+}
+
+print("Pruebas GetNotification")
+
+respuesta = requests.post(urlGetNotification, json=GetNotification)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetNotification, json=GetNotificationErrorUsuario)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetNotification, json=GetNotificationErrorContrasenya)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetNotification, json=GetNotificationErrorNotificacion)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetNotification, json=GetNotificationForbbiden)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+
+# Pruebas RemoveNotification
+
+RemoveNotification = {
+    'idUsr' : 'usuario:2',
+    'idNotificacion': 'notificacion:3',
+    'contrasenya': '1234'
+}
+
+RemoveNotificationErrorUsuario = {
+    'idUsr' : 'usuario:10',
+    'idNotificacion': 'notificacion:3',
+    'contrasenya': '1234'
+}
+
+RemoveNotificationErrorContrasenya = {
+    'idUsr' : 'usuario:2',
+    'idNotificacion': 'notificacion:3',
+    'contrasenya': '12345'
+}
+
+RemoveNotificationErrorNotificacion = {
+    'idUsr' : 'usuario:2',
+    'idNotificacion': 'notificacion:10',
+    'contrasenya': '1234'
+}
+
+RemoveNotificationForbbiden = {
+    'idUsr' : 'usuario:1',
+    'idNotificacion': 'notificacion:3',
+    'contrasenya': '1234'
+}
+
+print("Pruebas RemoveNotification")
+
+print(requests.post(urlRemoveNotification, json=RemoveNotificationErrorUsuario).status_code)
+print(requests.post(urlRemoveNotification, json=RemoveNotificationErrorContrasenya).status_code)
+print(requests.post(urlRemoveNotification, json=RemoveNotificationErrorNotificacion).status_code)
+print(requests.post(urlRemoveNotification, json=RemoveNotificationForbbiden).status_code)
+print(requests.post(urlRemoveNotification, json=RemoveNotification).status_code)
+
+# Pruebas SetLastSecondHeared
+
+SetLastSecondHeared = {
+    'idUsr' : 'usuario:2',
+    'contrasenya': '1234',
+    'idAudio': 'audio:1',
+    'segundos': 10
+}
+
+SetLastSecondHearedErrorUsuario = {
+    'idUsr' : 'usuario:10',
+    'contrasenya': '1234',
+    'idAudio': 'audio:1',
+    'segundos': 10
+}
+
+SetLastSecondHearedErrorContrasenya = {
+    'idUsr' : 'usuario:2',
+    'contrasenya': '12345',
+    'idAudio': 'audio:1',
+    'segundos': 10
+}
+
+SetLastSecondHearedErrorAudio = {
+    'idUsr' : 'usuario:2',
+    'contrasenya': '1234',
+    'idAudio': 'audio:10',
+    'segundos': 10
+}
+
+SetLastSecondHearedErrorSegundo = {
+    'idUsr' : 'usuario:2',
+    'contrasenya': '1234',
+    'idAudio': 'audio:1',
+    'segundos': -1
+}
+
+print("Pruebas SetLastSecondHeared")
+
+print(requests.post(urlSetLastSecondHeared, json=SetLastSecondHearedErrorUsuario).status_code)
+print(requests.post(urlSetLastSecondHeared, json=SetLastSecondHearedErrorContrasenya).status_code)
+print(requests.post(urlSetLastSecondHeared, json=SetLastSecondHearedErrorAudio).status_code)
+print(requests.post(urlSetLastSecondHeared, json=SetLastSecondHearedErrorSegundo).status_code)
+print(requests.post(urlSetLastSecondHeared, json=SetLastSecondHeared).status_code)
+
+# Pruebas GetLastSecondHeared
+
+GetLastSecondHeared = {
+    'idUsr' : 'usuario:2',
+    'contrasenya': '1234',
+    'idAudio': 'audio:1'
+}
+
+GetLastSecondHearedErrorUsuario = {
+    'idUsr' : 'usuario:10',
+    'contrasenya': '1234',
+    'idAudio': 'audio:1'
+}
+
+GetLastSecondHearedErrorContrasenya = {
+    'idUsr' : 'usuario:2',
+    'contrasenya': '12345',
+    'idAudio': 'audio:1'
+}
+
+GetLastSecondHearedErrorAudio = {
+    'idUsr' : 'usuario:2',
+    'contrasenya': '1234',
+    'idAudio': 'audio:10'
+}
+
+print("Pruebas GetLastSecondHeared")
+
+respuesta = requests.post(urlGetLastSecondHeared, json=GetLastSecondHeared)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetLastSecondHeared, json=GetLastSecondHearedErrorUsuario)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetLastSecondHeared, json=GetLastSecondHearedErrorContrasenya)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetLastSecondHeared, json=GetLastSecondHearedErrorAudio)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
