@@ -91,6 +91,11 @@ def setUser(r, usuarioDiccionario):
 def getUser(r, id):
     return daoUsuario.getUsuario(r, id)
 
+def getUserPublicData(r, id ):
+    user = getUser(r, id)
+    del user[constantes.CLAVE_CONTRASENYA]
+    del user[constantes.CLAVE_EMAIL]
+    return user
 
 def removeUser(r, id, contrasenya):
     if(r.exists(id) == 0):

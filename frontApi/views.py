@@ -220,9 +220,11 @@ def GetUser(request):
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
         return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
-    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False and contrasenya != None):
         return JsonResponse({'error': 'La contraseña es incorrecta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     
+    if(contrasenya == None):
+        return JsonResponse(usuarios.getUserPublicData(r, idUsuario), status=erroresHTTP.OK)
     return JsonResponse(usuarios.getUser(r, idUsuario), status=erroresHTTP.OK)
 
 @csrf_exempt
