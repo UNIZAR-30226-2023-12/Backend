@@ -165,7 +165,7 @@ def SetSong(request):
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     status = usuarios.ValidateUser(r, idUsuario, contrasenya)
 
-    if status == erroresHTTP.OK:
+    if status == True:
 
         # Añado la canción a la base de datos
         status = moduloAudios.anyadirCancion(r, json_data)
@@ -175,7 +175,7 @@ def SetSong(request):
 
         return JsonResponse({'msg': 'Cancion añadida correctamente'}, status=erroresHTTP.OK)
     else:
-        return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=status)
+        return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
 
 @csrf_exempt
 def SetUser(request):
