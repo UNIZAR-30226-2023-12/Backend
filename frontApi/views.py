@@ -73,7 +73,7 @@ def GetFicheroSong(request):
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
     id = request.GET.get(constantes.CLAVE_ID_AUDIO)
-    calidadAlta = request.GET.get(constantes.CLAVE_FICHERO_ALTA_CALIDAD)
+    calidadAlta = request.GET.get(constantes.CLAVE_CALIDAD_AUDIO)
     esCancion = request.GET.get('esCancion')
 
     if esCancion == "True":
