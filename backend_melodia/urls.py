@@ -65,4 +65,5 @@ urlpatterns = [
     path('FlushDB/', viewsApi.FlushDB, name='FlushDB'),
     path('GenerateRandomCodeUsr/', viewsApi.GenerateRandomCodeUsr, name='GenerateRandomCodeUsr'),
     path('RecuperarContrasenya/', viewsApi.RecuperarContrasenya, name='RecuperarContrasenya'),
+    path('GetTopReproducciones/', viewsApi.GetTopReproducciones, name='GetTopReproducciones'),
 ]

@@ -28,6 +28,12 @@ def existeCancion(r, id):
 def IDUltimoAudio(r):
     return daoAudio.incrementarIDUltimoAudio(r)
 
+def addReproduccion(r, id):
+    daoAudio.incrementarReproduccion(r, id)
+
+def getReproducciones(r, id):
+    return daoAudio.getReproducciones(r, id)
+
 # Función para almacenar una canción
 def almacenarCancion(r, cancionDic):
     # Antes de guardar compruebo si el diccionario contiene todas las claves necesarias

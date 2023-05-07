@@ -105,11 +105,13 @@ def modificarCancion(r, id, dic):
     
 # Función para obtener el diccionario de una canción
 def obtenerDiccionarioCancion(r, id):
+    controlAudios.addReproduccion(r, id)
     return controlAudios.obtenerTodosCancion(r, id)
 
 
 def obtenerTodasLasCanciones(r):
-    return dao.obtenerTodasLasCanciones(r)
+    audios = dao.obtenerTodasLasCanciones(r)
+    return audios
 
 def obtenerTodosLosPodcasts(r):
     return dao.obtenerTodosLosPodcasts(r)
@@ -181,6 +183,13 @@ def anyadirPodcast(r, dic):
     controlAudios.almacenarPodcast(r, podcastDic)
 
     return 0
+
+
+def setLastSecondHeared(r, idUsuario, idAudio, second):
+    return dao.setLastSecondHeared(r, idUsuario, idAudio, second)
+
+def getReproducciones(r, id):
+    return controlAudios.getReproducciones(r, id)
 
 # Función para eliminar un podcast
 def eliminarPodcast(r, id):
