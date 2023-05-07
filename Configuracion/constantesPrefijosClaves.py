@@ -193,3 +193,8 @@ CLAVE_HASH_EMAIL_ID = "tablaHashEmailId"
 CLAVE_SET_USUARIOS_ENTRENADOS = "usuariosEntrenados"
 CLAVE_LISTA_ENTRENAMIENTO = "listaEntrenamiento"
 PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO = "segundosReproducidos"
+
+CORREO_RECUPERACION = "enterprisemussa@gmail.com"
+CONTRASENYA_CORREO_RECUPERACION = "Melodia_12"
+PREFIJO_CODIGO_RECUPERACION = "codigoRecuperacion"
+CLAVE_CODIGO_RECUPERACION = "codigoRecuperacion"

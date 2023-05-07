@@ -14,9 +14,14 @@ from recomendador import generacion_datos as gen_datos
 
 from Global import ModuloGlobal
 
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.image import MIMEImage
 
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+import random
 
 r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
 
@@ -557,6 +562,20 @@ def AddSecondsToSong(request):
     return JsonResponse({'status': status}, status=status)
 
 
+def GetSongSeconds(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request bdoy to extract idUsuario
+    idAudio = request.GET.get(constantes.CLAVE_ID_AUDIO)
+
+    # Control de errores
+    if(moduloAudios.existeCancion(r, idAudio) == False):
+        return JsonResponse({'error': 'La canción no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
+    
+    segundos = ModuloGlobal.getSongSeconds(r, idAudio)
+
+    return JsonResponse({constantes.CLAVE_SEGUNDOS: segundos}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def SetFolder(request):
@@ -1098,3 +1117,81 @@ def AlmacenarEjemplo(request):
 
     return JsonResponse({'msg': 'Ejemplo almacenado correctamente'}, status=erroresHTTP.OK)
 
+@csrf_exempt
+def GenerateRandomCodeUsr(request):
+    # Compruebo que el método sea GET
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    emailUsuario = json_data[constantes.CLAVE_EMAIL]
+
+    # Compruebo que el usuario existe
+    if(usuarios.existeUsuarioEmail(r, emailUsuario)):
+
+        # Generar número aleatorio
+        code = random.randint(100000, 999999)
+        usuarios.setCodigoRecuperacion(r, emailUsuario, code)
+
+        
+        # Configuración del servidor de correo electrónico y la cuenta
+        smtp_server = "smtp.gmail.com"
+        smtp_port = 587
+        smtp_username = constantes.CORREO_RECUPERACION
+        smtp_password = constantes.CONTRASENYA_CORREO_RECUPERACION
+
+        # Configuración del correo electrónico
+        from_email = smtp_username
+        to_email = emailUsuario
+        subject = "Correo electrónico de prueba"
+        body = "Este es un correo electrónico de prueba enviado desde Python."
+
+        msg = MIMEMultipart()
+        msg['From'] = from_email
+        msg['To'] = to_email
+        msg['Subject'] = subject
+
+        # Agregar el cuerpo del correo electrónico
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Conectar al servidor SMTP y enviar el correo electrónico
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_username, smtp_password)
+            server.sendmail(from_email, to_email, msg.as_string())
+
+        code = erroresHTTP.OK
+
+    else:
+        code = erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
+
+
+    return JsonResponse({'code': code}, status=erroresHTTP.OK)
+
+
+@csrf_exempt
+def RecuperarContrasenya(request):
+    # Compruebo que el método sea GET
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    emailUsuario = json_data[constantes.CLAVE_EMAIL]
+    code = json_data[constantes.CLAVE_CODIGO_RECUPERACION]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+
+    # Compruebo que el usuario existe
+    if(usuarios.existeUsuarioEmail(r, emailUsuario)):
+        # Compruebo que el código es correcto
+        if(usuarios.getCodigoRecuperacion(r, emailUsuario) == code):
+            usuarios.setContrasenya(r, emailUsuario, contrasenya)
+            code = erroresHTTP.OK
+        else:
+            code = erroresHTTP.ERROR_USUARIO_CODIGO_RECUPERACION_INCORRECTO
+    else:
+        code = erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
+
+    return JsonResponse({'code': code}, status=erroresHTTP.OK)

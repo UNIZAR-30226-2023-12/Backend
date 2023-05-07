@@ -62,6 +62,9 @@ def getAlias(r, idUsuario):
 def getContrasenya(r, idUsuario):
     return r.hget(idUsuario, constantes.CLAVE_CONTRASENYA)
 
+def setContrasenya(r, id, contrasenya):
+    return r.hset(id, constantes.CLAVE_CONTRASENYA, contrasenya)
+
 def getTipoUsuario(r, idUsuario):
     return r.hget(idUsuario, constantes.CLAVE_TIPO_USUARIO)
 
@@ -188,3 +191,9 @@ def existeEmailId(r, email):
     if (r.hexists(constantes.CLAVE_HASH_EMAIL_ID, email) == 1):
         return True
     return False
+
+def setCodigoRecuperacion(r, idUsuario, codigo):
+    return r.set(constantes.PREFIJO_CODIGO_RECUPERACION + ":" + idUsuario, codigo)
+
+def getCodigoRecuperacion(r, idUsuario):
+    return r.get(constantes.PREFIJO_CODIGO_RECUPERACION + ":" + idUsuario)

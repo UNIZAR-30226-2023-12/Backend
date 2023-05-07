@@ -8,17 +8,12 @@ ip = '127.0.0.1'
 port = '8000'
 
 # URL del endpoint SetSong
-<<<<<<< HEAD
-url_set_song = 'http://127.0.0.1:8081/SetSong/'
-url_set_usr = 'http://127.0.0.1:8081/SetUser/'
-url_get = 'http://127.0.0.1:8081/GetSong/'
-=======
 url_set_song = 'http://'+ip+':'+port+'/SetSong/'
 url_set_usr = 'http://'+ip+':'+port+'/SetUser/'
 url_get_usr = 'http://'+ip+':'+port+'/GetUser/'
 url_get = 'http://'+ip+':'+port+'/GetSong/'
 url_busqueda = 'http://'+ip+':'+port+'/GlobalSearch/'
->>>>>>> main
+url_sendCode = 'http://'+ip+':'+port+'/GenerateRandomCodeUsr/'
 
 # Crear un objeto HttpRequest vacío
 # request = HttpRequest()
@@ -42,12 +37,17 @@ with open('STARSET-DIE FOR YOU.mp3', 'rb') as f:
 
 # String idUsr, String email, String alias, String contrasenya, String tipoUsuario
 new_user_data = {
-    'idUsr': 'admin',
-    'email': 'admin@melodia.es',
-    'alias': 'admin',
+    'idUsr': 'hsunekichi',
+    'email': 'hsunekichi@gmail.com',
+    'alias': 'hsunekichi',
     'contrasenya': '1234',
     'tipoUsuario': 'admin'
 }
+
+data_generateCode = {
+    'email': 'hsunekichi@gmail.com',
+}
+
 
 # Datos del cuerpo de la petición
 new_song_data = {
@@ -99,3 +99,8 @@ print(response.json())
 # prints de json content
 #print(response.json()['nombre'])
 """
+
+requests.post(url_set_usr, json=new_user_data)
+
+response = requests.get(url_sendCode, json=data_generateCode)
+print(response.json())

@@ -135,6 +135,9 @@ def ValidateUser(r, id, contrasenya):
         return True
     return False
 
+def setContrasenya(r, id, contrasenya):
+    daoUsuario.setContrasenya(r, id, contrasenya)
+
 def getIdEmailId(r, email):
     return daoUsuario.getIdEmailId(r, email)
    
@@ -426,6 +429,10 @@ def getAudiosFavoritos(r, idUsuario):
     return audios
 
 
+def setCodigoRecuperacion(r, idUsuario, codigo):
+    daoUsuario.setCodigoRecuperacion(r, idUsuario, codigo)
 
+def getCodigoRecuperacion(r, idUsuario):
+    return daoUsuario.getCodigoRecuperacion(r, idUsuario)
 
 
