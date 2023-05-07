@@ -181,6 +181,7 @@ LISTA_TIPO_FAVORITOS = "listaFavoritos"
 LISTA_TIPO_RANKING = "listaRanking"
 LISTA_PRIVADA = "privada"
 LISTA_PUBLICA = "publica"
+CLAVE_LINK_LISTA = "linkLista"
 
 
 # Constantes simbólicas de los prefijos de los sets de listas
@@ -193,3 +194,7 @@ CLAVE_HASH_EMAIL_ID = "tablaHashEmailId"
 CLAVE_SET_USUARIOS_ENTRENADOS = "usuariosEntrenados"
 CLAVE_LISTA_ENTRENAMIENTO = "listaEntrenamiento"
 PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO = "segundosReproducidos"
+
+
+
+CLAVE_ID_ERROR = "idError"

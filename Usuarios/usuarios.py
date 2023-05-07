@@ -7,6 +7,10 @@ import DAOS.daoCarpetas as daoCarpetas
 import DAOS.daoAudio as daoAudios
 import Configuracion.constantesPrefijosClaves as constantes
 import Configuracion.constantesErroresHTTP as erroresHTTP
+from cryptography.fernet import Fernet
+
+key = Fernet.generate_key()
+f = Fernet(key)
 
 # Funciones de usuarios normales
 
@@ -44,8 +48,6 @@ def correctoDiccionarioCarpeta(diccionario):
 def tipoUsuarioValido(tipoUsuario):
     return daoUsuario.tipoUsuarioValido(tipoUsuario)
 
-def getTipoUser(r, id):
-    return daoUsuario.getTipoUsuario(r, id)
 
 def getTipoNotificacion(r, id):
     return daoNotificaciones.getTipoNotificacion(r, id)
@@ -98,13 +100,10 @@ def getUserPublicData(r, id ):
     return user
 
 def removeUser(r, id, contrasenya):
-    if(r.exists(id) == 0):
-        return -1
     amigos = daoUsuario.getAmigos(r, id)
     #Eliminar usuario de la lista de amigos de sus amigos
     for amigo in amigos:
         daoUsuario.eliminarAmigo(r, amigo, id)
-
     #Eliminar los sets de amigos, artistas, listas del usuario, notificaciones y carpetas
     r.delete(constantes.PREFIJO_AMIGOS + id)
     r.delete(constantes.PREFIJO_ARTISTAS_SUSCRITOS + id)
@@ -116,7 +115,6 @@ def removeUser(r, id, contrasenya):
     if(daoUsuario.getTipoUsuario(r, id) == constantes.USUARIO_ADMINISTRADOR):
         daoUsuario.eliminarAdministrador(r, id)
     daoUsuario.eliminarUsuario(r, id)
-    return 1
 
 def AskAdminToBeArtist(r, idUsuario):
     idNotificacion = daoNotificaciones.getIdContador(r)
@@ -169,6 +167,14 @@ def removeNotification(r, idUsuario, idNotificacion):
     daoUsuario.eliminarNotificacion(r, idUsuario, idNotificacion)
     daoNotificaciones.eliminarNotificacion(r, idNotificacion)
 
+def getLinkLista(r, id):
+    link = f.encrypt(str(id))
+    return link
+
+def getListaFromLink(r, link):
+    id = f.decrypt(link)
+    return id
+
 # Funciones adicionales de artistas
 
 
@@ -182,6 +188,13 @@ def acceptArtist(r, idNotificacion):
         daoUsuario.eliminarNotificacion(r, admin, idNotificacion)
     daoNotificaciones.eliminarNotificacion(r, idNotificacion)
     daoUsuario.setTipoUsuario(r, idUsuario, daoUsuario.constantes.USUARIO_ARTISTA)
+
+def rejectArtist(r, idNotificacion):
+    # Eliminamos la notificación a los administradores
+    administradores = daoUsuario.getAdministradores(r)
+    for admin in administradores:
+        daoUsuario.eliminarNotificacion(r, admin, idNotificacion)
+    daoNotificaciones.eliminarNotificacion(r, idNotificacion)
 
 def esAdministrador(r, id):
     if (r.exists(id) == 0):
@@ -248,9 +261,6 @@ def isNotificactionFromUser(r, idUsuario, idNotificacion):
         return False
     return True
 
-def setNombreLista(r, idLista, nombre):
-    daoListas.setNombreLista(r, idLista, nombre)
-
 def setSongLista(r, idLista, idAudio):
     daoListas.anyadirAudioLista(r, idLista, idAudio)
 
@@ -263,19 +273,22 @@ def setPrivacyLista(r, idUsuario, idLista, publica):
     return 1
 
 def removeLista(r, idUsuario, idLista):
-    if (r.exists(idUsuario) == 0):
-        return -2
-    if (r.exists(idLista) == 0):
-        return -1
     daoListas.eliminarLista(r, idLista)
-    daoUsuario.eliminarLista(r, idUsuario, idLista)
-    return 1
+    if(idLista in daoUsuario.getListas):
+        daoUsuario.eliminarLista(r, idUsuario, idLista)
+    
+    if(idLista in daoCarpetas.getListasCarpeta(r, idUsuario)):
+        daoCarpetas.eliminarListaCarpeta(r, idUsuario, idLista)
+    
 
 def getLista(r, idLista):   
     return daoListas.getLista(r, idLista)
 
 def getListasUsr(r, idUsuario):
-    return daoUsuario.getListas(r, idUsuario)
+    listas = daoUsuario.getListas(r, idUsuario)
+    for carpeta in daoUsuario.getCarpetas(r, idUsuario):
+        listas.extend(daoCarpetas.getListasCarpeta(r, carpeta))
+    return listas
 
 def getListasUsrPublicas(r, idUsuario):
     listas = getListasUsr(r, idUsuario)
@@ -290,11 +303,7 @@ def getAudiosLista(r, idLista):
     return daoListas.getAudiosLista(r, idLista)
 
 def getSongsArtist(r, idArtista):
-    if(r.exists(idArtista) == 0):
-        return -1
     return daoUsuario.getCanciones(r, idArtista)
-
-
 
 def removeSongLista(r, idLista, idAudio):
     if (daoListas.existeLista(r, idLista) == False):
@@ -366,6 +375,11 @@ def acceptFriend(r, idUsuario, idNotificacion):
     daoUsuario.eliminarNotificacion(r, idUsuario, idNotificacion)
     return erroresHTTP.OK
 
+def rejectFriend(r, idUsuario, idNotificacion):
+    daoNotificaciones.eliminarNotificacion(r, idNotificacion)
+    daoUsuario.eliminarNotificacion(r, idUsuario, idNotificacion)
+    return erroresHTTP.OK
+
 def getFriends(r, idUsuario):
     return daoUsuario.getAmigos(r, idUsuario)
 
@@ -424,6 +438,76 @@ def getAudiosFavoritos(r, idUsuario):
         if(daoListas.getTipoLista(r, idLista) == constantes.LISTA_TIPO_FAVORITOS):
             audios = daoListas.getAudiosLista(r, idLista)
     return audios
+
+# Gets y Sets de usuarios
+def getEmailUsr(r, idUsuario):
+    return daoUsuario.getEmail(r, idUsuario)
+
+def setEmailUsr(r, idUsuario, email):
+    daoUsuario.setEmail(r, idUsuario, email)
+
+def getAliasUsr(r, idUsuario):
+    return daoUsuario.getAlias(r, idUsuario)
+
+def setAliasUsr(r, idUsuario, alias):
+    daoUsuario.setAlias(r, idUsuario, alias)
+
+def getContrasenyaUsr(r, idUsuario):
+    return daoUsuario.getContrasenya(r, idUsuario)
+
+def setContrasenyaUsr(r, idUsuario, contrasenya):
+    daoUsuario.setContrasenya(r, idUsuario, contrasenya)
+
+def getTipoUsr(r, id):
+    return daoUsuario.getTipoUsuario(r, id)
+
+def setTipoUsr(r, idUsuario, tipo):
+    daoUsuario.setTipoUsuario(r, idUsuario, tipo)
+
+def getImagenPerfilUsr(r, idUsuario):
+    if (daoUsuario.getImagenPerfil(r, idUsuario) == None):
+        return constantes.DEFAULT_USER_IMAGE
+
+def setImagenPerfilUsr(r, idUsuario, imagen):
+    daoUsuario.setImagenPerfil(r, idUsuario, imagen)
+
+# Gets y Sets de Listas de Reproduccion
+def getNombreListaRep(r, idLista):
+    return daoListas.getNombreLista(r, idLista)
+
+def setNombreListaRep(r, idLista, nombre):
+    daoListas.setNombreLista(r, idLista, nombre)
+
+def getTipoListaRep(r, idLista):
+    return daoListas.getTipoLista(r, idLista)
+
+def setTipoListaRep(r, idLista, tipo):
+    daoListas.setTipoLista(r, idLista, tipo)
+
+def getPrivacidadListaRep(r, idLista):
+    return daoListas.getPrivacidadLista(r, idLista)
+
+def setPrivacidadListaRep(r, idLista, privacidad):
+    daoListas.setPrivacidadLista(r, idLista, privacidad)
+
+# Gets y Sets de Carpeta
+def getNombreCarpeta(r, idCarpeta):
+    return daoCarpetas.getNombreCarpeta(r, idCarpeta)
+
+def setNombreCarpeta(r, idCarpeta, nombre):
+    daoCarpetas.setNombreCarpeta(r, idCarpeta, nombre)
+
+def getPrivacidadCarpeta(r, idCarpeta):
+    return daoCarpetas.getPrivacidadCarpeta(r, idCarpeta)
+
+def setPrivacidadCarpeta(r, idCarpeta, privacidad):
+    daoCarpetas.setPrivacidadCarpeta(r, idCarpeta, privacidad)
+
+
+
+
+
+
 
 
 

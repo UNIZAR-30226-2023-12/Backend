@@ -35,7 +35,7 @@ def setCarpeta(r, carpetaDic):
     return r.hmset(id, carpetaDic)
 
 # Funcion para cambiar el nombre de una carpeta
-def cambiarNombreCarpeta(r, id, nombre):
+def setNombreCarpeta(r, id, nombre):
     return r.hset(id, constantes.CLAVE_NOMBRE_CARPETA, nombre)
 
 # Funcion para cambiar el tipo de carpeta (publica o privada)
