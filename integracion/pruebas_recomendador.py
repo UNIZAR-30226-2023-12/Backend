@@ -12,6 +12,7 @@ port = '8000'
 url_set_song = 'http://'+ip+':'+port+'/SetSong/'
 url_set_usr = 'http://'+ip+':'+port+'/SetUser/'
 url_get_song = 'http://'+ip+':'+port+'/GetSong/'
+url_get_reproducciones = 'http://'+ip+':'+port+'/GetTopReproducciones/'
 
 url_train = 'http://'+ip+':'+port+'/entrenar_recomendador/'
 url_add_examples = 'http://'+ip+':'+port+'/AlmacenarEjemplo/'
@@ -82,10 +83,16 @@ examples = [
 },
 ]
 
+get_reproducciones = {
+    'n': '10',
+    'esPodcast': '0'
+}
+
 new_user = json.dumps(new_user)
 new_song_data = json.dumps(new_song_data)
 get_audio_params = json.dumps(get_audio_params)
 train_data = json.dumps(train_data)
+get_reproducciones = json.dumps(get_reproducciones)
 
 #response = requests.post(url_set_usr, data=new_user) # Añade ejemplos de entrenamiento
 #print("set user: ", response.status_code)
@@ -105,6 +112,9 @@ for i in range(100):
 
 response = requests.post(url_recomend_song, data=train_data) # Obtiene una canción recomendada
 
+
+response = requests.get(url_get_reproducciones, data=get_reproducciones)
+print(response.json())
 
 # Get the headers from the response
 response_headers = response.request.headers
