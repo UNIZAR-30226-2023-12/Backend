@@ -1171,6 +1171,53 @@ def GenerateRandomCodeUsr(request):
     return JsonResponse({'code': code}, status=erroresHTTP.OK)
 
 
+
+@csrf_exempt
+def SetCalidadPorDefectoUsr(request):
+    # Compruebo que el método sea GET
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    passwd = json_data[constantes.CLAVE_CONTRASENYA]
+    calidad = json_data[constantes.CLAVE_CALIDAD_PREFERIDA]
+
+    status = usuarios.ValidateUser(r, idUsuario, passwd)
+    # Compruebo que el usuario existe
+    if(status == erroresHTTP.OK):
+        usuarios.setCalidadPorDefecto(r, idUsuario, calidad)
+        code = erroresHTTP.OK
+    else:
+        code = status
+
+    return JsonResponse({'code': code}, status=erroresHTTP.OK)
+
+
+@csrf_exempt
+def GetCalidadPorDefectoUsr(request):
+    # Compruebo que el método sea GET
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    passwd = json_data[constantes.CLAVE_CONTRASENYA]
+
+    status = usuarios.ValidateUser(r, idUsuario, passwd)
+    # Compruebo que el usuario existe
+    if(status == erroresHTTP.OK):
+        calidad = usuarios.getCalidadPorDefecto(r, idUsuario)
+        code = erroresHTTP.OK
+    else:
+        code = status
+
+    return JsonResponse({'code': code, 'calidad': calidad}, status=erroresHTTP.OK)
+
 @csrf_exempt
 def RecuperarContrasenya(request):
     # Compruebo que el método sea GET

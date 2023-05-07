@@ -88,6 +88,12 @@ def setUser(r, usuarioDiccionario):
     return id
 
 
+def setCalidadPorDefecto(r, idUsuario, calidad):
+    daoUsuario.setCalidadPorDefecto(r, idUsuario, calidad)
+
+def getCalidadPorDefecto(r, idUsuario):
+    return daoUsuario.getCalidadPorDefecto(r, idUsuario)
+
 def getUser(r, id):
     return daoUsuario.getUsuario(r, id)
 
