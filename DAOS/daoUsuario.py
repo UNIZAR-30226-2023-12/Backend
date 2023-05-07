@@ -137,6 +137,13 @@ def getRelaciones(r, idUsuario, prefijoRelacion):
     return relaciones
 
 
+def setCalidadPorDefecto(r, idUsuario, calidad):
+    return r.hset(idUsuario, constantes.CLAVE_CALIDAD_PREFERIDA, calidad)
+
+def getCalidadPorDefecto(r, idUsuario):
+    return r.hget(idUsuario, constantes.CLAVE_CALIDAD_PREFERIDA)
+
+
 # Funcion adicional de artista
 def anyadirCancion(r, idUsuario, idAudio):
     return anyadirRelacion(r, idUsuario, idAudio, constantes.CLAVE_CANCIONES)
