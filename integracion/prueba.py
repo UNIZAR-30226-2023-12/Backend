@@ -14,6 +14,7 @@ url_get_usr = 'http://'+ip+':'+port+'/GetUser/'
 url_get = 'http://'+ip+':'+port+'/GetSong/'
 url_busqueda = 'http://'+ip+':'+port+'/GlobalSearch/'
 url_sendCode = 'http://'+ip+':'+port+'/GenerateRandomCodeUsr/'
+url_changePasswd = 'http://'+ip+':'+port+'/RecuperarContrasenya/'
 
 # Crear un objeto HttpRequest vacío
 # request = HttpRequest()
@@ -37,7 +38,6 @@ with open('STARSET-DIE FOR YOU.mp3', 'rb') as f:
 
 # String idUsr, String email, String alias, String contrasenya, String tipoUsuario
 new_user_data = {
-    'idUsr': 'hsunekichi',
     'email': 'hsunekichi@gmail.com',
     'alias': 'hsunekichi',
     'contrasenya': '1234',
@@ -100,7 +100,9 @@ print(response.json())
 #print(response.json()['nombre'])
 """
 
-requests.post(url_set_usr, json=new_user_data)
+#requests.post(url_set_usr, json=new_user_data)
 
-response = requests.get(url_sendCode, json=data_generateCode)
+#response = requests.get(url_sendCode, json=data_generateCode)
+
+response = requests.post(url_changePasswd, json={'email': 'hsunekichi@gmail.com', 'contrasenya': '12345', 'codigo': '771687'})
 print(response.json())

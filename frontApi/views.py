@@ -1145,8 +1145,8 @@ def GenerateRandomCodeUsr(request):
         # Configuración del correo electrónico
         from_email = smtp_username
         to_email = emailUsuario
-        subject = "Correo electrónico de prueba"
-        body = "Este es un correo electrónico de prueba enviado desde Python."
+        subject = "Recupera tu contraseña - Melodia"
+        body = "Tu código de recuperación es el siguiente: " + str(code) + "\n\n" + "Si no has solicitado recuperar tu contraseña, ignora este correo."
 
         msg = MIMEMultipart()
         msg['From'] = from_email
@@ -1187,7 +1187,10 @@ def RecuperarContrasenya(request):
     if(usuarios.existeUsuarioEmail(r, emailUsuario)):
         # Compruebo que el código es correcto
         if(usuarios.getCodigoRecuperacion(r, emailUsuario) == code):
-            usuarios.setContrasenya(r, emailUsuario, contrasenya)
+
+            # Obtengo la id del usuario
+            idUsuario = usuarios.getIdEmailId(r, emailUsuario)
+            usuarios.setContrasenya(r, idUsuario, contrasenya)
             code = erroresHTTP.OK
         else:
             code = erroresHTTP.ERROR_USUARIO_CODIGO_RECUPERACION_INCORRECTO
