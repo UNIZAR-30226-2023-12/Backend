@@ -42,8 +42,8 @@ def echo(request):
 @csrf_exempt
 def GetSong(request):
     fichero = -1
-    # Compruebo que el método sea GET
-    if request.method != 'GET':
+    # Compruebo que el método sea POST
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     jsonData = json.loads(request.body)
@@ -54,8 +54,8 @@ def GetSong(request):
     status = usuarios.ValidateUser(r, idUsuario, contrasenya)
 
     # Si no es valido devuelvo el error
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    if (status == False):
+        return JsonResponse({'status': status}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     
     audio = moduloAudios.obtenerDiccionarioCancion(r, idAudio)
     del audio[constantes.CLAVE_FICHERO_ALTA_CALIDAD]
