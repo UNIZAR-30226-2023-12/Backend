@@ -2,8 +2,9 @@ import redis
 import Configuracion.constantesPrefijosClaves as constantes
 
 
-listaClaves = [constantes.CLAVE_ID_LISTA, constantes.CLAVE_NOMBRE_LISTA, 
-               constantes.CLAVE_PRIVACIDAD_LISTA, constantes.CLAVE_TIPO_LISTA]
+listaClaves = [constantes.CLAVE_NOMBRE_LISTA, 
+               constantes.CLAVE_PRIVACIDAD_LISTA, 
+               constantes.CLAVE_TIPO_LISTA]
 
 def getIdContador(r):
     return constantes.PREFIJO_ID_LISTA + ":" + str(r.incr(constantes.CLAVE_CONTADOR_LISTAS))
@@ -98,4 +99,9 @@ def getAudiosLista(r, id):
             stop = True
 
     return canciones
+
+def tipoListaValido(tipo):
+    if tipo == constantes.LISTA_TIPO_REPRODUCCION or tipo == constantes.LISTA_TIPO_FAVORITOS or tipo == constantes.LISTA_TIPO_RANKING:
+        return True
+    return False
     

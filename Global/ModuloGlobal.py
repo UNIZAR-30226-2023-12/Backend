@@ -6,7 +6,8 @@ def getTotalSegundosReproducidosAudio(r):
     segundosTotales = 0
     keys = daoGlobal.getKeysSegundosReproducidosAudios(r)
     for key in keys:
-        segundosTotales += daoGlobal.getSegundosReproduciodosAudio(r, key)
+        segundos = daoGlobal.getSegundosReproduciodosAudio(r, key)
+        segundosTotales += int(segundos)
     
     return segundosTotales
 
@@ -14,4 +15,8 @@ def addSecondsToSong(r, idAudio, segundos):
     segundosActuales = daoGlobal.getSegundosReproduciodosAudio(r, idAudio)
     if segundosActuales is None:
         segundosActuales = 0
-    daoGlobal.setSegundosReproduciodosAudio(r, idAudio, segundosActuales + segundos)
+    segundos += int(segundosActuales)
+    daoGlobal.setSegundosReproduciodosAudio(r, idAudio, segundos)
+
+def getSongSeconds(r, idAudio):
+    return daoGlobal.getSegundosReproduciodosAudio(r, idAudio)

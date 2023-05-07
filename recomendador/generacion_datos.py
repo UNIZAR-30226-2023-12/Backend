@@ -169,7 +169,7 @@ def get_audio_prediction_state(conn, id_usr, id_audio):
 
 
     id_artista = audios.obtenerArtCancion(conn, id_audio)         # Obtiene el artista del audio
-    suscrito = usuarios.estaSuscrito(conn, id_usr, id_artista)    # 1 si esta suscrito, 0 si no
+    suscrito = usuarios.isSubscribedToArtist(conn, id_usr, id_artista)    # 1 si esta suscrito, 0 si no
 
     # Obtiene el porcentaje de favoritos por genero del usuario
     numero_favoritos_por_genero = usuarios.getNFavoritosPorGenero(conn, id_usr) # Es una lista de enteros

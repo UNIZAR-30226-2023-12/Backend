@@ -4,9 +4,9 @@ import Configuracion.constantesPrefijosClaves as constantes
 #Numero de elementos que se devuelven en cada iteración de sscan
 COUNT = 100
 
-listaClaves = [constantes.CLAVE_ID_USUARIO, constantes.CLAVE_EMAIL, 
-               constantes.CLAVE_ALIAS, constantes.CLAVE_CONTRASENYA, 
-               constantes.CLAVE_TIPO_USUARIO]
+# Lista de claves necesarias para crear un usuario
+listaClaves = [constantes.CLAVE_EMAIL, constantes.CLAVE_ALIAS, 
+               constantes.CLAVE_CONTRASENYA, constantes.CLAVE_TIPO_USUARIO]
 
 
 
@@ -35,14 +35,17 @@ def setContrasenya(r, idUsuario, contrasenya):
 def setTipoUsuario(r, idUsuario, tipoUsuario):
     return r.hset(idUsuario, constantes.CLAVE_TIPO_USUARIO, tipoUsuario)
 
-def setUltimaCancion(r, idUsuario, idAudio):
+def setImagenPerfil(r, idUsuario, imagenPerfil):
+    return r.hset(idUsuario, constantes.CLAVE_IMAGEN_PERFIL, imagenPerfil)
+
+def setUltimoAudio(r, idUsuario, idAudio):
     return r.hset(idUsuario, constantes.CLAVE_ID_ULTIMO_AUDIO, idAudio)
 
 def eliminarUsuario(r, idUsuario):
     return r.delete(idUsuario)
 
 def tipoUsuarioValido(tipoUsuario):
-    if(tipoUsuario == constantes.USUARIO_ADMINISTRADOR or tipoUsuario == constantes.USUARIO_NORMAL or tipoUsuario == constantes.constantesUsuario.USUARIO_ARTISTA):
+    if(tipoUsuario == constantes.USUARIO_ADMINISTRADOR or tipoUsuario == constantes.USUARIO_NORMAL or tipoUsuario == constantes.USUARIO_ARTISTA):
         return True
     else:
         return False
@@ -59,11 +62,14 @@ def getAlias(r, idUsuario):
 def getContrasenya(r, idUsuario):
     return r.hget(idUsuario, constantes.CLAVE_CONTRASENYA)
 
+def setContrasenya(r, id, contrasenya):
+    return r.hset(id, constantes.CLAVE_CONTRASENYA, contrasenya)
+
 def getTipoUsuario(r, idUsuario):
     return r.hget(idUsuario, constantes.CLAVE_TIPO_USUARIO)
 
-def getUltimaCancion(r, idUsuario):
-    return r.hget(idUsuario, constantes.CLAVE_ID_ULTIMO_AUDIO)
+def getImagenPerfil(r, idUsuario):
+    return r.hget(idUsuario, constantes.CLAVE_IMAGEN_PERFIL)
 
 def anyadirAmigo(r, idUsuario, idAmigo):
     return anyadirRelacion(r, idUsuario, idAmigo, constantes.PREFIJO_AMIGOS)
@@ -107,8 +113,8 @@ def anyadirCarpeta(r, idUsuario, idCarpeta):
 def eliminarCarpeta(r, idUsuario, idCarpeta):
     return eliminarRelacion(r, idUsuario, idCarpeta, constantes.PREFIJO_CARPETAS)
 
-def getCarpetas(r, idUsuario, idCarpeta):
-    return getRelaciones(r, idUsuario, idCarpeta, constantes.PREFIJO_CARPETAS)
+def getCarpetas(r, idUsuario):
+    return getRelaciones(r, idUsuario, constantes.PREFIJO_CARPETAS)
 
 # Funciones para añadir, eliminar y obtener relaciones del usuario
 def anyadirRelacion(r, idUsuario, idRealacion, prefijoRelacion):
@@ -161,30 +167,15 @@ def getAdministradores(r):
             parar = True
     return administradores
 
-# Funciones para crear set de ulimos Audios escuchados
-def anyadirUltimoAudio(r, idUsuario, idAudio):
-    return anyadirRelacion(r, idUsuario, idAudio, constantes.PREFIJO_ULTIMOS_AUDIOS)
+# Funciones para crear set de ulimos Audios escuchados)
+def setSegundosAudio(r, idUsuario, idAudio, segundos):
+    return r.set(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio, segundos)
 
-def eliminarUltimoAudio(r, idUsuario, idAudio):
-    return eliminarRelacion(r, idUsuario, idAudio, constantes.PREFIJO_ULTIMOS_AUDIOS)
+def getSegundosAudio(r, idUsuario, idAudio):
+    return r.get(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
 
-def getIDSUltimosAudios(r, idUsuario):
-    return getRelaciones(r, idUsuario, constantes.PREFIJO_ULTIMOS_AUDIOS)
-
-def setUltimoAuido(r, idUsuario, idAudio, diccionarioUltimoAudio):
-    return r.hmset(constantes.PREFIJO_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, diccionarioUltimoAudio)
-
-def setSegundosUltimoAudio(r, idUsuario, idAudio, segundos):
-    return r.hset(constantes.PREFIJO_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS, segundos)
-
-def getUltimoAudio(r, idUsuario, idAudio):
-    return r.hgetall(constantes.PREFIJO_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
-
-def getSegundosUltimoAudio(r, idUsuario, idAudio):
-    return r.hget(constantes.PREFIJO_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio, constantes.CLAVE_SEGUNDOS)
-
-def eliminarUltimoAudio(r, idUsuario, idAudio):
-    return r.delete(constantes.PREFIJO_ULTIMOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
+def eliminarSegundosAudio(r, idUsuario, idAudio):
+    return r.delete(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
 
 # Daos para crear tabla hash email | idUsuario para agilizar el inicio de sesion
 def setEmailId(r, email, idUsuario):
@@ -200,3 +191,9 @@ def existeEmailId(r, email):
     if (r.hexists(constantes.CLAVE_HASH_EMAIL_ID, email) == 1):
         return True
     return False
+
+def setCodigoRecuperacion(r, idUsuario, codigo):
+    return r.set(constantes.PREFIJO_CODIGO_RECUPERACION + ":" + idUsuario, codigo)
+
+def getCodigoRecuperacion(r, idUsuario):
+    return r.get(constantes.PREFIJO_CODIGO_RECUPERACION + ":" + idUsuario)
