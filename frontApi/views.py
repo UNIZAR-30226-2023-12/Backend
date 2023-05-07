@@ -1538,7 +1538,8 @@ def GetNombreListaRep(request):
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeLista(r, idLista) == False):
         return JsonResponse({'error': 'La lista no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
-    if(idLista not in usuarios.getListasUsr(r, idUsuario) and usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ADMINISTRADOR):
+    if(usuarios.isListaFromUser(r, idUsuario, idLista) == False and usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ADMINISTRADOR and 
+       usuarios.isListaPublica(r, idLista) == False):
         return JsonResponse({'error': 'No tienes permisos para obtener el nombre de esta lista'}, status=erroresHTTP.FORBIDDEN)
     
     return JsonResponse({constantes.CLAVE_NOMBRE_CARPETA : usuarios.getNombreListaRep(r, idLista)}, status=erroresHTTP.OK)
@@ -1562,8 +1563,7 @@ def SetNombreListaRep(request):
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeLista(r, idLista) == False):
         return JsonResponse({'error': 'La lista no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
-    if(idLista not in usuarios.getListasUsr(r, idUsuario) and usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ADMINISTRADOR
-       and usuarios.isListaPublica(r, idLista) == False):
+    if(usuarios.isListaFromUser(r, idUsuario, idLista) == False and usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ADMINISTRADOR):
         return JsonResponse({'error': 'No tienes permisos para modificar esta lista'}, status=erroresHTTP.FORBIDDEN)
     
     usuarios.setNombreListaRep(r, idLista, nombreLista)
@@ -1589,7 +1589,7 @@ def GetPrivacidadListaRep(request):
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeLista(r, idLista) == False):
         return JsonResponse({'error': 'La lista no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
-    if (idLista not in usuarios.getListasUsr and usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ADMINISTRADOR
+    if (usuarios.isListaFromUser(r, idUsuario, idLista) == False and usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ADMINISTRADOR
          and usuarios.isListaPublica(r, idLista) == False):
         return JsonResponse({'error': 'No tienes permisos para obtener la privacidad de esta lista'}, status=erroresHTTP.FORBIDDEN)
     

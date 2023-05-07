@@ -239,8 +239,7 @@ def isCarpetaFromUser(r, idUsuario, idCarpeta):
 def isListaFromUser(r, idUsuario, idLista):
     if (r.exists(idUsuario) == 0 or r.exists(idLista) == 0):
         return False
-    listas = daoUsuario.getListas(r, idUsuario)
-    listas.append(daoCarpetas.getListasCarpeta(r, idUsuario))
+    listas = getAllListasUsr(r, idUsuario)
     
     if(idLista not in listas):
         return False
@@ -293,14 +292,20 @@ def removeLista(r, idUsuario, idLista):
 def getLista(r, idLista):   
     return daoListas.getLista(r, idLista)
 
-def getListasUsr(r, idUsuario):
+# Devuelve un set con los ids de todas las listas del usuario
+def getAllListasUsr(r, idUsuario):
     listas = daoUsuario.getListas(r, idUsuario)
     for carpeta in daoUsuario.getCarpetas(r, idUsuario):
         listas.extend(daoCarpetas.getListasCarpeta(r, carpeta))
     return listas
 
+# Devuelve un set con los ids de todas las listas del usuario menos las que se encuentran en una carpeta
+def getListasUsr(r, idUsuario):
+    listas = daoUsuario.getListas(r, idUsuario)
+    return listas
+
 def getListasUsrPublicas(r, idUsuario):
-    listas = getListasUsr(r, idUsuario)
+    listas = getAllListasUsr(r, idUsuario)
     listasPublicas = []
     for lista in listas:
         if(isListaPublica(r, lista)):
