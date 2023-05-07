@@ -1,4 +1,5 @@
 #!/bin/bash
 
-cd redis && ./start.sh
-cd ../django && ./start.sh
+./rm.sh
+./build.sh
+docker compose up -d

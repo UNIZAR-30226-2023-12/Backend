@@ -38,6 +38,7 @@ urlpatterns = [
     path('ValidateUserEmail/', viewsApi.ValidateUserEmail, name='ValidateUserEmail'),
     path('GetTotRepTime/', viewsApi.GetTotRepTime, name='GetTotRepTime'),
     path('AddSecondsToSong/', viewsApi.AddSecondsToSong, name='AddSecondsToSong'),
+    path('GetSongSeconds/', viewsApi.GetSongSeconds, name='GetSongSeconds'),
     path('SetFolder/', viewsApi.SetFolder, name='SetFolder'),
     path('AddListToFolder/', viewsApi.AddListToFolder, name='AddListToFolder'),
     path('RemoveListFromFolder/', viewsApi.RemoveListFromFolder, name='RemoveListFromFolder'),
@@ -62,4 +63,7 @@ urlpatterns = [
     path('AlmacenarEjemplo/', viewsApi.AlmacenarEjemplo, name='AlmacenarEjemplo'),
     path('GetRecomendedAudio/', viewsApi.GetRecomendedAudio, name='GetRecomendedAudio'),
     path('FlushDB/', viewsApi.FlushDB, name='FlushDB'),
+    path('GenerateRandomCodeUsr/', viewsApi.GenerateRandomCodeUsr, name='GenerateRandomCodeUsr'),
+    path('RecuperarContrasenya/', viewsApi.RecuperarContrasenya, name='RecuperarContrasenya'),
+    path('GetTopReproducciones/', viewsApi.GetTopReproducciones, name='GetTopReproducciones'),
 ]

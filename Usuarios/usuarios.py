@@ -90,6 +90,12 @@ def setUser(r, usuarioDiccionario):
     return id
 
 
+def setCalidadPorDefecto(r, idUsuario, calidad):
+    daoUsuario.setCalidadPorDefecto(r, idUsuario, calidad)
+
+def getCalidadPorDefecto(r, idUsuario):
+    return daoUsuario.getCalidadPorDefecto(r, idUsuario)
+
 def getUser(r, id):
     return daoUsuario.getUsuario(r, id)
 
@@ -132,6 +138,9 @@ def ValidateUser(r, id, contrasenya):
     if (daoUsuario.getContrasenya(r, id) == contrasenya):
         return True
     return False
+
+def setContrasenya(r, id, contrasenya):
+    daoUsuario.setContrasenya(r, id, contrasenya)
 
 def getIdEmailId(r, email):
     return daoUsuario.getIdEmailId(r, email)
@@ -510,6 +519,10 @@ def setPrivacidadCarpeta(r, idCarpeta, privacidad):
 
 
 
+def setCodigoRecuperacion(r, idUsuario, codigo):
+    daoUsuario.setCodigoRecuperacion(r, idUsuario, codigo)
 
+def getCodigoRecuperacion(r, idUsuario):
+    return daoUsuario.getCodigoRecuperacion(r, idUsuario)
 
 

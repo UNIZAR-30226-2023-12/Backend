@@ -1,5 +1,12 @@
 version: '3.9'
 services:
+  django:
+    image: melodia/django:latest
+    depends_on:
+      - redis
+    ports:
+      - "8081:8081"
+    container_name: django
   redis:
     image: melodia/redis:latest
     ports:

@@ -17,3 +17,6 @@ def addSecondsToSong(r, idAudio, segundos):
         segundosActuales = 0
     segundos += int(segundosActuales)
     daoGlobal.setSegundosReproduciodosAudio(r, idAudio, segundos)
+
+def getSongSeconds(r, idAudio):
+    return daoGlobal.getSegundosReproduciodosAudio(r, idAudio)

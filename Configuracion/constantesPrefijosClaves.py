@@ -136,6 +136,8 @@ CLAVE_CALIDAD_AUDIO = "calidad"
 CLAVE_FICHERO_ALTA_CALIDAD = "ficheroAltaCalidad"
 CLAVE_FICHERO_BAJA_CALIDAD = "ficheroBajaCalidad"
 CLAVE_PREFIJO_AUDIO = "audio"
+CLAVE_ES_PODCAST = "esPodcast"
+CLAVE_SECOND = "second"
 
 CLAVE_ID_AMIGO = "idAmigo"
 
@@ -198,3 +200,8 @@ PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO = "segundosReproducidos"
 
 
 CLAVE_ID_ERROR = "idError"
+
+CORREO_RECUPERACION = "enterprisemussa@gmail.com"
+CONTRASENYA_CORREO_RECUPERACION = "bupkbmfyswswolsu"
+PREFIJO_CODIGO_RECUPERACION = "codigo"
+CLAVE_CODIGO_RECUPERACION = "codigo"

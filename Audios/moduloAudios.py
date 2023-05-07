@@ -11,6 +11,7 @@ from Audios import controlAudios
 from Audios import controlCalidadAudios
 from DAOS import daoAudio as dao
 from Configuracion import constantesPrefijosClaves as constantes 
+from Configuracion import constantesErroresHTTP as errores
 ##############################################################################################################
 #
 #
@@ -41,7 +42,7 @@ def anyadirCancion(r, dic):
     calidad = dic['calidad']
     nVeces = 0
     val = 0
-    genero = dic['generos']
+    genero = dic['genero']
     longitud = dic['longitud']
     esPodcast = dic['esPodcast']
 
@@ -49,15 +50,15 @@ def anyadirCancion(r, dic):
     idGenero = constantes.obtenerIDGenero(genero)
 
     if calidad == 'alta':
-        ficheroAltaCalidad = dic['ficheroAltaCalidad']
+        ficheroAltaCalidad = dic['audio']
         ficheroBajaCalidad = controlCalidadAudios.convertirWavAMP3(ficheroAltaCalidad)
     elif calidad == 'baja':
         # Si no se dispone de fichero de alta calidad se inicia a -1
         ficheroAltaCalidad = '-1'
-        ficheroBajaCalidad = dic['ficheroBajaCalidad']
+        ficheroBajaCalidad = dic['audio']
     else:
         print("Opción de calidad no válida")
-        return -1
+        return errores.ERROR_CANCION_ELEMENTOS_VACIOS
     
     # Obtengo el id de la última canción que se ha añadido e incremento en 1
     id = controlAudios.IDUltimoAudio(r)
@@ -74,7 +75,7 @@ def anyadirCancion(r, dic):
     # Almaceno la canción
     controlAudios.almacenarCancion(r, cancionDic)
 
-    return 0
+    return errores.OK
 
 # Función para eliminar una canción
 def eliminarCancion(r, id):
@@ -104,11 +105,13 @@ def modificarCancion(r, id, dic):
     
 # Función para obtener el diccionario de una canción
 def obtenerDiccionarioCancion(r, id):
+    controlAudios.addReproduccion(r, id)
     return controlAudios.obtenerTodosCancion(r, id)
 
 
 def obtenerTodasLasCanciones(r):
-    return dao.obtenerTodasLasCanciones(r)
+    audios = dao.obtenerTodasLasCanciones(r)
+    return audios
 
 def obtenerTodosLosPodcasts(r):
     return dao.obtenerTodosLosPodcasts(r)
@@ -180,6 +183,13 @@ def anyadirPodcast(r, dic):
     controlAudios.almacenarPodcast(r, podcastDic)
 
     return 0
+
+
+def setLastSecondHeared(r, idUsuario, idAudio, second):
+    return dao.setLastSecondHeared(r, idUsuario, idAudio, second)
+
+def getReproducciones(r, id):
+    return controlAudios.getReproducciones(r, id)
 
 # Función para eliminar un podcast
 def eliminarPodcast(r, id):

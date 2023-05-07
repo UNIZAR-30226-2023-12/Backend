@@ -14,9 +14,14 @@ from recomendador import generacion_datos as gen_datos
 
 from Global import ModuloGlobal
 
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.image import MIMEImage
 
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+import random
 
 r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
 
@@ -41,9 +46,8 @@ def echo(request):
 # Create your views here.
 @csrf_exempt
 def GetSong(request):
-    fichero = -1
-    # Compruebo que el método sea GET
-    if request.method != 'GET':
+    # Compruebo que el método sea POST
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     jsonData = json.loads(request.body)
@@ -54,8 +58,8 @@ def GetSong(request):
     status = usuarios.ValidateUser(r, idUsuario, contrasenya)
 
     # Si no es valido devuelvo el error
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    if (status == False):
+        return JsonResponse({'status': status}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     
     audio = moduloAudios.obtenerDiccionarioCancion(r, idAudio)
     del audio[constantes.CLAVE_FICHERO_ALTA_CALIDAD]
@@ -73,7 +77,7 @@ def GetFicheroSong(request):
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
     id = request.GET.get(constantes.CLAVE_ID_AUDIO)
-    calidadAlta = request.GET.get(constantes.CLAVE_FICHERO_ALTA_CALIDAD)
+    calidadAlta = request.GET.get(constantes.CLAVE_CALIDAD_AUDIO)
     esCancion = request.GET.get('esCancion')
 
     if esCancion == "True":
@@ -165,7 +169,7 @@ def SetSong(request):
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     status = usuarios.ValidateUser(r, idUsuario, contrasenya)
 
-    if status == erroresHTTP.OK:
+    if status == True:
 
         # Añado la canción a la base de datos
         status = moduloAudios.anyadirCancion(r, json_data)
@@ -175,7 +179,7 @@ def SetSong(request):
 
         return JsonResponse({'msg': 'Cancion añadida correctamente'}, status=erroresHTTP.OK)
     else:
-        return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=status)
+        return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
 
 @csrf_exempt
 def SetUser(request):
@@ -283,6 +287,70 @@ def SetLista(request):
     return JsonResponse({constantes.CLAVE_ID_LISTA: idLista}, status=erroresHTTP.OK)
     
     
+@csrf_exempt
+def SetLastSecondHeared(request):
+    # String idUsr, String contrasenya, String idAudio, int second
+    if request.method == 'POST':
+        # Parse the JSON data from the request body
+        json_data = json.loads(request.body)
+        
+        idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+        contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+        idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+        second = json_data[constantes.CLAVE_SECOND]
+
+        # Validates the user
+        status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+        if (status != erroresHTTP.OK):
+            return JsonResponse({'status': status}, status=status)
+        
+        status = moduloAudios.setLastSecondHeared(r, idUsuario, idAudio, second)
+        return JsonResponse({'status': status}, status=status)
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@csrf_exempt
+def GetTopReproducciones(request):
+
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+
+    n = int(json_data[constantes.CLAVE_N])
+    esPodcast = json_data[constantes.CLAVE_ES_PODCAST] == "1"
+ 
+
+    if esPodcast:
+        audios  = list(moduloAudios.obtenerTodosLosPodcasts(r))
+    else:
+        audios = moduloAudios.obtenerTodasLasCanciones(r)
+        print(audios)
+        audios  = list(audios)
+
+
+    reproducciones = []
+
+    # Obtiene las reproducciones de cada audio
+    for audio in audios:
+        reproducciones.append(moduloAudios.getReproducciones(r, audio))
+
+    # pair the elements of the two lists
+    pairs = list(zip(audios, reproducciones))
+
+    # sort the pairs based on the values in the second list (i.e. b)
+    sorted_pairs = sorted(pairs, key=lambda x: x[1])
+
+    # extract the first element of each pair (i.e. the elements of a) into a new list
+    audios_ordenados = [pair[0] for pair in sorted_pairs]
+
+    return JsonResponse({'topAudios': audios_ordenados[0:n]}, status=200)
+
+
+
+    
+
 @csrf_exempt
 def ChangeNameListRepUsr(request):
     if request.method != 'POST':
@@ -627,6 +695,20 @@ def AddSecondsToSong(request):
     return JsonResponse({'status': status}, status=status)
 
 
+def GetSongSeconds(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request bdoy to extract idUsuario
+    idAudio = request.GET.get(constantes.CLAVE_ID_AUDIO)
+
+    # Control de errores
+    if(moduloAudios.existeCancion(r, idAudio) == False):
+        return JsonResponse({'error': 'La canción no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
+    
+    segundos = ModuloGlobal.getSongSeconds(r, idAudio)
+
+    return JsonResponse({constantes.CLAVE_SEGUNDOS: segundos}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def SetFolder(request):
@@ -1662,6 +1744,25 @@ def GlobalSearch(request):
     #return JsonResponse({'status': status}, status=status)
     return JsonResponse({'datos': respuesta}, status=200)
 
+
+@csrf_exempt
+def ByWordSearch(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    querys = request.GET.get(constantes.CLAVE_QUERY)
+    n = request.GET.get(constantes.CLAVE_N)    
+
+    respuestas = []
+
+    for query in querys:
+        respuesta = moduloAudios.buscarCanciones(r, query, n)
+        respuestas.append(respuesta)
+
+    return JsonResponse({'datos': respuestas}, status=200)
+
+
+
 @csrf_exempt
 def GetRecomendedAudio(request):
 
@@ -1743,3 +1844,131 @@ def AlmacenarEjemplo(request):
 
     return JsonResponse({'msg': 'Ejemplo almacenado correctamente'}, status=erroresHTTP.OK)
 
+@csrf_exempt
+def GenerateRandomCodeUsr(request):
+    # Compruebo que el método sea GET
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    emailUsuario = json_data[constantes.CLAVE_EMAIL]
+
+    # Compruebo que el usuario existe
+    if(usuarios.existeUsuarioEmail(r, emailUsuario)):
+
+        # Generar número aleatorio
+        code = random.randint(100000, 999999)
+        usuarios.setCodigoRecuperacion(r, emailUsuario, code)
+
+        
+        # Configuración del servidor de correo electrónico y la cuenta
+        smtp_server = "smtp.gmail.com"
+        smtp_port = 587
+        smtp_username = constantes.CORREO_RECUPERACION
+        smtp_password = constantes.CONTRASENYA_CORREO_RECUPERACION
+
+        # Configuración del correo electrónico
+        from_email = smtp_username
+        to_email = emailUsuario
+        subject = "Recupera tu contraseña - Melodia"
+        body = "Tu código de recuperación es el siguiente: " + str(code) + "\n\n" + "Si no has solicitado recuperar tu contraseña, ignora este correo."
+
+        msg = MIMEMultipart()
+        msg['From'] = from_email
+        msg['To'] = to_email
+        msg['Subject'] = subject
+
+        # Agregar el cuerpo del correo electrónico
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Conectar al servidor SMTP y enviar el correo electrónico
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_username, smtp_password)
+            server.sendmail(from_email, to_email, msg.as_string())
+
+        code = erroresHTTP.OK
+
+    else:
+        code = erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
+
+
+    return JsonResponse({'code': code}, status=erroresHTTP.OK)
+
+
+
+@csrf_exempt
+def SetCalidadPorDefectoUsr(request):
+    # Compruebo que el método sea GET
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    passwd = json_data[constantes.CLAVE_CONTRASENYA]
+    calidad = json_data[constantes.CLAVE_CALIDAD_PREFERIDA]
+
+    status = usuarios.ValidateUser(r, idUsuario, passwd)
+    # Compruebo que el usuario existe
+    if(status == erroresHTTP.OK):
+        usuarios.setCalidadPorDefecto(r, idUsuario, calidad)
+        code = erroresHTTP.OK
+    else:
+        code = status
+
+    return JsonResponse({'code': code}, status=erroresHTTP.OK)
+
+
+@csrf_exempt
+def GetCalidadPorDefectoUsr(request):
+    # Compruebo que el método sea GET
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    passwd = json_data[constantes.CLAVE_CONTRASENYA]
+
+    status = usuarios.ValidateUser(r, idUsuario, passwd)
+    # Compruebo que el usuario existe
+    if(status == erroresHTTP.OK):
+        calidad = usuarios.getCalidadPorDefecto(r, idUsuario)
+        code = erroresHTTP.OK
+    else:
+        code = status
+
+    return JsonResponse({'code': code, 'calidad': calidad}, status=erroresHTTP.OK)
+
+@csrf_exempt
+def RecuperarContrasenya(request):
+    # Compruebo que el método sea GET
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    emailUsuario = json_data[constantes.CLAVE_EMAIL]
+    code = json_data[constantes.CLAVE_CODIGO_RECUPERACION]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+
+    # Compruebo que el usuario existe
+    if(usuarios.existeUsuarioEmail(r, emailUsuario)):
+        # Compruebo que el código es correcto
+        if(usuarios.getCodigoRecuperacion(r, emailUsuario) == code):
+
+            # Obtengo la id del usuario
+            idUsuario = usuarios.getIdEmailId(r, emailUsuario)
+            usuarios.setContrasenya(r, idUsuario, contrasenya)
+            code = erroresHTTP.OK
+        else:
+            code = erroresHTTP.ERROR_USUARIO_CODIGO_RECUPERACION_INCORRECTO
+    else:
+        code = erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO
+
+    return JsonResponse({'code': code}, status=erroresHTTP.OK)
