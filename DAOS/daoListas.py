@@ -58,10 +58,6 @@ def eliminarLista(r, id):
     # Elimino la playlist
     r.delete(id)
 
-    # Elimino la lista de canciones de la playlist
-    r.delete(constantes.CLAVE_AUDIOS + ":" + id)
-    return 0
-
 #########################################################################################
 #
 #

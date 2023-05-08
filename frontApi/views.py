@@ -173,6 +173,9 @@ def SetSong(request):
 
         # Añado la canción a la base de datos
         status = moduloAudios.anyadirCancion(r, json_data)
+        
+        # Añado la canción a la lista de canciones del artista
+        usuarios.anyadirCancionArtista(r, idUsuario, idCancion)
 
         if status != 0:
             return JsonResponse({'error': 'Ha ocurrido un problema'}, status=status)
@@ -278,7 +281,7 @@ def SetLista(request):
         return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if (usuarios.correctoDiccionarioLista(diccionarioLista) == False):
         return JsonResponse({'error': 'El diccionario no es correcto'}, status=erroresHTTP.ERROR_LISTA_PARAMETROS_INCORRECTOS)
-    if (usuarios.listaPrivacidadValida(diccionarioLista[constantes.CLAVE_PRIVACIDAD_LISTA]) == False):
+    if (usuarios.isListaPrivacidadValida(diccionarioLista[constantes.CLAVE_PRIVACIDAD_LISTA]) == False):
         return JsonResponse({'error': 'La privacidad no es valida'}, status=erroresHTTP.ERROR_LISTA_PRIVACIDAD_INCORRECTA)
     if (usuarios.tipoListaValido(diccionarioLista[constantes.CLAVE_TIPO_LISTA]) == False):
         return JsonResponse({'error': 'El tipo de lista no es valido'}, status=erroresHTTP.ERROR_LISTA_TIPO_INCORRECTO)
@@ -347,10 +350,6 @@ def GetTopReproducciones(request):
 
     return JsonResponse({'topAudios': audios_ordenados[0:n]}, status=200)
 
-
-
-    
-
 @csrf_exempt
 def ChangeNameListRepUsr(request):
     if request.method != 'POST':
@@ -408,7 +407,7 @@ def SetSongLista(request):
         return JsonResponse({'error': 'La lista no pertenece al usuario'}, status=erroresHTTP.FORBIDDEN)
     
     # No error, so add the song to the list
-    usuarios.setSongLista(r, idLista, idAudio)
+    usuarios.anyadirAudioLista(r, idLista, idAudio)
     
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
@@ -1250,7 +1249,7 @@ def GetSongsArtist(request):
     if(usuarios.getTipoUsr(r, idArtista) != constantes.USUARIO_ARTISTA):
         return JsonResponse({'error': 'El usuario no es un artista'}, status=erroresHTTP.ERROR_USUARIO_NO_ARTISTA)
     
-    return JsonResponse({constantes.CLAVE_CANCIONES : usuarios.getSongsArtist(r, idArtista)}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.CLAVE_CANCIONES : usuarios.getCancionesArtista(r, idArtista)}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def RemoveUser(request):
@@ -1295,7 +1294,7 @@ def GetEmailUsr(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idUsuarioEmail = json_data[constantes.CLAVE_ID_USUARIO + 'Email']
+    idUsuarioEmail = json_data[constantes.CLAVE_ID_USUARIO + '2']
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -1315,7 +1314,7 @@ def SetEmailUsr(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idUsuarioEmail = json_data[constantes.CLAVE_ID_USUARIO + 'Email']
+    idUsuarioEmail = json_data[constantes.CLAVE_ID_USUARIO + '2']
     email = json_data[constantes.CLAVE_EMAIL]
 
     # Control de errores
@@ -1325,6 +1324,8 @@ def SetEmailUsr(request):
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeUsuario(r, idUsuarioEmail) == False):
         return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.existeUsuarioEmail(r, email) == True):
+        return JsonResponse({'error': 'El email ya existe'}, status=erroresHTTP.ERROR_USUARIO_EMAIL_YA_EXISTE)
     if(idUsuario != idUsuarioEmail and usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ADMINISTRADOR):
         return JsonResponse({'error': 'No tienes permisos para modificar este usuario'}, status=erroresHTTP.FORBIDDEN)
 
@@ -1340,7 +1341,7 @@ def GetAliasUsr(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idUsuarioAlias = json_data[constantes.CLAVE_ID_USUARIO + 'Alias']
+    idUsuarioAlias = json_data[constantes.CLAVE_ID_USUARIO + '2']
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -1360,7 +1361,7 @@ def SetAliasUsr(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idUsuarioAlias = json_data[constantes.CLAVE_ID_USUARIO + 'Alias']
+    idUsuarioAlias = json_data[constantes.CLAVE_ID_USUARIO + '2']
     alias = json_data[constantes.CLAVE_ALIAS]
 
     # Control de errores
@@ -1385,7 +1386,7 @@ def GetContrasenyaUsr(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idUsuarioContrasenya = json_data[constantes.CLAVE_ID_USUARIO + 'Contrasenya']
+    idUsuarioContrasenya = json_data[constantes.CLAVE_ID_USUARIO + '2']
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -1407,7 +1408,7 @@ def SetContrasenyaUsr(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idUsuarioContrasenya = json_data[constantes.CLAVE_ID_USUARIO + 'Contrasenya']
+    idUsuarioContrasenya = json_data[constantes.CLAVE_ID_USUARIO + '2']
     contrasenyaNueva = json_data[constantes.CLAVE_CONTRASENYA_NUEVA]
 
     # Control de errores
@@ -1432,7 +1433,7 @@ def GetTipoUsr(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idUsuarioTipo = json_data[constantes.CLAVE_ID_USUARIO + 'Tipo']
+    idUsuarioTipo = json_data[constantes.CLAVE_ID_USUARIO + '2']
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -1452,7 +1453,7 @@ def SetTipoUsr(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idUsuarioTipo = json_data[constantes.CLAVE_ID_USUARIO + 'Tipo']
+    idUsuarioTipo = json_data[constantes.CLAVE_ID_USUARIO + '2']
     tipoUsuario = json_data[constantes.CLAVE_TIPO_USUARIO]
 
     # Control de errores
@@ -1479,7 +1480,7 @@ def GetImagenPerfilUsr(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idUsuarioImagen = json_data[constantes.CLAVE_ID_USUARIO + 'Imagen']
+    idUsuarioImagen = json_data[constantes.CLAVE_ID_USUARIO + '2']
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -1500,7 +1501,7 @@ def SetImagenPerfilUsr(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idUsuarioImagen = json_data[constantes.CLAVE_ID_USUARIO + 'Imagen']
+    idUsuarioImagen = json_data[constantes.CLAVE_ID_USUARIO + '2']
     imagenPerfil = json_data[constantes.CLAVE_IMAGEN_PERFIL]
 
     # Control de errores
@@ -1553,7 +1554,7 @@ def SetNombreListaRep(request):
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     idLista = json_data[constantes.CLAVE_ID_LISTA]
-    nombreLista = json_data[constantes.CLAVE_NOMBRE_CARPETA]
+    nombreLista = json_data[constantes.CLAVE_NOMBRE_LISTA]
 
     # Control de errores
 
@@ -1617,7 +1618,7 @@ def SetPrivacidadListaRep(request):
         return JsonResponse({'error': 'La lista no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
     if (usuarios.isListaFromUser(r, idUsuario, idLista) and usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ADMINISTRADOR):
         return JsonResponse({'error': 'No tienes permisos para modificar esta lista'}, status=erroresHTTP.FORBIDDEN)
-    if(usuarios.listaPrivacidadValida(privacidadLista) == False):
+    if(usuarios.isListaPrivacidadValida(privacidadLista) == False):
         return JsonResponse({'error': 'La privacidad de la lista no es correcta'}, status=erroresHTTP.ERROR_LISTA_PRIVACIDAD_INCORRECTA)
     
     usuarios.setPrivacidadListaRep(r, idLista, privacidadLista)

@@ -54,10 +54,6 @@ def eliminarListaCarpeta(r, idCarpeta, idPlaylists):
 def eliminarCarpeta(r, id):
     # Elimino la carpeta
     r.delete(id)
-    
-    # Elimino la lista de playlists de la carpeta
-    r.delete(constantes.CLAVE_LISTAS_CARPETA + ":" + id)
-    return 0
 
 #########################################################################################
 #
