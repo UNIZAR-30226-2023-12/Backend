@@ -125,10 +125,18 @@ def getCalidadPorDefecto(r, idUsuario):
 # que el usuario en caso de ser artista no se borra de sus suscriptores
 def removeUser(r, id, contrasenya):
     amigos = daoUsuario.getAmigos(r, id)
-    #Eliminar usuario de la lista de amigos de sus amigos
+    # Eliminar usuario de la lista de amigos de sus amigos
     for amigo in amigos:
         daoUsuario.eliminarAmigo(r, amigo, id)
-    #Eliminar los sets de amigos, artistas, listas, notificaciones y carpetas
+    # Elimina las listas del usuario
+    for lista in daoUsuario.getListas(r, id):
+        removeLista(r, id, lista)
+    # Elimina las carpetas del usuario
+    for folder in daoUsuario.getCarpetas(r, id):
+        removeFolder(r, id, folder)
+    
+        #Eliminar los sets de amigos, artistas, listas, notificaciones y carpetas
+
     r.delete(constantes.PREFIJO_AMIGOS + id)
     r.delete(constantes.PREFIJO_ARTISTAS_SUSCRITOS + id)
     r.delete(constantes.CLAVE_LISTAS + id)
@@ -334,7 +342,6 @@ def isListaFromCarpeta(r, idCarpeta, idLista):
 def setLista(r, idUsuario, diccionarioLista):
     id = daoListas.getIdContador(r)
     diccionarioLista[constantes.CLAVE_ID_LISTA] = id
-    diccionarioLista[constantes.CLAVE_ID_USUARIO] = idUsuario
 
     # Creamos la lista
     daoListas.setLista(r, diccionarioLista) 
@@ -509,14 +516,15 @@ def removeListFromFolder(r, idCarpeta, idLista):
        
 def removeFolder(r, idUsuario, idCarpeta):
     # Elimino las listas de la carpeta
-    for lista in daoCarpetas.getListasCarpeta:
+    for lista in daoCarpetas.getListasCarpeta(r, idCarpeta):
+        # Elimino las lista
         removeLista(r, idUsuario, lista)
 
-    # Elimino la lista de playlists de la carpeta
-    r.delete(constantes.CLAVE_LISTAS_CARPETA + ":" + id)
 
     # Elimino la información de la carpeta
     daoCarpetas.eliminarCarpeta(r, idCarpeta)
+
+    r.delete(constantes.CLAVE_LISTAS_CARPETA + ":" + idCarpeta)
     # Elimino el id de la carpeta del usuario
     daoUsuario.eliminarCarpeta(r, idUsuario, idCarpeta)
     

@@ -25,6 +25,11 @@ import random
 
 r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
 
+@csrf_exempt
+def FlushDB(request):
+    r.flushdb()
+    return JsonResponse({'status': 'OK'})
+
 # echo request
 @csrf_exempt
 def echo(request):
@@ -201,7 +206,8 @@ def SetUser(request):
 
     diccionarioLista = {constantes.CLAVE_NOMBRE_LISTA : "Favoritos", 
                         constantes.CLAVE_PRIVACIDAD_LISTA : constantes.LISTA_PRIVADA, 
-                        constantes.CLAVE_TIPO_LISTA : constantes.LISTA_TIPO_FAVORITOS}
+                        constantes.CLAVE_TIPO_LISTA : constantes.LISTA_TIPO_FAVORITOS,
+                        constantes.CLAVE_ID_USUARIO : idUsuario}
     usuarios.setLista(r, idUsuario, diccionarioLista)
 
     return JsonResponse({constantes.CLAVE_ID_USUARIO: idUsuario}, status=erroresHTTP.OK)
@@ -262,7 +268,7 @@ def SetLista(request):
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     diccionarioLista = json_data.copy()
-    del diccionarioLista[constantes.CLAVE_ID_USUARIO]
+    # Quitamos la contrasenya del diccionario
     del diccionarioLista[constantes.CLAVE_CONTRASENYA]
 
     # Control de errores
@@ -476,6 +482,8 @@ def RemoveListRepUsr(request):
         return JsonResponse({'status': erroresHTTP.ERROR_LISTA_NO_ENCONTRADA}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
     if (usuarios.isListaFromUser(r, idUsuario, idLista) == False):
         return JsonResponse({'status': erroresHTTP.FORBIDDEN}, status=erroresHTTP.FORBIDDEN)
+    if(usuarios.getTipoListaRep(r, idLista) == constantes.LISTA_TIPO_FAVORITOS):
+        return JsonResponse({'status': erroresHTTP.ERROR_LISTA_ES_FAVORITOS}, status=erroresHTTP.ERROR_LISTA_ES_FAVORITOS)
 
     # No error, so remove the list
     usuarios.removeLista(r, idLista)
@@ -751,9 +759,11 @@ def AddListToFolder(request):
         return JsonResponse({'error': 'La carpeta no existe'}, status=erroresHTTP.ERROR_CARPETA_NO_ENCONTRADA)
     if(usuarios.isCarpetaFromUser(r, idUsuario, idCarpeta) == False):
         return JsonResponse({'error': 'La carpeta no pertenece al usuario'}, status=erroresHTTP.ERROR_CARPETA_NOT_IN_USER)
-    if(usuarios.isListaFromUser(r, idUsuario, idLista) == False and usuarios.isListaPublica(r, idLista) == False):
+    if(usuarios.isListaFromUser(r, idUsuario, idLista) == False):
         return JsonResponse({'error': 'La lista no pertenece al usuario'}, status=erroresHTTP.FORBIDDEN)
-
+    if(usuarios.getTipoListaRep(r, idLista) == constantes.LISTA_TIPO_FAVORITOS):
+        return JsonResponse({'error': 'La lista es de favoritos'}, status=erroresHTTP.ERROR_LISTA_ES_FAVORITOS)
+    
     usuarios.addListToFolder(r, idCarpeta, idLista)
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)

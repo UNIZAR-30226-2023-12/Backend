@@ -19,6 +19,7 @@ from frontApi import views as viewsApi
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('FlushDB/', viewsApi.FlushDB, name='FlushDB'),
     path('GetSong/', viewsApi.GetSong, name='GetSong'),
     path('GetFicheroSong/', viewsApi.GetFicheroSong, name='GetFicheroSong'),
     path('SetSong/', viewsApi.SetSong, name='SetSong'),
