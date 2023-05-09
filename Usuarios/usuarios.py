@@ -107,8 +107,10 @@ def setTipoUsr(r, idUsuario, tipo):
     daoUsuario.setTipoUsuario(r, idUsuario, tipo)
 
 def getImagenPerfilUsr(r, idUsuario):
-    if (daoUsuario.getImagenPerfil(r, idUsuario) == None):
-        return constantes.DEFAULT_USER_IMAGE
+    imagen = daoUsuario.getImagenPerfil(r, idUsuario)
+    if(imagen == None):
+        return daoUsuario.getImagenPerfilDefault(r)
+    return imagen
 
 def setImagenPerfilUsr(r, idUsuario, imagen):
     daoUsuario.setImagenPerfil(r, idUsuario, imagen)
@@ -332,6 +334,7 @@ def isListaFromCarpeta(r, idCarpeta, idLista):
 def setLista(r, idUsuario, diccionarioLista):
     id = daoListas.getIdContador(r)
     diccionarioLista[constantes.CLAVE_ID_LISTA] = id
+    diccionarioLista[constantes.CLAVE_ID_USUARIO] = idUsuario
 
     # Creamos la lista
     daoListas.setLista(r, diccionarioLista) 
@@ -359,6 +362,10 @@ def getPrivacidadListaRep(r, idLista):
 
 def setPrivacidadListaRep(r, idLista, privacidad):
     daoListas.setPrivacidadLista(r, idLista, privacidad)
+
+def getIDUsuarioListaRep(r, idLista):
+    return daoListas.getIDUsuario(r, idLista)
+
 
 # Devuelve un set con los ids de todas las listas del usuario menos las que se encuentran en una carpeta
 def getListasUsr(r, idUsuario):

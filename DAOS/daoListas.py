@@ -4,7 +4,8 @@ import Configuracion.constantesPrefijosClaves as constantes
 
 listaClaves = [constantes.CLAVE_NOMBRE_LISTA, 
                constantes.CLAVE_PRIVACIDAD_LISTA, 
-               constantes.CLAVE_TIPO_LISTA]
+               constantes.CLAVE_TIPO_LISTA,
+               constantes.CLAVE_ID_USUARIO]
 
 def getIdContador(r):
     return constantes.PREFIJO_ID_LISTA + ":" + str(r.incr(constantes.CLAVE_CONTADOR_LISTAS))
@@ -45,6 +46,9 @@ def setPrivacidadLista(r, idLista, privacidad):
 def setTipoLista(r, idLista, tipo):
     return r.hset(idLista, constantes.CLAVE_TIPO_LISTA, tipo)
 
+def setIDUsuario(r, idLista, idUsuario):
+    return r.hset(idLista, constantes.CLAVE_ID_USUARIO, idUsuario)
+
 # Funcion para añadir una o más canciones a una playlist
 def anyadirAudioLista(r, idLista, idAudio):
     return r.sadd(constantes.CLAVE_AUDIOS + ":" + idLista, idAudio)
@@ -81,6 +85,9 @@ def getPrivacidadLista(r, id):
 # Funcion para obtener el tipo de playlist (reproduccion o favoritos o ranking)
 def getTipoLista(r, id):
     return r.hget(id, constantes.CLAVE_TIPO_LISTA)
+
+def getIDUsuario(r, id):
+    return r.hget(id, constantes.CLAVE_ID_USUARIO)
 
 # Funcion para obtener las canciones de una playlist
 def getAudiosLista(r, id):

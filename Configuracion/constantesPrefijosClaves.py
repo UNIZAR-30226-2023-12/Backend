@@ -102,6 +102,8 @@ CLAVE_QUERY = "query"
 CLAVE_N = "n"
 CLAVE_TEMPORAL_ENTRENAMIENTO = "datos_temporales"
 
+CLAVE_ID_AMIGO = "idAmigo"
+
 # Prefijos de las claves relacionadas con los usuarios
 PREFIJO_ID_USUARIO = "usuario"
 PREFIJO_AMIGOS = "amigos"
@@ -138,8 +140,14 @@ CLAVE_FICHERO_BAJA_CALIDAD = "ficheroBajaCalidad"
 CLAVE_PREFIJO_AUDIO = "audio"
 CLAVE_ES_PODCAST = "esPodcast"
 CLAVE_SECOND = "second"
+CLAVE_IMAGEN_AUDIO = "imagenAudio"
 
-CLAVE_ID_AMIGO = "idAmigo"
+CLAVE_DEFAULT_AUDIO_IMAGE = "defaultAudioImage"
+
+CLAVE_DEFAULT_USER_IMAGE = 'defaultUserImage'
+
+
+
 
 
 

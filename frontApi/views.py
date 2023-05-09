@@ -25,12 +25,6 @@ import random
 
 r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
 
-# View para pruebas
-@csrf_exempt
-def FlushDB(request):
-    r.flushdb()
-    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
-
 # echo request
 @csrf_exempt
 def echo(request):
@@ -174,8 +168,6 @@ def SetSong(request):
         # Añado la canción a la base de datos
         status = moduloAudios.anyadirCancion(r, json_data)
         
-        # Añado la canción a la lista de canciones del artista
-        usuarios.anyadirCancionArtista(r, idUsuario, idCancion)
 
         if status != 0:
             return JsonResponse({'error': 'Ha ocurrido un problema'}, status=status)
@@ -1189,7 +1181,7 @@ def GetLinkLista(request):
     return JsonResponse({constantes.CLAVE_LINK_LISTA : usuarios.getLinkLista(r, idLista)}, status=erroresHTTP.OK)
 
 @csrf_exempt
-def getListaFromLink(request):
+def GetListaFromLink(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1730,6 +1722,52 @@ def SetPrivacidadCarpeta(request):
     usuarios.setPrivacidadCarpeta(r, idCarpeta, privacidadCarpeta)
 
     return JsonResponse({'status': 'OK'}, status=erroresHTTP.OK)
+
+@csrf_exempt
+def GetUsuarioListaRep(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    json_data = json.loads(request.body)
+
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idLista = json_data[constantes.CLAVE_ID_LISTA]
+
+    # Control de errores
+
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeLista(r, idLista) == False):
+        return JsonResponse({'error': 'La lista de reproducción no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
+    if(usuarios.isListaFromUser(r, idUsuario, idLista) == False and usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ADMINISTRADOR 
+       and usuarios.isListaPublica(r, idLista) == False):
+        return JsonResponse({'error': 'No tienes permisos para obtener esta lista de reproducción'}, status=erroresHTTP.FORBIDDEN)
+    
+    return JsonResponse({constantes.CLAVE_ID_USUARIO : usuarios.getIDUsuarioListaRep(r, idLista)}, status=erroresHTTP.OK)
+
+@csrf_exempt
+def GetImagenAudio(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+
+    if(moduloAudios.existeCancion(r, idAudio) == False):
+        return JsonResponse({'error': 'El audio no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
+    
+    return JsonResponse({constantes.CLAVE_IMAGEN_AUDIO : moduloAudios.getImagenAudio(r, idAudio)}, status=erroresHTTP.OK)
 
 
 @csrf_exempt
