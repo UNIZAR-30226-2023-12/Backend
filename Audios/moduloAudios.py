@@ -12,6 +12,7 @@ from Audios import controlCalidadAudios
 from DAOS import daoAudio as dao
 from Configuracion import constantesPrefijosClaves as constantes 
 from Configuracion import constantesErroresHTTP as errores
+from Usuarios import usuarios
 ##############################################################################################################
 #
 #
@@ -75,6 +76,9 @@ def anyadirCancion(r, dic):
     # Almaceno la canción
     controlAudios.almacenarCancion(r, cancionDic)
 
+    # Añado la canción a la lista de canciones del artista
+    usuarios.anyadirCancionArtista(r, artista, id)
+
     return errores.OK
 
 # Función para eliminar una canción
@@ -122,6 +126,12 @@ def buscarCanciones(r, query, n):
     respuesta = dao.buscarAudios(r, query)
 
     return respuesta[0:n]
+
+def getValoracion(r, idUsr, idAudio):
+    return dao.getValoracion(r, idUsr, idAudio)
+
+def setValoracion(r, idUsr, idAudio, val):
+    return dao.setValoracion(r, idUsr, idAudio, val)
 
 ##############################################################################################################
 #
@@ -224,3 +234,6 @@ def modificarPodcast(r, id, dic):
 # Función para obtener el diccionario de un podcast (todos los atributos del mismo)
 def obtenerDiccionarioPodcast(r, id):
     return controlAudios.obtenerTodosPodcast(r, id)
+
+def getImagenAudio(r, id):
+    return controlAudios.getImagenAudio(r, id)

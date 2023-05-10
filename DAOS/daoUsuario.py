@@ -71,6 +71,9 @@ def getTipoUsuario(r, idUsuario):
 def getImagenPerfil(r, idUsuario):
     return r.hget(idUsuario, constantes.CLAVE_IMAGEN_PERFIL)
 
+def getImagenPerfilDefault(r):
+    return r.get(constantes.CLAVE_DEFAULT_USER_IMAGE)
+
 def anyadirAmigo(r, idUsuario, idAmigo):
     return anyadirRelacion(r, idUsuario, idAmigo, constantes.PREFIJO_AMIGOS)
     

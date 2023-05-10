@@ -129,6 +129,10 @@ def cambiarEsPodcast(r, id, esPodcast):
     r.hset(id, 'esPodcast', esPodcast)
     return 0
 
+def setImagen(r, id, imagen):
+    r.hset(id, constantes.CLAVE_IMAGEN_AUDIO, imagen)
+    return 0
+
 # Funcion para eliminar una cancion
 def eliminarCancion(r, id):
     r.delete(id)     
@@ -195,8 +199,13 @@ def buscarAudios(r, query):
 
     return encontradas
 
-    
 
+def getValoracion(r, idUsr, idAudio):
+    return r.hget(idUsr+':valoraciones', idAudio)
+
+def setValoracion(r, idUsr, idAudio, val):
+    r.hset(idUsr+':valoraciones', idAudio, val)
+    
 
 # Funcion para obtener el num de veces que se ha escuchado una cancion
 def obtenerVecesreproducidasCancion(r, id):
@@ -241,6 +250,12 @@ def obtenerNumFavoritosCancion(r, id):
 # Funcion para obtener el atributo esPodcast de un audio
 def obtenerEsPodcast(r, id):
     return r.hget(id, 'esPodcast') == 'True'
+
+def getImagenAudio(r, id):
+    return r.hget(id, constantes.CLAVE_IMAGEN_AUDIO)
+
+def getImagenDefaultAudio(r):
+    return r.get(constantes.CLAVE_DEFAULT_AUDIO_IMAGE)
 
 #########################################################################################
 #
