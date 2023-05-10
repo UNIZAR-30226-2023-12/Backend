@@ -1928,6 +1928,9 @@ def GetValoracion(request):
     
     valoracion = moduloAudios.getValoracion(r, idUsr, idAudio)
 
+    if valoracion == None:
+        valoracion = 0
+
     return JsonResponse({'valoracion': valoracion}, status=erroresHTTP.OK)
 
 
