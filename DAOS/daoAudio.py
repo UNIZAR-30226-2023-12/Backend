@@ -195,8 +195,13 @@ def buscarAudios(r, query):
 
     return encontradas
 
-    
 
+def getValoracion(r, idUsr, idAudio):
+    return r.hget(idUsr+':valoraciones', idAudio)
+
+def setValoracion(r, idUsr, idAudio, val):
+    r.hset(idUsr+':valoraciones', idAudio, val)
+    
 
 # Funcion para obtener el num de veces que se ha escuchado una cancion
 def obtenerVecesreproducidasCancion(r, id):

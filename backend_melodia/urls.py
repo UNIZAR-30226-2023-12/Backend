@@ -66,4 +66,6 @@ urlpatterns = [
     path('GenerateRandomCodeUsr/', viewsApi.GenerateRandomCodeUsr, name='GenerateRandomCodeUsr'),
     path('RecuperarContrasenya/', viewsApi.RecuperarContrasenya, name='RecuperarContrasenya'),
     path('GetTopReproducciones/', viewsApi.GetTopReproducciones, name='GetTopReproducciones'),
+    path('GetValoracion/', viewsApi.GetValoracion, name='GetValoracion'),
+    path('SetValoracion/', viewsApi.SetValoracion, name='SetValoracion'),
 ]
