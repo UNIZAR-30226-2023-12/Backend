@@ -1915,14 +1915,14 @@ def AlmacenarEjemplo(request):
 @csrf_exempt
 def GetValoracion(request):
     # Compruebo que el método sea GET
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    idUsr = request.GET.get('idUsr')
+    idUsr = request.POST.get('idUsr')
     if idUsr == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
-    idAudio = request.GET.get('idAudio')
+    idAudio = request.POST.get('idAudio')
     if idAudio == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
