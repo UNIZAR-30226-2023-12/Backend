@@ -54,11 +54,12 @@ def GetSong(request):
     idUsuario = jsonData[constantes.CLAVE_ID_USUARIO]
     contrasenya = jsonData[constantes.CLAVE_CONTRASENYA]
 
-    status = usuarios.ValidateUser(r, idUsuario, contrasenya)
 
-    # Si no es valido devuelvo el error
-    if (status == False):
-        return JsonResponse({'status': status}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     
     audio = moduloAudios.obtenerDiccionarioCancion(r, idAudio)
     del audio[constantes.CLAVE_FICHERO_ALTA_CALIDAD]
@@ -298,7 +299,7 @@ def SetLastSecondHeared(request):
         idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
         contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
         idAudio = json_data[constantes.CLAVE_ID_AUDIO]
-        second = json_data[constantes.CLAVE_SECOND]
+        second = json_data[constantes.CLAVE_SECONDS]
 
         # Validates the user
         status = usuarios.ValidateUser(r, idUsuario, contrasenya)
@@ -449,7 +450,7 @@ def GetListasUsr(request):
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
         return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
-    if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False and contrasenya != None):
+    if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
         return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeUsuario(r, idUsuarioGet) == False):
         if(usuarios.isSubscribedToArtist(r, idUsuario, idUsuarioGet) == False):
@@ -662,7 +663,7 @@ def GetTotRepTime(request):
     segundos = ModuloGlobal.getTotalSegundosReproducidosAudio(r)
 
 
-    return JsonResponse({constantes.CLAVE_SEGUNDOS: segundos}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.CLAVE_SECONDS: segundos}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def AddSecondsToSong(request):
@@ -674,7 +675,7 @@ def AddSecondsToSong(request):
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     idAudio = json_data[constantes.CLAVE_ID_AUDIO]
-    segundos = json_data[constantes.CLAVE_SEGUNDOS]
+    segundos = json_data[constantes.CLAVE_SECONDS]
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -707,7 +708,7 @@ def GetSongSeconds(request):
     
     segundos = ModuloGlobal.getSongSeconds(r, idAudio)
 
-    return JsonResponse({constantes.CLAVE_SEGUNDOS: segundos}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.CLAVE_SECONDS: segundos}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def SetFolder(request):
@@ -1078,6 +1079,47 @@ def UnsubscribeToArtist(request):
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 @csrf_exempt
+def GetSubscriptionsUsr(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+     
+    return JsonResponse({constantes.CLAVE_ARTISTA_AUDIO : usuarios.getSubscriptionsUsr(r, idUsuario)}, status=erroresHTTP.OK)
+
+@csrf_exempt
+def IsSubscribedToArtist(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Parse the JSON data from the request body to extract idUsuario
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idArtista = json_data[constantes.CLAVE_ID_USUARIO + "Artista"]
+
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+    if(usuarios.existeUsuario(r, idArtista) == False):
+        return JsonResponse({'error': 'El artista no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.getTipoUsr(r, idArtista) != constantes.USUARIO_ARTISTA):
+        return JsonResponse({'error': 'El usuario no es un artista'}, status=erroresHTTP.ERROR_USUARIO_NO_ARTISTA)
+    
+    return JsonResponse({'status': usuarios.isSubscribedToArtist(r, idUsuario, idArtista)}, status=erroresHTTP.OK)
+
+@csrf_exempt
 def GetNotificationsUsr(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -1153,7 +1195,7 @@ def SetLastSecondHeared(request):
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     idAudio = json_data[constantes.CLAVE_ID_AUDIO]
-    segundo = json_data[constantes.CLAVE_SEGUNDOS]
+    segundo = json_data[constantes.CLAVE_SECONDS]
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -1170,7 +1212,7 @@ def SetLastSecondHeared(request):
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 @csrf_exempt
-def GetLinkLista(request):
+def GetLinkAudio(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1178,20 +1220,20 @@ def GetLinkLista(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idLista = json_data[constantes.CLAVE_ID_LISTA]
+    idAudio = json_data[constantes.CLAVE_ID_LISTA]
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
         return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
-    if(usuarios.existeLista(r, idLista) == False):
-        return JsonResponse({'error': 'La lista no existe'}, status=erroresHTTP.ERROR_LISTA_NO_ENCONTRADA)
+    if(moduloAudios.existeCancion(r, idAudio) == False):
+        return JsonResponse({'error': 'El audio no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
     
-    return JsonResponse({constantes.CLAVE_LINK_LISTA : usuarios.getLinkLista(r, idLista)}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.CLAVE_LINK_AUDIO : usuarios.getLinkAudio(r, idAudio)}, status=erroresHTTP.OK)
 
 @csrf_exempt
-def GetListaFromLink(request):
+def GetAudioFromLink(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1199,7 +1241,7 @@ def GetListaFromLink(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    link = json_data[constantes.CLAVE_LINK_LISTA]
+    link = json_data[constantes.CLAVE_LINK_AUDIO]
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -1208,7 +1250,7 @@ def GetListaFromLink(request):
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
 
     
-    return JsonResponse({constantes.PREFIJO_ID_LISTA : usuarios.getListaFromLink(r, link)}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.PREFIJO_ID_LISTA : usuarios.getAudioFromLink(r, link)}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def GetLastSecondHeared(request):
@@ -1229,7 +1271,7 @@ def GetLastSecondHeared(request):
     if(moduloAudios.existeCancion(r, idAudio) == False):
         return JsonResponse({'error': 'La cancion no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
     
-    return JsonResponse({constantes.CLAVE_SEGUNDOS : usuarios.getLastSecondHeared(r, idUsuario,idAudio)}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.CLAVE_SECONDS : usuarios.getLastSecondHeared(r, idUsuario,idAudio)}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def GetSongsArtist(request):

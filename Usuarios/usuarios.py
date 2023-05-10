@@ -213,6 +213,9 @@ def subscribeToArtist(r, idUsuario, idArtista):
 def unsubscribeToArtist(r, idUsuario, idArtista):
     daoUsuario.eliminarArtista(r, idUsuario, idArtista)
 
+def getSubscriptionsUsr(r, idUsuario):
+    return daoUsuario.getArtistas(r, idUsuario)
+
 ##############################################################################################################
 ## Funciones Usuarios Artista
 ##############################################################################################################
@@ -413,12 +416,12 @@ def removeSongLista(r, idLista, idAudio):
     return erroresHTTP.OK
 
 # Devuelve el link dado el id de una lista
-def getLinkLista(r, id):
+def getLinkAudio(r, id):
     link = f.encrypt(str(id))
     return link
 
 # Devuelve el id de una lista dado el link
-def getListaFromLink(r, link):
+def getAudioFromLink(r, link):
     id = f.decrypt(link)
     return id
 

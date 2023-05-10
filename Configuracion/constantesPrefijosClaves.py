@@ -112,7 +112,6 @@ PREFIJO_NOTIFICACIONES = "notificaciones"
 PREFIJO_CARPETAS = "carpetas"
 PREFIJO_SEGUNDOS_AUDIOS = "segundosAudios"
 # Claves para hash de ultimosAudios
-CLAVE_SEGUNDOS = "segundos"
 
 # Clave de set de ids de administradores
 CLAVE_ADMINISTRADORES = "administradores"
@@ -139,8 +138,10 @@ CLAVE_FICHERO_ALTA_CALIDAD = "ficheroAltaCalidad"
 CLAVE_FICHERO_BAJA_CALIDAD = "ficheroBajaCalidad"
 CLAVE_PREFIJO_AUDIO = "audio"
 CLAVE_ES_PODCAST = "esPodcast"
-CLAVE_SECOND = "second"
+CLAVE_SECONDS = "second"
 CLAVE_IMAGEN_AUDIO = "imagenAudio"
+CLAVE_LINK_AUDIO = "linkAudio"
+
 
 CLAVE_DEFAULT_AUDIO_IMAGE = "defaultAudioImage"
 
@@ -191,7 +192,6 @@ LISTA_TIPO_FAVORITOS = "listaFavoritos"
 LISTA_TIPO_RANKING = "listaRanking"
 LISTA_PRIVADA = "privada"
 LISTA_PUBLICA = "publica"
-CLAVE_LINK_LISTA = "linkLista"
 
 
 # Constantes simbólicas de los prefijos de los sets de listas
