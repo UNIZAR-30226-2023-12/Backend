@@ -35,7 +35,7 @@ def setCarpeta(r, carpetaDic):
     return r.hmset(id, carpetaDic)
 
 # Funcion para cambiar el nombre de una carpeta
-def cambiarNombreCarpeta(r, id, nombre):
+def setNombreCarpeta(r, id, nombre):
     return r.hset(id, constantes.CLAVE_NOMBRE_CARPETA, nombre)
 
 # Funcion para cambiar el tipo de carpeta (publica o privada)
@@ -54,10 +54,6 @@ def eliminarListaCarpeta(r, idCarpeta, idPlaylists):
 def eliminarCarpeta(r, id):
     # Elimino la carpeta
     r.delete(id)
-    
-    # Elimino la lista de playlists de la carpeta
-    r.delete(constantes.CLAVE_LISTAS_CARPETA + ":" + id)
-    return 0
 
 #########################################################################################
 #

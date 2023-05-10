@@ -88,23 +88,40 @@ print(requests.post(urlSetUser, json=usuarioTipoErroneo).status_code)
 # Pruebas GetUser
 getUser = {
     'idUsr': 'usuario:1',
-    'contrasenya': '1234'
+    'contrasenya': '1234',
+    'idUsrGet' : 'usuario:1' 
 }
 
 getUserErroneo = {
     'idUsr': 'usuario:4',
-    'contrasenya': '1234'
+    'contrasenya': '1234',
+    'idUsrGet' : 'usuario:4'
 }
 
 getUserContrasenyaErronea = {
     'idUsr': 'usuario:1',
-    'contrasenya': '12345'
+    'contrasenya': '12345',
+    'idUsrGet' : 'usuario:1'
 }
 
+getUserOtroUser = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idUsrGet' : 'usuario:2'
+}
+
+
+
 print("Pruebas get user")
-print(requests.post(urlGetUser, json=getUser).json())
-print(requests.post(urlGetUser, json=getUserErroneo).status_code)
-print(requests.post(urlGetUser, json=getUserContrasenyaErronea).status_code)
+respuesta = requests.post(urlGetUser, json=getUser)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetUser, json=getUserErroneo)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetUser, json=getUserContrasenyaErronea)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+respuesta = requests.post(urlGetUser, json=getUserOtroUser)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+
 
 
 # Pruebas validateUser
@@ -350,27 +367,32 @@ print(str(respuesta.status_code) + " " + str(respuesta.json()))
 # Pruebas getListasUsr
 getListasUsr = {
     'idUsr': 'usuario:1',
-    'contrasenya': '1234'
+    'contrasenya': '1234',
+    'idUsrGet': 'usuario:1'
 }
 
 getListasUsrErrorUsuario = {
-    'idUsr': 'usuario:3',
-    'contrasenya': '1234'
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idUsrGet': 'usuario:3'
 }
 
 getListasUsrErrorContrasenya = {
     'idUsr': 'usuario:1',
-    'contrasenya': '12345'
+    'contrasenya': '12345',
+    'idUsrGet': 'usuario:1'
 }
 
 getListasUsrPublicas = {
-    'idUsr': 'usuario:2',
-    'contrasenya': None
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idUsrGet': 'usuario:2'
 }
 
 getListasUsrPublicas2 = {
-    'idUsr': 'usuario:1',
-    'contrasenya': None
+    'idUsr': 'usuario:2',
+    'contrasenya': '1234',
+    'idUsrGet': 'usuario:1'
 }
 
 print("Pruebas getListasUsr")
@@ -755,7 +777,7 @@ AddListToFolder = {
     'idUsr': 'usuario:1',
     'contrasenya': '1234',
     'idCarpeta': 'carpeta:1',
-    'idLista': 'lista:1'
+    'idLista': 'lista:3'
 }
 
 AddListToFolderErrorUsuario = {
@@ -823,7 +845,7 @@ RemoveListFromFolder = {
     'idUsr': 'usuario:1',
     'contrasenya': '1234',
     'idCarpeta': 'carpeta:1',
-    'idLista': 'lista:1'
+    'idLista': 'lista:3'
 }
 
 RemoveListFromFolderErrorUsuario = {
@@ -996,27 +1018,32 @@ print(str(respuesta.status_code) + " " + str(respuesta.text))
 
 GetFoldersUsr = {
     'idUsr': 'usuario:1',
-    'contrasenya': '1234'
+    'contrasenya': '1234',
+    'idUsrGet' : 'usuario:1'
 }
 
 GetFoldersUsrErrorUsuario = {
     'idUsr': 'usuario:10',
-    'contrasenya': '1234'
+    'contrasenya': '1234',
+    'idUsrGet' : 'usuario:10'
 }
 
 GetFoldersUsrErrorContrasenya = {
     'idUsr': 'usuario:1',
-    'contrasenya': '12345'
+    'contrasenya': '12345',
+    'idUsrGet' : 'usuario:1'
 }
 
 GetFoldersUsrPublica = {
-    'idUsr': 'usuario:1',
-    'contrasenya': None
+    'idUsr': 'usuario:2',
+    'contrasenya': '1234',
+    'idUsrGet' : 'usuario:1'
 }
 
 GetFoldersUsrPublica2 = {
-    'idUsr': 'usuario:2',
-    'contrasenya': None
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idUsrGet' : 'usuario:2'
 }
 
 print("Pruebas GetFoldersUsr")
