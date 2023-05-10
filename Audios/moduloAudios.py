@@ -127,6 +127,12 @@ def buscarCanciones(r, query, n):
 
     return respuesta[0:n]
 
+def getValoracion(r, idUsr, idAudio):
+    return dao.getValoracion(r, idUsr, idAudio)
+
+def setValoracion(r, idUsr, idAudio, val):
+    return dao.setValoracion(r, idUsr, idAudio, val)
+
 ##############################################################################################################
 #
 #
