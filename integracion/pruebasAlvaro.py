@@ -653,6 +653,65 @@ print(requests.post(urlAcceptArtist, json=acceptArtist).status_code)
 r.delete('notificacion:2')
 r.delete('notificacion:3')
 
+# Pruebas AddSecondsToSong
+AddSecondsToSong = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idAudio': 'audio:1',
+    'second': 10
+}
+
+AddSecondsToSongErrorUsuario = {
+    'idUsr': 'usuario:10',
+    'contrasenya': '1234',
+    'idAudio': 'audio:1',
+    'second': 10
+}
+
+AddSecondsToSongErrorContrasenya = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '12345',
+    'idAudio': 'audio:1',
+    'second': 10
+}
+
+AddSecondsToSongErrorAudio = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idAudio': 'audio:10',
+    'second': 10
+}
+
+AddSecondsToSongErrorSeconds = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idAudio': 'audio:1',
+    'second': -10
+}
+
+AddSecondsToSong2 = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idAudio': 'audio:2',
+    'second': 10
+}
+
+GetTotRepTime = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234'
+}
+
+print("Pruebas AddSecondsToSong")
+respuesta = requests.post(urlGetTotRepTime, json=GetTotRepTime)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+print(requests.post(urlAddSecondsToSong, json=AddSecondsToSong2).status_code)
+print(requests.post(urlAddSecondsToSong, json=AddSecondsToSong).status_code)
+print(requests.post(urlAddSecondsToSong, json=AddSecondsToSongErrorUsuario).status_code)
+print(requests.post(urlAddSecondsToSong, json=AddSecondsToSongErrorContrasenya).status_code)
+print(requests.post(urlAddSecondsToSong, json=AddSecondsToSongErrorAudio).status_code)
+print(requests.post(urlAddSecondsToSong, json=AddSecondsToSongErrorSeconds).status_code)
+print(requests.post(urlAddSecondsToSong, json=AddSecondsToSong).status_code)
+
 # Pruebas GetTotRepTime
 GetTotRepTime = {
     'idUsr': 'usuario:1',
@@ -684,52 +743,8 @@ respuesta = requests.post(urlGetTotRepTime, json=GetTotRepTimeErrorContrasenya)
 print(str(respuesta.status_code) + " " + str(respuesta.json()))
 respuesta = requests.post(urlGetTotRepTime, json=GetTotRepTimeErrorAdmin)
 print(str(respuesta.status_code) + " " + str(respuesta.json()))
+exit(0)
 
-# Pruebas AddSecondsToSong
-AddSecondsToSong = {
-    'idUsr': 'usuario:1',
-    'contrasenya': '1234',
-    'idAudio': 'audio:1',
-    'segundos': 10
-}
-
-AddSecondsToSongErrorUsuario = {
-    'idUsr': 'usuario:10',
-    'contrasenya': '1234',
-    'idAudio': 'audio:1',
-    'segundos': 10
-}
-
-AddSecondsToSongErrorContrasenya = {
-    'idUsr': 'usuario:1',
-    'contrasenya': '12345',
-    'idAudio': 'audio:1',
-    'segundos': 10
-}
-
-AddSecondsToSongErrorAudio = {
-    'idUsr': 'usuario:1',
-    'contrasenya': '1234',
-    'idAudio': 'audio:10',
-    'segundos': 10
-}
-
-AddSecondsToSongErrorSeconds = {
-    'idUsr': 'usuario:1',
-    'contrasenya': '1234',
-    'idAudio': 'audio:1',
-    'segundos': -10
-}
-
-print("Pruebas AddSecondsToSong")
-print(requests.post(urlAddSecondsToSong, json=AddSecondsToSong).status_code)
-print(requests.post(urlAddSecondsToSong, json=AddSecondsToSongErrorUsuario).status_code)
-print(requests.post(urlAddSecondsToSong, json=AddSecondsToSongErrorContrasenya).status_code)
-print(requests.post(urlAddSecondsToSong, json=AddSecondsToSongErrorAudio).status_code)
-print(requests.post(urlAddSecondsToSong, json=AddSecondsToSongErrorSeconds).status_code)
-print(requests.post(urlAddSecondsToSong, json=AddSecondsToSong).status_code)
-respuesta = requests.post(urlGetTotRepTime, json=GetTotRepTime)
-print(str(respuesta.status_code) + " " + str(respuesta.json()))
 
 # Pruebas SetFolder
 SetFolder = {
