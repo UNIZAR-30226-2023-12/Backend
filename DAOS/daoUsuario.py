@@ -179,13 +179,13 @@ def getAdministradores(r):
 
 # Funciones para crear set de ulimos Audios escuchados)
 def setSegundosAudio(r, idUsuario, idAudio, segundos):
-    return r.set(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio, segundos)
+    return r.hset(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario, idAudio, segundos)
 
 def getSegundosAudio(r, idUsuario, idAudio):
-    return r.get(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
+    return r.hget(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario, idAudio)
 
 def eliminarSegundosAudio(r, idUsuario, idAudio):
-    return r.delete(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
+    return r.delete(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario,  idAudio)
 
 # Daos para crear tabla hash email | idUsuario para agilizar el inicio de sesion
 def setEmailId(r, email, idUsuario):

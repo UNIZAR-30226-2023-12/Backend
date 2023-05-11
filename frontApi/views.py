@@ -166,19 +166,24 @@ def SetUser(request):
     json_data = json.loads(request.body)
     
     email = json_data[constantes.CLAVE_EMAIL]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    alias = json_data[constantes.CLAVE_ALIAS]
+    tipoUsuario = json_data[constantes.CLAVE_TIPO_USUARIO]
+
+    diccionarioUsuario = {constantes.CLAVE_EMAIL : email,
+                            constantes.CLAVE_CONTRASENYA : contrasenya,
+                            constantes.CLAVE_ALIAS : alias,
+                            constantes.CLAVE_TIPO_USUARIO : tipoUsuario}
 
     # Control de errores
     if(usuarios.existeUsuarioEmail(r, email)):
         return JsonResponse({'error': 'El email ya existe'}, status=erroresHTTP.ERROR_USUARIO_EMAIL_YA_EXISTE)
     
-    if(usuarios.correctoDiccionarioUsuario(json_data) == False):
-        return JsonResponse({'error': 'El diccionario no es correcto'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
-    
     if(usuarios.tipoUsuarioValido(json_data[constantes.CLAVE_TIPO_USUARIO]) == False):
         return JsonResponse({'error': 'El tipo de usuario no es valido'}, status=erroresHTTP.ERROR_USUARIO_TIPO_NO_VALIDO)
     
     # No error, so add the user
-    idUsuario = usuarios.setUser(r, json_data)
+    idUsuario = usuarios.setUser(r, diccionarioUsuario)
 
     diccionarioLista = {constantes.CLAVE_NOMBRE_LISTA : "Favoritos", 
                         constantes.CLAVE_PRIVACIDAD_LISTA : constantes.LISTA_PRIVADA, 
@@ -243,9 +248,14 @@ def SetLista(request):
     
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    diccionarioLista = json_data.copy()
-    # Quitamos la contrasenya del diccionario
-    del diccionarioLista[constantes.CLAVE_CONTRASENYA]
+    nombreLista = json_data[constantes.CLAVE_NOMBRE_LISTA]
+    privacidadLista = json_data[constantes.CLAVE_PRIVACIDAD_LISTA]
+    tipoLista = json_data[constantes.CLAVE_TIPO_LISTA]
+    diccionarioLista = {constantes.CLAVE_ID_USUARIO : idUsuario,
+                        constantes.CLAVE_NOMBRE_LISTA : nombreLista,
+                        constantes.CLAVE_PRIVACIDAD_LISTA : privacidadLista,
+                        constantes.CLAVE_TIPO_LISTA : tipoLista}
+
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -253,8 +263,6 @@ def SetLista(request):
     # Validates the user
     if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
         return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
-    if (usuarios.correctoDiccionarioLista(diccionarioLista) == False):
-        return JsonResponse({'error': 'El diccionario no es correcto'}, status=erroresHTTP.ERROR_LISTA_PARAMETROS_INCORRECTOS)
     if (usuarios.isListaPrivacidadValida(diccionarioLista[constantes.CLAVE_PRIVACIDAD_LISTA]) == False):
         return JsonResponse({'error': 'La privacidad no es valida'}, status=erroresHTTP.ERROR_LISTA_PRIVACIDAD_INCORRECTA)
     if (usuarios.tipoListaValido(diccionarioLista[constantes.CLAVE_TIPO_LISTA]) == False):
@@ -665,9 +673,9 @@ def AddSecondsToSong(request):
     if (segundos < 0):
         return JsonResponse({'error': 'Los segundos no pueden ser negativos'}, status=erroresHTTP.ERROR_SEGUNDOS_NEGATIVOS)
 
-    status = ModuloGlobal.addSecondsToSong(r, idAudio, segundos)
+    ModuloGlobal.addSecondsToSong(r, idAudio, segundos)
 
-    return JsonResponse({'status': status}, status=status)
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 
 def GetSongSeconds(request):
@@ -704,8 +712,6 @@ def SetFolder(request):
         return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
-    if(usuarios.correctoDiccionarioCarpeta(diccionarioCarpeta) == False):
-        return JsonResponse({'error': 'El diccionario de la carpeta no es correcto'}, status=erroresHTTP.ERROR_CARPETA_PARAMETROS_INCORRECTOS)
     if(usuarios.carpetaPrivacidadValida(privacidad) == False):
         return JsonResponse({'error': 'La privacidad no es correcta'}, status=erroresHTTP.ERROR_CARPETA_PRIVACIDAD_NO_VALIDA)
     idFolder = usuarios.setFolder(r, idUsuario, diccionarioCarpeta)
@@ -740,7 +746,7 @@ def AddListToFolder(request):
     if(usuarios.getTipoListaRep(r, idLista) == constantes.LISTA_TIPO_FAVORITOS):
         return JsonResponse({'error': 'La lista es de favoritos'}, status=erroresHTTP.ERROR_LISTA_ES_FAVORITOS)
     
-    usuarios.addListToFolder(r, idCarpeta, idLista)
+    usuarios.addListToFolder(r, idUsuario, idCarpeta, idLista)
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 

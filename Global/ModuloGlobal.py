@@ -1,6 +1,7 @@
 import redis
 import Configuracion.constantesPrefijosClaves as constantes
 import DAOS.daoGlobal as daoGlobal
+from datetime import datetime
 
 def getTotalSegundosReproducidosAudio(r):
     segundosTotales = 0

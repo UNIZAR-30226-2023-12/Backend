@@ -26,6 +26,7 @@ urlRemoveListFromFolder = 'http://127.0.0.1:8081/RemoveListFromFolder/'
 urlRemoveFolder = 'http://127.0.0.1:8081/RemoveFolder/'
 urlGetFolder = 'http://127.0.0.1:8081/GetFolder/'
 urlGetFoldersUsr = 'http://127.0.0.1:8081/GetFoldersUsr/'
+urlGetListasFolder = 'http://127.0.0.1:8081/GetListasFolder/'
 urlAskFriend = 'http://127.0.0.1:8081/AskFriend/'
 urlAcceptFriend = 'http://127.0.0.1:8081/AcceptFriend/'
 urlGetFriends = 'http://127.0.0.1:8081/GetFriends/'
@@ -839,6 +840,17 @@ print(requests.post(urlAddListToFolder, json=AddListToFolderErrorLista).status_c
 print(requests.post(urlAddListToFolder, json=AddListToFolderErrorNoInUser).status_code)
 print(requests.post(urlAddListToFolder, json=AddListToFolderListPrivate).status_code)
 
+# Pruebas GetListasFolder
+GetListasFolder = {
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'idCarpeta': 'carpeta:1'
+}
+
+print("Pruebas GetListasFolder")
+respuesta = requests.post(urlGetListasFolder, json=GetListasFolder)
+print(str(respuesta.status_code) + " " + str(respuesta.json()))
+
 # Pruebas RemoveListFromFolder
 
 RemoveListFromFolder = {
@@ -1407,35 +1419,35 @@ SetLastSecondHeared = {
     'idUsr' : 'usuario:2',
     'contrasenya': '1234',
     'idAudio': 'audio:1',
-    'segundos': 10
+    'second': 10
 }
 
 SetLastSecondHearedErrorUsuario = {
     'idUsr' : 'usuario:10',
     'contrasenya': '1234',
     'idAudio': 'audio:1',
-    'segundos': 10
+    'second': 10
 }
 
 SetLastSecondHearedErrorContrasenya = {
     'idUsr' : 'usuario:2',
     'contrasenya': '12345',
     'idAudio': 'audio:1',
-    'segundos': 10
+    'second': 10
 }
 
 SetLastSecondHearedErrorAudio = {
     'idUsr' : 'usuario:2',
     'contrasenya': '1234',
     'idAudio': 'audio:10',
-    'segundos': 10
+    'second': 10
 }
 
 SetLastSecondHearedErrorSegundo = {
     'idUsr' : 'usuario:2',
     'contrasenya': '1234',
     'idAudio': 'audio:1',
-    'segundos': -1
+    'second': -1
 }
 
 print("Pruebas SetLastSecondHeared")

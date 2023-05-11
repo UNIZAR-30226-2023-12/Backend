@@ -507,7 +507,8 @@ def getPublicFoldersUser(r, idUsuario):
             folders.remove(folder)
     return folders
 
-def addListToFolder(r, idCarpeta, idLista):
+def addListToFolder(r, idUsuario, idCarpeta, idLista):
+    daoUsuario.eliminarLista(r, idUsuario, idLista)
     daoCarpetas.anyadirListaCarpeta(r, idCarpeta, idLista)
 
 def getListasFolder(r, idCarpeta):
