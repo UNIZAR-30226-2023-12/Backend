@@ -13,6 +13,12 @@ def getTotalSegundosReproducidosAudio(r):
     return segundosTotales
 
 def addSecondsToSong(r, idAudio, segundos):
+    if(r.exists(constantes.PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO) == 0):
+        daoGlobal.setSegundosReproduciodosAudio(r, idAudio, segundos)
+        segundosExpire = getTimeUntilSunday()
+        r.expire(constantes.PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO, segundosExpire)
+        return
+
     segundosActuales = daoGlobal.getSegundosReproduciodosAudio(r, idAudio)
     if segundosActuales is None:
         segundosActuales = 0
@@ -20,4 +26,18 @@ def addSecondsToSong(r, idAudio, segundos):
     daoGlobal.setSegundosReproduciodosAudio(r, idAudio, segundos)
 
 def getSongSeconds(r, idAudio):
-    return daoGlobal.getSegundosReproduciodosAudio(r, idAudio)
+    segundos = daoGlobal.getSegundosReproduciodosAudio(r, idAudio)
+    if segundos is None:
+        return 0
+    return segundos
+
+# Funcion interna para obtener el numero de segundos que faltan hasta el domingo
+def getTimeUntilSunday():
+    dt = datetime.datetime.now()
+    x = dt.weekday()
+    tomorrow = dt + datetime.timedelta(days=7 - x)
+    time = datetime.datetime.combine(tomorrow, datetime.time.min) - dt
+    segundos = time.total_seconds()
+    segundos = int(segundos)
+    return segundos
+
