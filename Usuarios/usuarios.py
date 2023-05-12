@@ -477,7 +477,7 @@ def setFolder(r, idUsuario, diccionarioCarpeta):
     diccionarioCarpeta[constantes.CLAVE_ID_CARPETA] = id
     daoCarpetas.setCarpeta(r, diccionarioCarpeta) 
     daoUsuario.anyadirCarpeta(r, idUsuario, id)
-    return erroresHTTP.OK
+    return id
 
 def getFolder(r, idCarpeta):
     return daoCarpetas.getCarpeta(r, idCarpeta)

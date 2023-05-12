@@ -708,9 +708,9 @@ def SetFolder(request):
         return JsonResponse({'error': 'El diccionario de la carpeta no es correcto'}, status=erroresHTTP.ERROR_CARPETA_PARAMETROS_INCORRECTOS)
     if(usuarios.carpetaPrivacidadValida(privacidad) == False):
         return JsonResponse({'error': 'La privacidad no es correcta'}, status=erroresHTTP.ERROR_CARPETA_PRIVACIDAD_NO_VALIDA)
-    usuarios.setFolder(r, idUsuario, diccionarioCarpeta)
+    idFolder = usuarios.setFolder(r, idUsuario, diccionarioCarpeta)
 
-    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.CLAVE_ID_CARPETA : idFolder}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def AddListToFolder(request):
@@ -825,7 +825,7 @@ def GetFolder(request):
 
 @csrf_exempt
 def GetListasFolder(request):
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     # Parse the JSON data from the request body to extract idUsuario
