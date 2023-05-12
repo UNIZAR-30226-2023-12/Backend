@@ -141,6 +141,7 @@ CLAVE_ES_PODCAST = "esPodcast"
 CLAVE_SECONDS = "second"
 CLAVE_IMAGEN_AUDIO = "imagenAudio"
 CLAVE_LINK_AUDIO = "linkAudio"
+CLAVE_VALORACION = "valoracion"
 
 
 CLAVE_DEFAULT_AUDIO_IMAGE = "defaultAudioImage"
@@ -210,6 +211,6 @@ PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO = "segundosReproducidos"
 CLAVE_ID_ERROR = "idError"
 
 CORREO_RECUPERACION = "enterprisemussa@gmail.com"
-CONTRASENYA_CORREO_RECUPERACION = "bupkbmfyswswolsu"
+CONTRASENYA_CORREO_RECUPERACION = "jrbecurardgvnxxw"
 PREFIJO_CODIGO_RECUPERACION = "codigo"
 CLAVE_CODIGO_RECUPERACION = "codigo"

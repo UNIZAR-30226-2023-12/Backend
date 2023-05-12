@@ -1918,11 +1918,13 @@ def GetValoracion(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    idUsr = request.POST.get('idUsr')
+    json_data = json.loads(request.body)
+    
+    idUsr = json_data[constantes.CLAVE_ID_USUARIO]
     if idUsr == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
-    idAudio = request.POST.get('idAudio')
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
     if idAudio == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
@@ -1940,15 +1942,17 @@ def SetValoracion(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    idUsr = request.POST.get('idUsr')
+    json_data = json.loads(request.body)
+    
+    idUsr = json_data[constantes.CLAVE_ID_USUARIO]
     if idUsr == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
-    idAudio = request.POST.get('idAudio')
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
     if idAudio == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
-    valoracion = request.POST.get('valoracion')
+    valoracion = json_data[constantes.CLAVE_VALORACION]
     if valoracion == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
@@ -1964,7 +1968,7 @@ def SetValoracion(request):
 @csrf_exempt
 def GenerateRandomCodeUsr(request):
     # Compruebo que el método sea GET
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     
