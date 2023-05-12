@@ -123,7 +123,7 @@ def obtenerTodosLosPodcasts(r):
 
 # Función de búsqueda de canciones
 def buscarCanciones(r, query, n):
-    respuesta = dao.buscarAudios(r, query)
+    respuesta, artistas = dao.buscarAudios(r, query)
 
     return respuesta[0:n]
 
@@ -132,6 +132,13 @@ def getValoracion(r, idUsr, idAudio):
 
 def setValoracion(r, idUsr, idAudio, val):
     return dao.setValoracion(r, idUsr, idAudio, val)
+
+def buscarGeneral(r, query, n):
+    respuesta, artistas, listas = dao.buscarAudios(r, query)
+
+    return respuesta[0:n], artistas[0:n], listas[0:n]
+
+
 
 ##############################################################################################################
 #
