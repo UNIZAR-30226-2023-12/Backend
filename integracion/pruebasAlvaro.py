@@ -743,7 +743,6 @@ respuesta = requests.post(urlGetTotRepTime, json=GetTotRepTimeErrorContrasenya)
 print(str(respuesta.status_code) + " " + str(respuesta.json()))
 respuesta = requests.post(urlGetTotRepTime, json=GetTotRepTimeErrorAdmin)
 print(str(respuesta.status_code) + " " + str(respuesta.json()))
-exit(0)
 
 
 # Pruebas SetFolder
