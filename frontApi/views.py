@@ -671,11 +671,11 @@ def AddSecondsToSong(request):
 
 
 def GetSongSeconds(request):
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    # Parse the JSON data from the request bdoy to extract idUsuario
-    idAudio = request.GET.get(constantes.CLAVE_ID_AUDIO)
+    json_data = json.loads(request.body)
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
 
     # Control de errores
     if(moduloAudios.existeCancion(r, idAudio) == False):
