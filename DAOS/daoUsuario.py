@@ -21,6 +21,10 @@ def existeUsuario(r, idUsuario):
 def setUsuario(r, usuarioDiccionario):
     idUsuario = usuarioDiccionario[constantes.CLAVE_ID_USUARIO]
     del(usuarioDiccionario[constantes.CLAVE_ID_USUARIO])
+
+    if usuarioDiccionario[constantes.CLAVE_TIPO_USUARIO] == constantes.USUARIO_ARTISTA:
+        r.sadd('ListaGlobalArtistas', idUsuario)
+
     return r.hmset(idUsuario, usuarioDiccionario)
 
 def setEmail(r, idUsuario, email):
@@ -33,6 +37,10 @@ def setContrasenya(r, idUsuario, contrasenya):
     return r.hset(idUsuario, constantes.CLAVE_CONTRASENYA, contrasenya)
 
 def setTipoUsuario(r, idUsuario, tipoUsuario):
+
+    if tipoUsuario == constantes.USUARIO_ARTISTA:
+        r.sadd('ListaGlobalArtistas', idUsuario)
+
     return r.hset(idUsuario, constantes.CLAVE_TIPO_USUARIO, tipoUsuario)
 
 def setImagenPerfil(r, idUsuario, imagenPerfil):
@@ -138,6 +146,24 @@ def getRelaciones(r, idUsuario, prefijoRelacion):
         if(cursor == 0):
             parar = True
     return relaciones
+
+
+
+def obtenerTodosArtistas(r):
+    return r.smembers('ListaGlobalArtistas')
+
+
+def obtenerDatosArtistas(r, artistas):
+    datosArtistas = []
+
+    for idArtista in artistas:
+        datos = r.hgetall(idArtista)
+        datos['id'] = idArtista
+        datosArtistas.append(datos)
+
+    return datosArtistas
+
+
 
 
 def setCalidadPorDefecto(r, idUsuario, calidad):

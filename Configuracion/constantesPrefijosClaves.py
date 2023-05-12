@@ -79,6 +79,59 @@ def obtenerIDGenero(genero):
         return GENERO_FUNK
     else:
         return -1
+    
+
+def obtenerNombreGenero(genero):
+
+    if(genero == GENERO_POP):
+        return "pop"
+    elif(genero == GENERO_ROCK):
+        return "rock"
+    elif(genero == GENERO_METAL):
+        return "metal"
+    elif(genero == GENERO_RAP):
+        return "rap"
+    elif(genero == GENERO_REGGAE):
+        return "reggae"
+    elif(genero == GENERO_JAZZ):
+        return "jazz"
+    elif(genero == GENERO_BLUES):
+        return "blues"
+    elif(genero == GENERO_CLASICA):
+        return "clasica"
+    elif(genero == GENERO_ELECTRONICA):
+        return "electronica"
+    elif(genero == GENERO_FOLK):
+        return "folk"
+    elif(genero == GENERO_LATINA):
+        return "latina"
+    elif(genero == GENERO_INDIE):
+        return "indie"
+    elif(genero == GENERO_COUNTRY):
+        return "country"
+    elif(genero == GENERO_AMBIENT):
+        return "ambient"
+    elif(genero == GENERO_TRAP):
+        return "trap"
+    elif(genero == GENERO_DANCE):
+        return "dance"
+    elif(genero == GENERO_HIPHOP):
+        return "hiphop"
+    elif(genero == GENERO_RNB):
+        return "rnb"
+    elif(genero == GENERO_SOUL):
+        return "soul"
+    elif(genero == GENERO_PUNK):
+        return "punk"
+    elif(genero == GENERO_FUNK):
+        return "funk"
+    else:
+        return ""
+
+    
+    
+
+
 
 
 RECOMENDADOR_TAMANYO_VENTANA_PREDICCION = 10

@@ -1805,10 +1805,10 @@ def GlobalSearch(request):
     query = request.GET.get(constantes.CLAVE_QUERY)
     n = request.GET.get(constantes.CLAVE_N)    
 
-    respuesta = moduloAudios.buscarCanciones(r, query, n)
+    audios, artistas, listas = moduloAudios.buscarGeneral(r, query, int(n))
 
     #return JsonResponse({'status': status}, status=status)
-    return JsonResponse({'datos': respuesta}, status=200)
+    return JsonResponse({'audios': audios, 'artistas': artistas, 'listas': listas}, status=200)
 
 
 @csrf_exempt

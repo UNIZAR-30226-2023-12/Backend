@@ -11,6 +11,8 @@ port = '8000'
 url_set_song = 'http://'+ip+':'+port+'/SetSong/'
 url_set_usr = 'http://'+ip+':'+port+'/SetUser/'
 url_get_usr = 'http://'+ip+':'+port+'/GetUser/'
+url_set_lista = 'http://'+ip+':'+port+'/SetLista/'
+
 url_get = 'http://'+ip+':'+port+'/GetSong/'
 url_busqueda = 'http://'+ip+':'+port+'/GlobalSearch/'
 url_sendCode = 'http://'+ip+':'+port+'/GenerateRandomCodeUsr/'
@@ -41,7 +43,7 @@ new_user_data = {
     'email': 'hsunekichi@gmail.com',
     'alias': 'hsunekichi',
     'contrasenya': '1234',
-    'tipoUsuario': 'admin'
+    'tipoUsuario': 'artista'
 }
 
 data_generateCode = {
@@ -62,17 +64,24 @@ new_song_data = {
     'longitud': 318
 }
 
-params_example = {
-    'idUsr': 'usuario:1',
-    'idSong': 'idAudio:1',
-    'calidadAlta': 'True',
-    'esCancion': 'True'
+params_busqueda = {
+    'query': 'lista',
+    'n': '10'
 }
-response = requests.post(url_set_usr, json=new_user_data)
+#response = requests.post(url_set_usr, json=new_user_data)
 
 params_get_usr = {
     'idUsr': 'usuario:1',
     'contrasenya': '1234'
+}
+
+new_list_data = {
+    'nombreLista': 'Lista de prueba',
+    'idUsr': 'usuario:1',
+    'contrasenya': '1234',
+    'privada': 'publica',
+    'tipoLista': 'listaReproduccion'
+
 }
 
 
@@ -100,9 +109,9 @@ print(response.json())
 #print(response.json()['nombre'])
 """
 
-#requests.post(url_set_usr, json=new_user_data)
+response = requests.post(url_set_lista, json=new_list_data)
 
-#response = requests.get(url_sendCode, json=data_generateCode)
+response = requests.get(url_busqueda, params=params_busqueda)
 
-response = requests.post(url_changePasswd, json={'email': 'hsunekichi@gmail.com', 'contrasenya': '12345', 'codigo': '771687'})
+#response = requests.post(url_changePasswd, json={'email': 'hsunekichi@gmail.com', 'contrasenya': '12345', 'codigo': '771687'})
 print(response.json())
