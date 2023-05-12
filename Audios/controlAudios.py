@@ -243,6 +243,9 @@ def getImagenAudio(r, id):
         return daoAudio.getImagenDefaultAudio(r)
     return imagen
 
+def setImagenAudio(r, id, imagen):
+    return daoAudio.setImagenAudio(r, id, imagen)
+
 
 # Función para obtener las canciones 
 

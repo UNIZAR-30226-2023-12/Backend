@@ -1,5 +1,8 @@
 import redis
 import Configuracion.constantesPrefijosClaves as constantes
+from PIL import Image
+from io import BytesIO
+import base64
 
 #Numero de elementos que se devuelven en cada iteración de sscan
 COUNT = 100
@@ -72,7 +75,20 @@ def getImagenPerfil(r, idUsuario):
     return r.hget(idUsuario, constantes.CLAVE_IMAGEN_PERFIL)
 
 def getImagenPerfilDefault(r):
-    return r.get(constantes.CLAVE_DEFAULT_USER_IMAGE)
+    img = r.get(constantes.CLAVE_DEFAULT_USER_IMAGE)
+    if(img == None):
+        setImagenPerfilDefault(r)
+        img = r.get(constantes.CLAVE_DEFAULT_USER_IMAGE)
+    return img
+
+def setImagenPerfilDefault(r):
+    output = BytesIO()
+    imagen = Image.open("/home/alvaro/Documents/Proyecto Software/Backend/Configuracion/defaultUserImage.png")
+    imagen.save(output, format=imagen.format)
+    imagen = output.getvalue()
+    imagen = base64.b64encode(imagen)
+    return r.set(constantes.CLAVE_DEFAULT_USER_IMAGE, imagen)
+
 
 def anyadirAmigo(r, idUsuario, idAmigo):
     return anyadirRelacion(r, idUsuario, idAmigo, constantes.PREFIJO_AMIGOS)

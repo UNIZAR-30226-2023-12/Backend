@@ -87,6 +87,7 @@ urlpatterns = [
     path('SetPrivacidadCarpeta/', viewsApi.SetPrivacidadCarpeta, name='SetPrivacidadCarpeta'),
     path('GetUsuarioListaRep/', viewsApi.GetUsuarioListaRep, name='GetUsuarioListaRep'),
     path('GetImagenAudio/', viewsApi.GetImagenAudio, name='GetImagenAudio'),
+    path('SetImagenAudio/', viewsApi.SetImagenAudio, name='SetImagenAudio'),
     path('GlobalSearch/', viewsApi.GlobalSearch, name='GlobalSearch'),
     path('echo/', viewsApi.echo, name='echo'),
     path('entrenar_recomendador/', viewsApi.entrenar_recomendador, name='entrenar_recomendador'),

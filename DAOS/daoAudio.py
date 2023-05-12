@@ -254,6 +254,9 @@ def obtenerEsPodcast(r, id):
 def getImagenAudio(r, id):
     return r.hget(id, constantes.CLAVE_IMAGEN_AUDIO)
 
+def setImagenAudio(r, id, imagen):
+    return r.hset(id, constantes.CLAVE_IMAGEN_AUDIO, imagen)
+
 def getImagenDefaultAudio(r):
     return r.get(constantes.CLAVE_DEFAULT_AUDIO_IMAGE)
 

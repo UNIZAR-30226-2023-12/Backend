@@ -237,3 +237,6 @@ def obtenerDiccionarioPodcast(r, id):
 
 def getImagenAudio(r, id):
     return controlAudios.getImagenAudio(r, id)
+
+def setImagenAudio(r, id, imagen):
+    return controlAudios.setImagenAudio(r, id, imagen)

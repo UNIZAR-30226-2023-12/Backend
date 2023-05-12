@@ -210,7 +210,7 @@ def GetUser(request):
     if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False and contrasenya != None):
         return JsonResponse({'error': 'La contraseña es incorrecta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeUsuario(r, idUsuarioGet) == False):
-        if(usuarios.isSubscribedToArtist(r, idUsuario, idUsuarioGet) == False):
+        if(usuarios.isSubscribedToArtist(r, idUsuario, idUsuarioGet)):
             usuarios.unsubscribeToArtist(r, idUsuario, idUsuarioGet)
         return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     
@@ -436,7 +436,7 @@ def GetListasUsr(request):
     if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
         return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeUsuario(r, idUsuarioGet) == False):
-        if(usuarios.isSubscribedToArtist(r, idUsuario, idUsuarioGet) == False):
+        if(usuarios.isSubscribedToArtist(r, idUsuario, idUsuarioGet)):
             usuarios.unsubscribeToArtist(r, idUsuario, idUsuarioGet)
         return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     
@@ -869,7 +869,7 @@ def GetFoldersUsr(request):
     if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False) and contrasenya != None:
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeUsuario(r, idUsuarioGet) == False):
-        if(usuarios.isSubscribedToArtist(r, idUsuario, idUsuarioGet) == False):
+        if(usuarios.isSubscribedToArtist(r, idUsuario, idUsuarioGet)):
             usuarios.unsubscribeToArtist(r, idUsuario, idUsuarioGet)
         return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     
@@ -1270,6 +1270,8 @@ def GetSongsArtist(request):
     if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeUsuario(r, idArtista) == False):
+        if(usuarios.isSubscribedToArtist(r, idUsuario, idArtista)):
+            usuarios.unsubscribeToArtist(r, idUsuario, idArtista)
         return JsonResponse({'error': 'El artista no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     if(usuarios.getTipoUsr(r, idArtista) != constantes.USUARIO_ARTISTA):
         return JsonResponse({'error': 'El usuario no es un artista'}, status=erroresHTTP.ERROR_USUARIO_NO_ARTISTA)
@@ -1801,6 +1803,30 @@ def GetImagenAudio(request):
         return JsonResponse({'error': 'El audio no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
     
     return JsonResponse({constantes.CLAVE_IMAGEN_AUDIO : moduloAudios.getImagenAudio(r, idAudio)}, status=erroresHTTP.OK)
+
+@csrf_exempt
+def SetImagenAudio(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+    imagenAudio = json_data[constantes.CLAVE_IMAGEN_AUDIO]
+
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+
+    if(moduloAudios.existeCancion(r, idAudio) == False):
+        return JsonResponse({'error': 'El audio no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
+    
+    moduloAudios.setImagenAudio(r, idAudio, imagenAudio)
+
+    return JsonResponse({'status': 'OK'}, status=erroresHTTP.OK)
 
 
 @csrf_exempt

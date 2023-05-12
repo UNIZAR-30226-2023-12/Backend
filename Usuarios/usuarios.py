@@ -123,7 +123,7 @@ def getCalidadPorDefecto(r, idUsuario):
 
 # Elimina el usuario de la base de datos, tener en cuenta 
 # que el usuario en caso de ser artista no se borra de sus suscriptores
-def removeUser(r, id, contrasenya):
+def removeUser(r, id):
     amigos = daoUsuario.getAmigos(r, id)
     # Eliminar usuario de la lista de amigos de sus amigos
     for amigo in amigos:
@@ -142,6 +142,8 @@ def removeUser(r, id, contrasenya):
     r.delete(constantes.CLAVE_LISTAS + id)
     r.delete(constantes.PREFIJO_NOTIFICACIONES + id)
     r.delete(constantes.PREFIJO_CARPETAS + id)
+
+    daoUsuario.eliminarEmailId(r, daoUsuario.getEmail(r, id))
 
     #Si es administrador, eliminarlo de la lista de administradores
     if(daoUsuario.getTipoUsuario(r, id) == constantes.USUARIO_ADMINISTRADOR):
