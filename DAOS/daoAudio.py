@@ -12,6 +12,8 @@
 
 import redis
 import Configuracion.constantesPrefijosClaves as constantes
+import DAOS.daoUsuario as daoUsuario
+import DAOS.daoListas as daoListas
 
 
 #########################################################################################
@@ -181,23 +183,44 @@ def obtenerTodasLasCanciones(r):
 def buscarAudios(r, query):
     canciones = obtenerTodasLasCanciones(r)
     podcasts = obtenerTodosLosPodcasts(r)
+    artistas = daoUsuario.obtenerTodosArtistas(r)
+    listas = daoListas.obtenerTodasLasListas(r)
+
     datosCanciones = obtenerDatosCanciones(r, canciones)
     datosPodcasts = obtenerDatosPodcasts(r, podcasts)
+    datosArtistas = daoUsuario.obtenerDatosArtistas(r, artistas)
+    datosListas = daoListas.obtenerDatosListas(r, listas)
     encontradas = []
+    artistasEncontrados = []
+    listasEncontradas = []
 
-    for audio in datosCanciones:
-        if (query.lower() in audio['nombre'].lower() or 
-            query.lower() in audio['artista'].lower()):
-            encontradas.append(audio['id'])
 
-    for audio in datosCanciones:
-        if (query.lower() in audio['nombre'].lower() or 
-            query.lower() in audio['artista'].lower() or
-            query.lower() in audio['descripcion'].lower()):
-            encontradas.append(audio['id'])
-        
+    if len(datosCanciones) > 0:
+        for audio in datosCanciones:
+            if (query.lower() in audio[constantes.CLAVE_NOMBRE_AUDIO].lower() or 
+                query.lower() in audio[constantes.CLAVE_ARTISTA_AUDIO].lower() or 
+                query.lower() in constantes.obtenerNombreGenero(audio[constantes.CLAVE_GENEROS_AUDIO])):
+                encontradas.append(audio[constantes.CLAVE_ID_AUDIO])
 
-    return encontradas
+    if len(datosPodcasts) > 0:
+        for audio in datosPodcasts:
+            if (query.lower() in audio[constantes.CLAVE_NOMBRE_AUDIO].lower() or 
+                query.lower() in audio[constantes.CLAVE_ARTISTA_AUDIO].lower() or
+                query.lower() in audio[constantes.CLAVE_DESCRIPCION_AUDIO].lower() or 
+                query.lower() in constantes.obtenerNombreGenero(audio[constantes.CLAVE_GENEROS_AUDIO])):
+                encontradas.append(audio[constantes.CLAVE_ID_AUDIO])
+
+    if len(datosArtistas) > 0:
+        for artista in datosArtistas:
+            if query.lower() in artista[constantes.CLAVE_ALIAS].lower():
+                artistasEncontrados.append(artista[constantes.CLAVE_ID_USUARIO])
+
+    if len(datosListas) > 0:
+        for lista in datosListas:
+            if query.lower() in lista[constantes.CLAVE_NOMBRE_LISTA].lower() and lista[constantes.CLAVE_PRIVACIDAD_LISTA] == constantes.LISTA_PUBLICA:
+                listasEncontradas.append(lista[constantes.CLAVE_ID_LISTA])
+            
+    return encontradas, artistasEncontrados, listasEncontradas
 
 
 def getValoracion(r, idUsr, idAudio):

@@ -79,6 +79,59 @@ def obtenerIDGenero(genero):
         return GENERO_FUNK
     else:
         return -1
+    
+
+def obtenerNombreGenero(genero):
+
+    if(genero == GENERO_POP):
+        return "pop"
+    elif(genero == GENERO_ROCK):
+        return "rock"
+    elif(genero == GENERO_METAL):
+        return "metal"
+    elif(genero == GENERO_RAP):
+        return "rap"
+    elif(genero == GENERO_REGGAE):
+        return "reggae"
+    elif(genero == GENERO_JAZZ):
+        return "jazz"
+    elif(genero == GENERO_BLUES):
+        return "blues"
+    elif(genero == GENERO_CLASICA):
+        return "clasica"
+    elif(genero == GENERO_ELECTRONICA):
+        return "electronica"
+    elif(genero == GENERO_FOLK):
+        return "folk"
+    elif(genero == GENERO_LATINA):
+        return "latina"
+    elif(genero == GENERO_INDIE):
+        return "indie"
+    elif(genero == GENERO_COUNTRY):
+        return "country"
+    elif(genero == GENERO_AMBIENT):
+        return "ambient"
+    elif(genero == GENERO_TRAP):
+        return "trap"
+    elif(genero == GENERO_DANCE):
+        return "dance"
+    elif(genero == GENERO_HIPHOP):
+        return "hiphop"
+    elif(genero == GENERO_RNB):
+        return "rnb"
+    elif(genero == GENERO_SOUL):
+        return "soul"
+    elif(genero == GENERO_PUNK):
+        return "punk"
+    elif(genero == GENERO_FUNK):
+        return "funk"
+    else:
+        return ""
+
+    
+    
+
+
 
 
 RECOMENDADOR_TAMANYO_VENTANA_PREDICCION = 10
@@ -141,6 +194,7 @@ CLAVE_ES_PODCAST = "esPodcast"
 CLAVE_SECONDS = "second"
 CLAVE_IMAGEN_AUDIO = "imagenAudio"
 CLAVE_LINK_AUDIO = "linkAudio"
+CLAVE_VALORACION = "valoracion"
 
 
 CLAVE_DEFAULT_AUDIO_IMAGE = "defaultAudioImage"
@@ -210,6 +264,6 @@ PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO = "segundosReproducidos"
 CLAVE_ID_ERROR = "idError"
 
 CORREO_RECUPERACION = "enterprisemussa@gmail.com"
-CONTRASENYA_CORREO_RECUPERACION = "bupkbmfyswswolsu"
+CONTRASENYA_CORREO_RECUPERACION = "jrbecurardgvnxxw"
 PREFIJO_CODIGO_RECUPERACION = "codigo"
 CLAVE_CODIGO_RECUPERACION = "codigo"
