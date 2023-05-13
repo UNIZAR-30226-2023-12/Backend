@@ -6,3 +6,4 @@ pydub
 numpy
 numba
 django-cors-headers
+cryptography
