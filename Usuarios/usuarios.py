@@ -9,6 +9,7 @@ import Configuracion.constantesPrefijosClaves as constantes
 import Configuracion.constantesErroresHTTP as erroresHTTP
 from cryptography.fernet import Fernet
 
+
 key = Fernet.generate_key()
 f = Fernet(key)
 ##############################################################################################################
