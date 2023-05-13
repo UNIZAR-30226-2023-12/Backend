@@ -52,6 +52,9 @@ urlSetImagenAudio = 'http://127.0.0.1:8081/SetImagenAudio/'
 urlGetImagenAudio = 'http://127.0.0.1:8081/GetImagenAudio/'
 urlGetSongsArtist = 'http://127.0.0.1:8081/GetSongsArtist/'
 urlRemoveListaRepUsr = 'http://127.0.0.1:8081/RemoveListaRepUsr/'
+urlGetLinkAudio = 'http://127.0.0.1:8081/GetLinkAudio/'
+urlGetAudioFromLink = 'http://127.0.0.1:8081/GetAudioFromLink/'
+
 
 setUser = {
     'email': 'alvaro@gmail.com',
@@ -125,7 +128,7 @@ print(requests.post(urlRejectFriend, json={'idUsr': 'usuario:2', 'contrasenya': 
 
 # Pruebas RejectArtista
 print('Pruebas RejectArtista')
-print(requests.post(urlAskAdminToBeArtist, json={'idUsr': 'usuario:3', 'contrasenya': '1234'}).status_code)
+print(requests.post(urlAskAdminToBeArtist, json={'idUsr': 'usuario:3', 'contrasenya': '1234', 'mensaje' : 'Quiero ser artista'}).status_code)
 print(requests.post(urlRejectArtista, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idNotificacion' : 'notificacion:2'}).status_code)
 
 # Pruebas setPrivacidadCarpeta
@@ -180,3 +183,14 @@ print(requests.post(urlSetSongLista, json={'idUsr': 'usuario:1', 'contrasenya': 
 print(requests.post(urlSetFolder, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'nombreCarpeta' : 'carpeta1', 'privacidadCarpeta' : 'publica'}).status_code)
 print(requests.post(urlAddListToFolder, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idLista' : 'lista:7', 'idCarpeta' : 'carpeta:2'}).status_code)
 print(requests.post(urlRemoveListaRepUsr, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idLista' : 'lista:7'}).status_code)
+
+# Pruebas GetLinkAudio
+print('Pruebas GetLinkAudio')
+respuesta = requests.post(urlGetLinkAudio, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idAudio' : 'audio:1'})
+print(str(respuesta.status_code) + ' ' + str(respuesta.json()))
+link = respuesta.json()['linkAudio']
+
+# Pruebas GetAudioFromLink
+print('Pruebas GetAudioFromLink')   
+respuesta = requests.post(urlGetAudioFromLink, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'linkAudio' : link})
+print(str(respuesta.status_code) + ' ' + str(respuesta.json()))

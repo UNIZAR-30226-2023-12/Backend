@@ -9,6 +9,7 @@ import Configuracion.constantesPrefijosClaves as constantes
 import Configuracion.constantesErroresHTTP as erroresHTTP
 from cryptography.fernet import Fernet
 
+
 key = Fernet.generate_key()
 f = Fernet(key)
 ##############################################################################################################
@@ -152,14 +153,13 @@ def removeUser(r, id):
     daoUsuario.eliminarUsuario(r, id)
 
 # Función para solictiar ser artista a los administradores
-def AskAdminToBeArtist(r, idUsuario):
+def AskAdminToBeArtist(r, idUsuario, mensajeNotificacion):
     idNotificacion = daoNotificaciones.getIdContador(r)
     diccionarioNotificaciones = {constantes.CLAVE_ID_NOTIFICACION: idNotificacion, 
                                  constantes.CLAVE_ID_USUARIO_EMISIOR: idUsuario, 
                                  constantes.CLAVE_TIPO_NOTIFICACION: constantes.NOTIFICACION_TIPO_SOLICITUD_ARTISTA,
                                  constantes.CLAVE_TITULO_NOTIFICACION: constantes.TITULO_NOTIFICACION_ARTISTA,
-                                 constantes.CLAVE_MENSAJE_NOTIFICACION: daoUsuario.getAlias(r,idUsuario) + constantes.MENSAJE_NOTIFICACION_ARTISTA}
-    # Creamos la notificacíon tipo solicitud de artista
+                                 constantes.CLAVE_MENSAJE_NOTIFICACION: mensajeNotificacion}
     daoNotificaciones.setNotificacion(r, diccionarioNotificaciones)
     # Añadimos la notificación a todos los administradores
     for admin in  daoUsuario.getAdministradores(r):
@@ -419,12 +419,16 @@ def removeSongLista(r, idLista, idAudio):
 
 # Devuelve el link dado el id de una lista
 def getLinkAudio(r, id):
-    link = f.encrypt(str(id))
+    idBytes = bytes(id, 'utf-8')
+    link = f.encrypt(idBytes)
+    link = link.decode('utf-8')
     return link
 
 # Devuelve el id de una lista dado el link
 def getAudioFromLink(r, link):
+    link = bytes(link, 'utf-8')
     id = f.decrypt(link)
+    id = id.decode('utf-8')
     return id
 
 def removeLista(r, idUsuario, idLista):

@@ -154,6 +154,7 @@ CLAVE_IMAGEN_PERFIL = "imagenPerfil"
 CLAVE_QUERY = "query"
 CLAVE_N = "n"
 CLAVE_TEMPORAL_ENTRENAMIENTO = "datos_temporales"
+CLAVE_CALIDAD_PREFERIDA = "calidadPreferida"
 
 CLAVE_ID_AMIGO = "idAmigo"
 

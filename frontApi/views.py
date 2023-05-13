@@ -140,6 +140,10 @@ def SetSong(request):
     status = usuarios.ValidateUser(r, idUsuario, contrasenya)
     json_data['artista'] = idUsuario
 
+    # Control de errores
+    if (usuarios.getTipoUsr(r, idUsuario) == constantes.USUARIO_ARTISTA):
+        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ARTISTA}, status=erroresHTTP.ERROR_USUARIO_NO_ARTISTA)
+
     if status == True:
 
         # Añado la canción a la base de datos
@@ -538,6 +542,7 @@ def AskAdminToBeArtist(request):
     
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    mensajeNotificacion = json_data[constantes.CLAVE_MENSAJE_NOTIFICACION]
     
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -549,7 +554,7 @@ def AskAdminToBeArtist(request):
     if(usuarios.getTipoUsr(r, idUsuario) == constantes.USUARIO_ADMINISTRADOR):
         return JsonResponse({'status': erroresHTTP.FORBIDDEN}, status=erroresHTTP.FORBIDDEN)
 
-    usuarios.AskAdminToBeArtist(r, idUsuario)
+    usuarios.AskAdminToBeArtist(r, idUsuario, mensajeNotificacion)
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
@@ -2062,15 +2067,15 @@ def SetCalidadPorDefectoUsr(request):
     passwd = json_data[constantes.CLAVE_CONTRASENYA]
     calidad = json_data[constantes.CLAVE_CALIDAD_PREFERIDA]
 
-    status = usuarios.ValidateUser(r, idUsuario, passwd)
-    # Compruebo que el usuario existe
-    if(status == erroresHTTP.OK):
-        usuarios.setCalidadPorDefecto(r, idUsuario, calidad)
-        code = erroresHTTP.OK
-    else:
-        code = status
+    # Contrlo de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.OK)
+    if(usuarios.ValidateUser(r, idUsuario, passwd) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.OK)
+    
+    usuarios.setCalidadPorDefecto(r, idUsuario, calidad)
 
-    return JsonResponse({'code': code}, status=erroresHTTP.OK)
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 
 @csrf_exempt
@@ -2085,15 +2090,15 @@ def GetCalidadPorDefectoUsr(request):
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     passwd = json_data[constantes.CLAVE_CONTRASENYA]
 
-    status = usuarios.ValidateUser(r, idUsuario, passwd)
-    # Compruebo que el usuario existe
-    if(status == erroresHTTP.OK):
-        calidad = usuarios.getCalidadPorDefecto(r, idUsuario)
-        code = erroresHTTP.OK
-    else:
-        code = status
-
-    return JsonResponse({'code': code, 'calidad': calidad}, status=erroresHTTP.OK)
+    # Contrlo de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.OK)
+    if(usuarios.ValidateUser(r, idUsuario, passwd) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.OK)
+    
+    calidad = usuarios.getCalidadPorDefecto(r, idUsuario)
+        
+    return JsonResponse({'status': erroresHTTP.OK, 'calidad': calidad}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def RecuperarContrasenya(request):

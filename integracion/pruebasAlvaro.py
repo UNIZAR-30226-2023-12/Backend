@@ -82,13 +82,13 @@ usuarioTipoErroneo = {
     'tipoUsuario': 'erroneo',
 }
 
-requests.post(urlFlushDB)
 print("Pruebas set user")
 print(requests.post(urlSetUser, json=usuarioCorrecto1).status_code)
 print(requests.post(urlSetUser, json=usuarioCorrecto2).status_code)
 print(requests.post(urlSetUser, json=usuarioMismoEmail).status_code)
 print(requests.post(urlSetUser, json=usuarioDatosErroneos).status_code)
 print(requests.post(urlSetUser, json=usuarioTipoErroneo).status_code)
+
 
 # Pruebas GetUser
 getUser = {
