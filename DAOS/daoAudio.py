@@ -137,7 +137,8 @@ def setImagen(r, id, imagen):
 
 # Funcion para eliminar una cancion
 def eliminarCancion(r, id):
-    r.delete(id)     
+    r.delete(id)
+    r.srem(constantes.PREFIJO_LISTA_GLOBAL_CANCIONES, id)
     return 0
 
 def setLastSecondHeared(r, idUsuario, idAudio, second):
@@ -168,7 +169,7 @@ def obtenerDatosCanciones(r, ids):
 
     for id in ids:
         datos = obtenerDatosCancion(r, id)
-        datos['id'] = id
+        datos[constantes.CLAVE_ID_AUDIO] = id
         datosCanciones.append(datos)
 
     return datosCanciones
@@ -217,6 +218,7 @@ def buscarAudios(r, query):
 
     if len(datosListas) > 0:
         for lista in datosListas:
+            print (lista)
             if query.lower() in lista[constantes.CLAVE_NOMBRE_LISTA].lower() and lista[constantes.CLAVE_PRIVACIDAD_LISTA] == constantes.LISTA_PUBLICA:
                 listasEncontradas.append(lista[constantes.CLAVE_ID_LISTA])
             
@@ -390,6 +392,7 @@ def cambiarNumFavoritosPodcast(r, id, numFavoritos):
 # Funcion para eliminar un podcast
 def eliminarPodcast(r, id):
     r.delete(id)
+    r.srem(constantes.PREFIJO_LISTA_GLOBAL_PODCASTS, id)
     return 0
 
 #########################################################################################
@@ -420,7 +423,9 @@ def obtenerDatosPodcasts(r, ids):
     datosPodcasts = []
 
     for id in ids:
-        datosPodcasts.append(obtenerDatosPodcast(r, id))
+        datos = obtenerDatosPodcast(r, id)
+        datos[constantes.CLAVE_ID_AUDIO] = id
+        datosPodcasts.append(datos)
 
     return datosPodcasts
 
