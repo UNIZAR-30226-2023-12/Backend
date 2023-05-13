@@ -140,6 +140,10 @@ def SetSong(request):
     status = usuarios.ValidateUser(r, idUsuario, contrasenya)
     json_data['artista'] = idUsuario
 
+    # Control de errores
+    if (usuarios.getTipoUsr(r, idUsuario) == constantes.USUARIO_ARTISTA):
+        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ARTISTA}, status=erroresHTTP.ERROR_USUARIO_NO_ARTISTA)
+
     if status == True:
 
         # Añado la canción a la base de datos
@@ -537,6 +541,7 @@ def AskAdminToBeArtist(request):
     
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    mensajeNotificacion = json_data[constantes.CLAVE_MENSAJE_NOTIFICACION]
     
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -548,7 +553,7 @@ def AskAdminToBeArtist(request):
     if(usuarios.getTipoUsr(r, idUsuario) == constantes.USUARIO_ADMINISTRADOR):
         return JsonResponse({'status': erroresHTTP.FORBIDDEN}, status=erroresHTTP.FORBIDDEN)
 
-    usuarios.AskAdminToBeArtist(r, idUsuario)
+    usuarios.AskAdminToBeArtist(r, idUsuario, mensajeNotificacion)
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 

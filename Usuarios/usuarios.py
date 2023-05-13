@@ -152,14 +152,13 @@ def removeUser(r, id):
     daoUsuario.eliminarUsuario(r, id)
 
 # Función para solictiar ser artista a los administradores
-def AskAdminToBeArtist(r, idUsuario):
+def AskAdminToBeArtist(r, idUsuario, mensajeNotificacion):
     idNotificacion = daoNotificaciones.getIdContador(r)
     diccionarioNotificaciones = {constantes.CLAVE_ID_NOTIFICACION: idNotificacion, 
                                  constantes.CLAVE_ID_USUARIO_EMISIOR: idUsuario, 
                                  constantes.CLAVE_TIPO_NOTIFICACION: constantes.NOTIFICACION_TIPO_SOLICITUD_ARTISTA,
                                  constantes.CLAVE_TITULO_NOTIFICACION: constantes.TITULO_NOTIFICACION_ARTISTA,
-                                 constantes.CLAVE_MENSAJE_NOTIFICACION: daoUsuario.getAlias(r,idUsuario) + constantes.MENSAJE_NOTIFICACION_ARTISTA}
-    # Creamos la notificacíon tipo solicitud de artista
+                                 constantes.CLAVE_MENSAJE_NOTIFICACION: mensajeNotificacion}
     daoNotificaciones.setNotificacion(r, diccionarioNotificaciones)
     # Añadimos la notificación a todos los administradores
     for admin in  daoUsuario.getAdministradores(r):
