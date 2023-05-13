@@ -293,7 +293,7 @@ def SetLastSecondHeared(request):
 @csrf_exempt
 def GetTopReproducciones(request):
 
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     # Parse the JSON data from the request body to extract idUsuario
