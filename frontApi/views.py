@@ -25,11 +25,6 @@ import random
 
 r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
 
-@csrf_exempt
-def FlushDB(request):
-    r.flushdb()
-    return JsonResponse({'status': 'OK'})
-
 # echo request
 @csrf_exempt
 def echo(request):
@@ -143,6 +138,7 @@ def SetSong(request):
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    json_data['artista'] = idUsuario
 
     if status == True:
 
@@ -445,7 +441,7 @@ def GetListasUsr(request):
     return JsonResponse({constantes.CLAVE_LISTAS: usuarios.getListasUsr(r, idUsuario)}, status=erroresHTTP.OK)
 
 @csrf_exempt
-def RemoveListRepUsr(request):
+def RemoveListaRepUsr(request):
     if request.method != 'POST':
          # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -470,7 +466,7 @@ def RemoveListRepUsr(request):
         return JsonResponse({'status': erroresHTTP.ERROR_LISTA_ES_FAVORITOS}, status=erroresHTTP.ERROR_LISTA_ES_FAVORITOS)
 
     # No error, so remove the list
-    usuarios.removeLista(r, idLista)
+    usuarios.removeLista(r, idUsuario, idLista)
     
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
@@ -1518,7 +1514,7 @@ def GetImagenPerfilUsr(request):
         return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     
 
-    return JsonResponse({constantes.CLAVE_IMAGEN_PERFIL : usuarios.getImagenPerfilUsr(r, idUsuario)}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.CLAVE_IMAGEN_PERFIL : usuarios.getImagenPerfilUsr(r, idUsuarioImagen)}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def SetImagenPerfilUsr(request):

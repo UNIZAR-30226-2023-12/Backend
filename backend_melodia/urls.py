@@ -19,7 +19,6 @@ from frontApi import views as viewsApi
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('FlushDB/', viewsApi.FlushDB, name='FlushDB'),
     path('GetSong/', viewsApi.GetSong, name='GetSong'),
     path('GetFicheroSong/', viewsApi.GetFicheroSong, name='GetFicheroSong'),
     path('SetSong/', viewsApi.SetSong, name='SetSong'),
@@ -28,6 +27,7 @@ urlpatterns = [
     path('ValidateUser/', viewsApi.ValidateUser, name='ValidateUser'),
     path('SetLista/', viewsApi.SetLista, name='SetLista'),
     path('GetListasUsr/', viewsApi.GetListasUsr, name='GetListasUsr'),
+    path('RemoveListaRepUsr/', viewsApi.RemoveListaRepUsr, name='RemoveListaRepUsr'),
     path('GetAudiosLista/', viewsApi.GetAudiosLista, name='GetAudiosLista'),
     path('ChangeNameListRepUsr/', viewsApi.ChangeNameListRepUsr, name='ChangeNameListRepUsr'),
     path('SetSongLista/', viewsApi.SetSongLista, name='SetSongLista'),

@@ -238,7 +238,7 @@ def obtenerEsPodcast(r, id):
     return daoAudio.obtenerEsPodcast(r, id)
 
 def getImagenAudio(r, id):
-    imagen = daoAudio.obtenerImagenAudio(r, id)
+    imagen = daoAudio.getImagenAudio(r, id)
     if imagen == None:
         return daoAudio.getImagenDefaultAudio(r)
     return imagen

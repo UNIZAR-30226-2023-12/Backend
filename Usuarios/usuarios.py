@@ -439,8 +439,9 @@ def removeLista(r, idUsuario, idLista):
         daoUsuario.eliminarLista(r, idUsuario, idLista)
     
     # Elimino el id de la lista de las carpetas del usuario
-    if(idLista in daoCarpetas.getListasCarpeta(r, idUsuario)):
-        daoCarpetas.eliminarListaCarpeta(r, idUsuario, idLista)
+    for idCarpeta in daoUsuario.getCarpetas(r, idUsuario):
+        if(idLista in daoCarpetas.getListasCarpeta(r,idCarpeta)):
+            daoCarpetas.eliminarListaCarpeta(r, idCarpeta, idLista)
 
 ##############################################################################################################
 ## Funciones carpetas

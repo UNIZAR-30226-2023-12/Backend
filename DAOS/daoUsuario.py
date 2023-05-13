@@ -75,20 +75,7 @@ def getImagenPerfil(r, idUsuario):
     return r.hget(idUsuario, constantes.CLAVE_IMAGEN_PERFIL)
 
 def getImagenPerfilDefault(r):
-    img = r.get(constantes.CLAVE_DEFAULT_USER_IMAGE)
-    if(img == None):
-        setImagenPerfilDefault(r)
-        img = r.get(constantes.CLAVE_DEFAULT_USER_IMAGE)
-    return img
-
-def setImagenPerfilDefault(r):
-    output = BytesIO()
-    imagen = Image.open("/home/alvaro/Documents/Proyecto Software/Backend/Configuracion/defaultUserImage.png")
-    imagen.save(output, format=imagen.format)
-    imagen = output.getvalue()
-    imagen = base64.b64encode(imagen)
-    return r.set(constantes.CLAVE_DEFAULT_USER_IMAGE, imagen)
-
+    return r.get(constantes.CLAVE_DEFAULT_USER_IMAGE)
 
 def anyadirAmigo(r, idUsuario, idAmigo):
     return anyadirRelacion(r, idUsuario, idAmigo, constantes.PREFIJO_AMIGOS)

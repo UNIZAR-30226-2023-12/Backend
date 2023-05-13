@@ -46,7 +46,12 @@ urlSetPrivacidadCarpeta = 'http://127.0.0.1:8081/SetPrivacidadCarpeta/'
 urlGetPrivacidadCarpeta = 'http://127.0.0.1:8081/GetPrivacidadCarpeta/'
 urlGetSubscriptionsUsr = 'http://127.0.0.1:8081/GetSubscriptionsUsr/'
 urlIsSubscribedToArtist = 'http://127.0.0.1:8081/IsSubscribedToArtist/'
+urlSetImagenPerfilUsr  = 'http://127.0.0.1:8081/SetImagenPerfilUsr/'
 urlGetImagenUsr = 'http://127.0.0.1:8081/GetImagenPerfilUsr/'
+urlSetImagenAudio = 'http://127.0.0.1:8081/SetImagenAudio/'
+urlGetImagenAudio = 'http://127.0.0.1:8081/GetImagenAudio/'
+urlGetSongsArtist = 'http://127.0.0.1:8081/GetSongsArtist/'
+urlRemoveListaRepUsr = 'http://127.0.0.1:8081/RemoveListaRepUsr/'
 
 setUser = {
     'email': 'alvaro@gmail.com',
@@ -76,14 +81,22 @@ setUser4 = {
     'tipoUsuario': 'artista'
 }
 
+setUser5 = {
+    'email': 'as@gmail.com',
+    'contrasenya': '1234',
+    'alias': 'usuario5',
+    'tipoUsuario': 'artista'
+}
+
 
 
 # Creamos cuatro usuarios y subscribimos al usuario 1 al usuario 4
-requests.post(urlFlushDB)
+r.flushall()
 requests.post(urlSetUser, json=setUser)
 requests.post(urlSetUser, json=setUser2)
 requests.post(urlSetUser, json=setUser3)
 requests.post(urlSetUser, json=setUser4)
+requests.post(urlSetUser, json=setUser5)
 
 
 # Pruebas GetSubscriptionsUsr
@@ -125,8 +138,45 @@ print('Pruebas getPrivacidadCarpeta')
 respuesta = requests.post(urlGetPrivacidadCarpeta, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idCarpeta' : 'carpeta:1'})
 print(str(respuesta.status_code) + ' ' + str(respuesta.json()))
 
+
+# Pruebas SetImagenUsr
+print('Pruebas SetImagenUsr')
+print(requests.post(urlSetImagenPerfilUsr, json={'idUsr': 'usuario:2', 'idUsr2' : 'usuario:2','contrasenya': '1234', 'imagenPerfil' : 'imagen1'}).status_code)
+
 # Pruebas GetImagenUsr
 print('Pruebas GetImagenUsr')
 respuesta = requests.post(urlGetImagenUsr, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idUsr2' : 'usuario:1'})
 print(str(respuesta.status_code) + ' ' + str(respuesta.json()))
+respuesta = requests.post(urlGetImagenUsr, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idUsr2' : 'usuario:2'})
+print(str(respuesta.status_code) + ' ' + str(respuesta.json()))
 
+r.hset('audio:1', 'nombre', 'imagen1')
+r.hset('audio:2', 'genero', 'imagen1')
+# Pruebas SetImagenAudio
+print('Pruebas SetImagenAudio')
+print(requests.post(urlSetImagenAudio, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idAudio' : 'audio:1', 'imagenAudio' : 'imagen1'}).status_code)
+
+# Pruebas GetImagenAudio
+print('Pruebas GetImagenAudio')
+respuesta = requests.post(urlGetImagenAudio, json={'idUsr': 'usuario:1','contrasenya': '1234', 'idAudio' : 'audio:1'})
+print(str(respuesta.status_code) + ' ' + str(respuesta.json()))
+respuesta = requests.post(urlGetImagenAudio, json={'idUsr': 'usuario:1','contrasenya': '1234', 'idAudio' : 'audio:2'})
+print(str(respuesta.status_code) + ' ' + str(respuesta.json()))
+
+# Pruebas GetSongsArtist
+print('Pruebas GetSongsArtist')
+respuesta = requests.post(urlGetSongsArtist, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idUsrArtista' : 'usuario:5'})
+print(str(respuesta.status_code) + ' ' + str(respuesta.json()))
+print(requests.post(urlSetSong, json={'idUsr': 'usuario:5', 'contrasenya': '1234', 'nombre' : 'cancion1', 'genero' : 'pop','longitud' : '300', 'calidad' : 'baja', 'audio' : 'ABC', 'esPodcast' : "False" }).status_code)
+respuesta = requests.post(urlGetSongsArtist, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idUsrArtista' : 'usuario:5'})
+print(str(respuesta.status_code) + ' ' + str(respuesta.json()))
+
+# Pruebas RemoveListaRepUsr
+print('Pruebas RemoveListaRepUsr')
+requests.post(urlSetLista, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'nombreLista' : 'lista1', 'privada' : 'publica', 'tipoLista' : 'listaReproduccion'})
+print(requests.post(urlRemoveListaRepUsr, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idLista' : 'lista:6'}).status_code)
+print(requests.post(urlSetLista, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'nombreLista' : 'lista1', 'privada' : 'publica', 'tipoLista' : 'listaReproduccion'}).status_code)
+print(requests.post(urlSetSongLista, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idLista' : 'lista:7', 'idAudio' : 'idAudio:1'}).status_code)
+print(requests.post(urlSetFolder, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'nombreCarpeta' : 'carpeta1', 'privacidadCarpeta' : 'publica'}).status_code)
+print(requests.post(urlAddListToFolder, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idLista' : 'lista:7', 'idCarpeta' : 'carpeta:2'}).status_code)
+print(requests.post(urlRemoveListaRepUsr, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idLista' : 'lista:7'}).status_code)
