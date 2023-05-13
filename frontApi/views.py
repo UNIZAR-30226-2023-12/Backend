@@ -1202,7 +1202,7 @@ def GetLinkAudio(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idAudio = json_data[constantes.CLAVE_ID_LISTA]
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -2097,8 +2097,6 @@ def GetCalidadPorDefectoUsr(request):
     
     calidad = usuarios.getCalidadPorDefecto(r, idUsuario)
         
-    
-
     return JsonResponse({'status': erroresHTTP.OK, 'calidad': calidad}, status=erroresHTTP.OK)
 
 @csrf_exempt

@@ -1,8 +1,5 @@
 import redis
 import Configuracion.constantesPrefijosClaves as constantes
-from PIL import Image
-from io import BytesIO
-import base64
 
 #Numero de elementos que se devuelven en cada iteración de sscan
 COUNT = 100

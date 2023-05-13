@@ -419,12 +419,16 @@ def removeSongLista(r, idLista, idAudio):
 
 # Devuelve el link dado el id de una lista
 def getLinkAudio(r, id):
-    link = f.encrypt(str(id))
+    idBytes = bytes(id, 'utf-8')
+    link = f.encrypt(idBytes)
+    link = link.decode('utf-8')
     return link
 
 # Devuelve el id de una lista dado el link
 def getAudioFromLink(r, link):
+    link = bytes(link, 'utf-8')
     id = f.decrypt(link)
+    id = id.decode('utf-8')
     return id
 
 def removeLista(r, idUsuario, idLista):
