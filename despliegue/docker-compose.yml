@@ -7,8 +7,6 @@ services:
     ports:
       - "8081:8081"
     container_name: django
-    networks:
-      melodia:
   redis:
     image: melodia/redis:latest
     ports:
@@ -16,23 +14,7 @@ services:
     volumes:
       - redis:/var/lib/redis/data
     container_name: redis
-    networks:
-      melodia:
-  react:
-    image: melodia/react:latest
-    depends_on:
-      - django
-    ports:
-      - "8080:3000"
-    container_name: react
-    networks:
-      melodia:
 
 volumes:
   redis:
     driver: local
-
-networks:
-  melodia:
-    driver: bridge
-

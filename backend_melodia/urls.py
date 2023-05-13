@@ -98,4 +98,8 @@ urlpatterns = [
     path('GetTopReproducciones/', viewsApi.GetTopReproducciones, name='GetTopReproducciones'),
     path('GetValoracion/', viewsApi.GetValoracion, name='GetValoracion'),
     path('SetValoracion/', viewsApi.SetValoracion, name='SetValoracion'),
+    path('SetCalidadPorDefectoUsr/', viewsApi.SetCalidadPorDefectoUsr, name='SetCalidadPorDefectoUsr'),
+    path('GetCalidadPorDefectoUsr/', viewsApi.GetCalidadPorDefectoUsr, name='GetCalidadPorDefectoUsr'),
+    path('GetLinkAudio/', viewsApi.GetLinkAudio, name='GetLinkAudio'),
+    path('GetAudioFromLink/', viewsApi.GetAudioFromLink, name='GetAudioFromLink'),
 ]

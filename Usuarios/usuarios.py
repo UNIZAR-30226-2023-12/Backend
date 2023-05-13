@@ -434,6 +434,7 @@ def getAudioFromLink(r, link):
 def removeLista(r, idUsuario, idLista):
     # Elimino la lista de canciones de la playlist
     r.delete(constantes.CLAVE_AUDIOS + ":" + idLista)
+    r.srem(constantes.CLAVE_LISTAS, idLista)
 
     # Elimino la infmoración de la lista
     daoListas.eliminarLista(r, idLista)

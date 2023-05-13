@@ -472,6 +472,7 @@ def RemoveListaRepUsr(request):
     # No error, so remove the list
     usuarios.removeLista(r, idUsuario, idLista)
     
+    
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
        
@@ -1832,11 +1833,11 @@ def SetImagenAudio(request):
 
 @csrf_exempt
 def GlobalSearch(request):
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
-    query = request.GET.get(constantes.CLAVE_QUERY)
-    n = request.GET.get(constantes.CLAVE_N)    
+    json_data = json.loads(request.body)
+    query = json_data[constantes.CLAVE_QUERY]
+    n = json_data[constantes.CLAVE_N]
 
     audios, artistas, listas = moduloAudios.buscarGeneral(r, query, int(n))
 

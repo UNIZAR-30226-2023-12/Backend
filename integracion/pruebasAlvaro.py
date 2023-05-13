@@ -3,6 +3,9 @@ import redis
 
 r = redis.Redis(host='localhost', port=6379, db=0, username='melodia', password ='melodia_Proyecto_Software_Grupo_12')
 
+r.flushall()
+
+exit()
 
 urlFlushDB = 'http://127.0.0.1:8081/FlushDB/'
 urlSetUser = 'http://127.0.0.1:8081/SetUser/'

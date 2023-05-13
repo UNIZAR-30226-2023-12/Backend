@@ -7,6 +7,8 @@ from django.http import HttpRequest
 ip = '127.0.0.1'
 port = '8000'
 
+
+
 # URL del endpoint SetSong
 url_set_song = 'http://'+ip+':'+port+'/SetSong/'
 url_set_usr = 'http://'+ip+':'+port+'/SetUser/'
