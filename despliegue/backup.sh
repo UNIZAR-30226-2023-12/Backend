@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker cp redis:/data/appendonlydir ./appendonlydir
+docker cp redis:/data/appendonlydir ./redis/appendonlydir
