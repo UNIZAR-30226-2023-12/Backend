@@ -3,31 +3,29 @@ import Configuracion.constantesPrefijosClaves as constantes
 import DAOS.daoGlobal as daoGlobal
 import datetime
 
-def getTotalSegundosReproducidosAudio(r):
+def getTotalSegundosReproducidosAudio(r, weekday):
     segundosTotales = 0
-    keys = daoGlobal.getKeysSegundosReproducidosAudios(r)
-    for key in keys:
-        segundos = daoGlobal.getSegundosReproduciodosAudio(r, key)
-        segundosTotales += int(segundos)
-    
+    audios = daoGlobal.getKeysSegundosReproducidosAudios(r, weekday)
+    for audio in audios:
+        segundosTotales += int(getSongSecondsDia(r, audio, weekday))
     return segundosTotales
 
 def addSecondsToSong(r, idAudio, segundos):
-    if(r.exists(constantes.PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO) == 0):
-        daoGlobal.setSegundosReproduciodosAudio(r, idAudio, segundos)
-        segundosExpire = getTimeUntilSunday()
-        r.expire(constantes.PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO, segundosExpire)
+    dt = datetime.datetime.now()
+    wd = dt.weekday()
+
+    if(r.exists(constantes.PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO + ":" + str(wd)) == 0):
+        daoGlobal.setSegundosReproduciodosAudio(r, idAudio, segundos, wd)
+        r.expire(constantes.PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO + ":" + str(wd), 604800) # expira en 7 dias
         return
 
-    segundosActuales = daoGlobal.getSegundosReproduciodosAudio(r, idAudio)
-    if segundosActuales is None:
-        segundosActuales = 0
-    segundos += int(segundosActuales)
-    daoGlobal.setSegundosReproduciodosAudio(r, idAudio, segundos)
+    segundosActuales = int(daoGlobal.getSegundosReproduciodosAudio(r, idAudio, wd)) + int(segundos)
+    daoGlobal.setSegundosReproduciodosAudio(r, idAudio, segundosActuales, wd)
+    
 
-def getSongSeconds(r, idAudio):
-    segundos = daoGlobal.getSegundosReproduciodosAudio(r, idAudio)
-    if segundos is None:
+def getSongSecondsDia(r, idAudio, weekday):
+    segundos = daoGlobal.getSegundosReproduciodosAudio(r, idAudio, weekday)
+    if(segundos == None):
         return 0
     return segundos
 

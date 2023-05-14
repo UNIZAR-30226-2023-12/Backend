@@ -260,6 +260,8 @@ CLAVE_SET_USUARIOS_ENTRENADOS = "usuariosEntrenados"
 CLAVE_LISTA_ENTRENAMIENTO = "listaEntrenamiento"
 PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO = "segundosReproducidos"
 
+CLAVE_DIA = "dia"
+
 
 
 CLAVE_ID_ERROR = "idError"
