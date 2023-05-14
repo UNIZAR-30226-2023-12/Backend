@@ -141,8 +141,8 @@ def SetSong(request):
     json_data['artista'] = idUsuario
 
     # Control de errores
-    if (usuarios.getTipoUsr(r, idUsuario) == constantes.USUARIO_ARTISTA):
-        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ARTISTA}, status=erroresHTTP.ERROR_USUARIO_NO_ARTISTA)
+    if (usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ARTISTA):
+       return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ARTISTA}, status=erroresHTTP.ERROR_USUARIO_NO_ARTISTA)
 
     if status == True:
 
