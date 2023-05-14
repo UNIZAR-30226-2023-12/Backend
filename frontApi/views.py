@@ -634,6 +634,7 @@ def GetTotRepTime(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    weekday = json_data['dia']
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -645,7 +646,7 @@ def GetTotRepTime(request):
     if(usuarios.esAdministrador(r, idUsuario) == False):
         return JsonResponse({'error': 'No eres administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
     
-    segundos = ModuloGlobal.getTotalSegundosReproducidosAudio(r)
+    segundos = ModuloGlobal.getTotalSegundosReproducidosAudio(r, weekday)
 
 
     return JsonResponse({constantes.CLAVE_SECONDS: segundos}, status=erroresHTTP.OK)
@@ -686,12 +687,13 @@ def GetSongSeconds(request):
     
     json_data = json.loads(request.body)
     idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+    weekday = json_data['dia']
 
     # Control de errores
     if(moduloAudios.existeCancion(r, idAudio) == False):
         return JsonResponse({'error': 'La canción no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
     
-    segundos = ModuloGlobal.getSongSeconds(r, idAudio)
+    segundos = ModuloGlobal.getSongSecondsDia(r, idAudio, weekday)
 
     return JsonResponse({constantes.CLAVE_SECONDS: segundos}, status=erroresHTTP.OK)
 

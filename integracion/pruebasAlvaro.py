@@ -5,8 +5,6 @@ r = redis.Redis(host='localhost', port=6379, db=0, username='melodia', password 
 
 r.flushall()
 
-exit()
-
 urlFlushDB = 'http://127.0.0.1:8081/FlushDB/'
 urlSetUser = 'http://127.0.0.1:8081/SetUser/'
 urlGetUser = 'http://127.0.0.1:8081/GetUser/'
@@ -701,7 +699,8 @@ AddSecondsToSong2 = {
 
 GetTotRepTime = {
     'idUsr': 'usuario:1',
-    'contrasenya': '1234'
+    'contrasenya': '1234',
+    'dia' : 6
 }
 
 print("Pruebas AddSecondsToSong")
@@ -714,11 +713,11 @@ print(requests.post(urlAddSecondsToSong, json=AddSecondsToSongErrorContrasenya).
 print(requests.post(urlAddSecondsToSong, json=AddSecondsToSongErrorAudio).status_code)
 print(requests.post(urlAddSecondsToSong, json=AddSecondsToSongErrorSeconds).status_code)
 print(requests.post(urlAddSecondsToSong, json=AddSecondsToSong).status_code)
-
 # Pruebas GetTotRepTime
 GetTotRepTime = {
     'idUsr': 'usuario:1',
-    'contrasenya': '1234'
+    'contrasenya': '1234',
+    'dia' : 6
 }
 
 GetTotRepTimeErrorUsuario = {
@@ -746,6 +745,7 @@ respuesta = requests.post(urlGetTotRepTime, json=GetTotRepTimeErrorContrasenya)
 print(str(respuesta.status_code) + " " + str(respuesta.json()))
 respuesta = requests.post(urlGetTotRepTime, json=GetTotRepTimeErrorAdmin)
 print(str(respuesta.status_code) + " " + str(respuesta.json()))
+exit(0)
 
 
 # Pruebas SetFolder

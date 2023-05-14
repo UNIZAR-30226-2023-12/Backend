@@ -45,14 +45,11 @@ def delete_usr_training_examples(r, id_usr):
     r.delete(constantes.CLAVE_LISTA_ENTRENAMIENTO+":"+ str(id_usr))
 
 # Daos para las estadisitcas de segundos reproducidos de los audios
-def setSegundosReproduciodosAudio(r, idAudio, segundos):
-    r.hset(constantes.PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO, idAudio, segundos)
+def setSegundosReproduciodosAudio(r, idAudio, segundos, weekday):
+    r.hset(constantes.PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO + ":" + str(weekday), idAudio, segundos)
 
-def getSegundosReproduciodosAudio(r, idAudio):
-    return r.hget(constantes.PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO, idAudio)
+def getSegundosReproduciodosAudio(r, idAudio, weekday):
+    return r.hget(constantes.PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO + ":" + str(weekday), idAudio)
 
-def eliminarSegundosReproduciodosAudio(r, idAudio):
-    r.hdel(constantes.PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO, idAudio)
-
-def getKeysSegundosReproducidosAudios(r):
-    return r.hkeys(constantes.PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO)
+def getKeysSegundosReproducidosAudios(r, weekday):
+    return r.hkeys(constantes.PREFIJO_SEGUNDOS_REPRODUCIDOS_AUDIO + ":" + str(weekday))
