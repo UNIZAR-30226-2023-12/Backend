@@ -1878,8 +1878,8 @@ def GetRecomendedAudio(request):
     passwd = json_data[constantes.CLAVE_CONTRASENYA]
 
     status = usuarios.ValidateUser(r, idUsr, passwd)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    if (status == False):
+        return JsonResponse({'status': status}, status=533)
     
     canciones = list(moduloAudios.obtenerTodasLasCanciones(r))
     podcasts = list(moduloAudios.obtenerTodosLosPodcasts(r))
