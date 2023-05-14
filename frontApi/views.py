@@ -680,6 +680,7 @@ def AddSecondsToSong(request):
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 
+@csrf_exempt
 def GetSongSeconds(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
