@@ -141,8 +141,8 @@ def SetSong(request):
     json_data['artista'] = idUsuario
 
     # Control de errores
-    if (usuarios.getTipoUsr(r, idUsuario) == constantes.USUARIO_ARTISTA):
-        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ARTISTA}, status=erroresHTTP.ERROR_USUARIO_NO_ARTISTA)
+    if (usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ARTISTA):
+       return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ARTISTA}, status=erroresHTTP.ERROR_USUARIO_NO_ARTISTA)
 
     if status == True:
 
@@ -297,7 +297,7 @@ def SetLastSecondHeared(request):
 @csrf_exempt
 def GetTopReproducciones(request):
 
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     # Parse the JSON data from the request body to extract idUsuario
@@ -681,6 +681,7 @@ def AddSecondsToSong(request):
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 
+@csrf_exempt
 def GetSongSeconds(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -1879,8 +1880,8 @@ def GetRecomendedAudio(request):
     passwd = json_data[constantes.CLAVE_CONTRASENYA]
 
     status = usuarios.ValidateUser(r, idUsr, passwd)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    if (status == False):
+        return JsonResponse({'status': status}, status=533)
     
     canciones = list(moduloAudios.obtenerTodasLasCanciones(r))
     podcasts = list(moduloAudios.obtenerTodosLosPodcasts(r))
