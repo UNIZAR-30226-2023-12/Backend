@@ -87,14 +87,13 @@ def GetFicheroSong(request):
         elif calidadAlta == "False":
             fichero = moduloAudios.obtenerFicheroPodcast(r, id, 'baja')
 
-    if fichero == 419 or fichero == 424 or fichero == 430 or fichero == 425:
+    if fichero == 419 or fichero == 424 or fichero == 430 or fichero == 425 or fichero == 519 or fichero == 524:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=fichero)
     else:
         idUsr = request.GET.get('idUsr')
         if idUsr == None:
             return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
         
-        gen_datos.add_audio_prediction_temporal(r, idUsr, id)
         # Gets the serialized audio
         return JsonResponse({'fichero': fichero})
 
