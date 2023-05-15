@@ -2013,7 +2013,7 @@ def SetValoracion(request):
     valoracion = float(valoracion)
 
     moduloAudios.setValoracion(r, idUsr, idAudio, valoracion)
-    moduloAudios.cambiarValAudio(r, idAudio, valoracion)
+    #moduloAudios.cambiarValAudio(r, idAudio, valoracion)
 
     return JsonResponse({'msg': 'Valoración almacenada correctamente'}, status=erroresHTTP.OK)
 
