@@ -60,7 +60,7 @@ def GetSong(request):
     del audio[constantes.CLAVE_FICHERO_ALTA_CALIDAD]
     del audio[constantes.CLAVE_FICHERO_BAJA_CALIDAD]
 
-    audio["nReproducciones"] = moduloAudios.getReproducciones(r, audio)
+    audio["nReproducciones"] = moduloAudios.getReproducciones(r, idAudio)
 
     gen_datos.add_audio_prediction_temporal(r, idUsuario, idAudio)
 
