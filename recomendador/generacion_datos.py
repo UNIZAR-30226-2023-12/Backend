@@ -224,7 +224,7 @@ def get_audio_prediction_state(conn, id_usr, id_audio):
 
 
 def get_state_for_prediction(r, id_usr, id_audio):
-    print(get_audio_prediction_state(r, id_usr, id_audio))
+
     paquete_datos = np.array(get_audio_prediction_state(r, id_usr, id_audio), np.float32)
     paquete_datos = np.reshape(paquete_datos, (1, np.shape(paquete_datos)[0]))
 
