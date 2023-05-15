@@ -8,3 +8,4 @@ numba
 django-cors-headers
 cryptography
 datetime
+tensorflow
