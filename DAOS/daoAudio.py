@@ -226,10 +226,13 @@ def buscarAudios(r, query):
     return encontradas, artistasEncontrados, listasEncontradas
 
 
-def getValoracion(r, idUsr, idAudio):
-    return r.hget("valoraciones" + ":" + idAudio, "valoracion")
+def getValoracion(r, idAudio):
+    valoracion =  r.hget("valoraciones" + ":" + idAudio, "valoracion")
+    if(valoracion == None):
+        valoracion = 0
+    return valoracion
 
-def setValoracion(r, idUsr, idAudio, val):
+def setValoracion(r, idAudio, val):
     votos = r.hget("valoraciones" + ":" + idAudio, "numeroVotos")
     if(votos == None):
         votos = 0

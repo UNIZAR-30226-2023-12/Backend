@@ -2010,6 +2010,7 @@ def SetValoracion(request):
     if valoracion == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
+    
     valoracion = float(valoracion)
 
     moduloAudios.setValoracion(r, idUsr, idAudio, valoracion)
