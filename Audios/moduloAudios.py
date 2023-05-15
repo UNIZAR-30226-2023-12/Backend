@@ -79,7 +79,7 @@ def anyadirCancion(r, dic):
     # Añado la canción a la lista de canciones del artista
     usuarios.anyadirCancionArtista(r, artista, id)
 
-    return errores.OK
+    return id
 
 # Función para eliminar una canción
 def eliminarCancion(r, id):

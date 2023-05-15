@@ -148,13 +148,10 @@ def SetSong(request):
     if status == True:
 
         # Añado la canción a la base de datos
-        status = moduloAudios.anyadirCancion(r, json_data)
+        id = moduloAudios.anyadirCancion(r, json_data)
         
 
-        if status != 0:
-            return JsonResponse({'error': 'Ha ocurrido un problema'}, status=status)
-
-        return JsonResponse({'msg': 'Cancion añadida correctamente'}, status=erroresHTTP.OK)
+        return JsonResponse({constantes.CLAVE_ID_AUDIO: id}, status=erroresHTTP.OK)
     else:
         return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
 
