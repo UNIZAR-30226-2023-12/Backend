@@ -60,6 +60,8 @@ def GetSong(request):
     del audio[constantes.CLAVE_FICHERO_ALTA_CALIDAD]
     del audio[constantes.CLAVE_FICHERO_BAJA_CALIDAD]
 
+    audio["nReproducciones"] = moduloAudios.getReproducciones(r, audio)
+
     gen_datos.add_audio_prediction_temporal(r, idUsuario, idAudio)
 
     return JsonResponse({constantes.CLAVE_ID_AUDIO: audio}, status=erroresHTTP.OK)
@@ -212,6 +214,7 @@ def GetUser(request):
     
     if(idUsuario != idUsuarioGet):
         return JsonResponse(usuarios.getUserPublicData(r, idUsuarioGet), status=erroresHTTP.OK)
+    
     return JsonResponse(usuarios.getUser(r, idUsuarioGet), status=erroresHTTP.OK)
 
 @csrf_exempt
@@ -268,27 +271,7 @@ def SetLista(request):
     return JsonResponse({constantes.CLAVE_ID_LISTA: idLista}, status=erroresHTTP.OK)
     
     
-@csrf_exempt
-def SetLastSecondHeared(request):
-    # String idUsr, String contrasenya, String idAudio, int second
-    if request.method == 'POST':
-        # Parse the JSON data from the request body
-        json_data = json.loads(request.body)
-        
-        idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
-        contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-        idAudio = json_data[constantes.CLAVE_ID_AUDIO]
-        second = json_data[constantes.CLAVE_SECONDS]
 
-        # Validates the user
-        status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-        if (status != erroresHTTP.OK):
-            return JsonResponse({'status': status}, status=status)
-        
-        status = moduloAudios.setLastSecondHeared(r, idUsuario, idAudio, second)
-        return JsonResponse({'status': status}, status=status)
-    else:
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 @csrf_exempt
 def GetTopReproducciones(request):
@@ -1186,7 +1169,7 @@ def SetLastSecondHeared(request):
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(moduloAudios.existeCancion(r, idAudio) == False):
         return JsonResponse({'error': 'La cancion no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
-    if(segundo < 0):
+    if(int(segundo) < 0):
         return JsonResponse({'error': 'El segundo no puede ser negativo'}, status=erroresHTTP.ERROR_SEGUNDOS_NEGATIVOS)
 
     usuarios.setLastSecondHeared(r, idUsuario,idAudio, segundo)
@@ -1931,15 +1914,17 @@ def AlmacenarEjemplo(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    idUsr = request.POST.get('idUsr')
+    json_data = json.loads(request.body)
+    
+    idUsr = json_data[constantes.CLAVE_ID_USUARIO]
     if idUsr == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
-    idAudio = request.POST.get('idAudio')
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
     if idAudio == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
-    valoracion = request.POST.get('valoracion')
+    valoracion = json_data[constantes.CLAVE_VALORACION]
     if valoracion == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     

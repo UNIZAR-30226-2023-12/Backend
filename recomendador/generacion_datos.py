@@ -1,5 +1,6 @@
 from Usuarios import usuarios
 from Audios import controlAudios as audios
+from Audios import moduloAudios as modAudios
 from Configuracion import constantesPrefijosClaves as conf
 import numpy as np
 from DAOS import daoGlobal
@@ -156,14 +157,14 @@ def get_audio_prediction_state(conn, id_usr, id_audio):
     es_podcast = audios.obtenerEsPodcast(conn, id_audio)            # 1 si es podcast, 0 si no
 
     if es_podcast:
-        valoracion_media = audios.obtenerValoracionPodcast(conn, id_audio)           # Valoración media del audio
+        valoracion_media = modAudios.obtenerValMedia(conn, id_audio)           # Valoración media del audio
         n_reproducciones = audios.obtenerVecesReproducidasPodcast(conn, id_audio)    # Número de reproducciones del audio
         n_favoritos = audios.obtenerFavoritosPodcast(conn, id_audio)                 # Número de favoritos del audio
         id_genero = audios.obtenerGenerosPodcast(conn, id_audio)                     # Genero del audio, un entero
         es_podcast = 1
 
     else:
-        valoracion_media = audios.obtenerValoracionCancion(conn, id_audio)         # Valoración media del audio
+        valoracion_media = modAudios.obtenerValAudio(conn, id_audio)         # Valoración media del audio
         n_reproducciones = audios.obtenerVecesReproducidasCancion(conn, id_audio)  # Número de reproducciones del audio
         n_favoritos = audios.obtenerNumFavoritosCancion(conn, id_audio)            # Número de favoritos del audio
         id_genero = audios.obtenerGenCancion(conn, id_audio)                       # Genero del audio, un entero
@@ -224,6 +225,7 @@ def get_audio_prediction_state(conn, id_usr, id_audio):
 
 
 def get_state_for_prediction(r, id_usr, id_audio):
+    print(get_audio_prediction_state(r, id_usr, id_audio))
     paquete_datos = np.array(get_audio_prediction_state(r, id_usr, id_audio), np.float32)
     paquete_datos = np.reshape(paquete_datos, (1, np.shape(paquete_datos)[0]))
 
@@ -317,7 +319,10 @@ def get_porcentaje_favoritos_de_artista_amigos(conn, id_usr, id_artista):
         temp_numero_favoritos_del_artista_amigo = usuarios.getNFavoritosPorArtista(conn, id_amigo, id_artista) # Es un entero
         
         # Calcula el porcentaje de favoritos por genero del amigo
-        porcentaje_favoritos = temp_numero_favoritos_del_artista_amigo / usuarios.getNFavoritos(conn, id_amigo)
+        favAmigos = usuarios.getNFavoritos(conn, id_amigo)
+        porcentaje_favoritos = 0
+        if favAmigos != 0:
+            porcentaje_favoritos = temp_numero_favoritos_del_artista_amigo / usuarios.getNFavoritos(conn, id_amigo)
 
         # Añade el porcentaje de favoritos por genero del amigo
         porcentaje_favoritos_de_artista_amigos += porcentaje_favoritos
