@@ -60,6 +60,8 @@ def GetSong(request):
     del audio[constantes.CLAVE_FICHERO_ALTA_CALIDAD]
     del audio[constantes.CLAVE_FICHERO_BAJA_CALIDAD]
 
+    audio["nReproducciones"] = moduloAudios.getReproducciones(r, audio)
+
     gen_datos.add_audio_prediction_temporal(r, idUsuario, idAudio)
 
     return JsonResponse({constantes.CLAVE_ID_AUDIO: audio}, status=erroresHTTP.OK)
@@ -212,6 +214,7 @@ def GetUser(request):
     
     if(idUsuario != idUsuarioGet):
         return JsonResponse(usuarios.getUserPublicData(r, idUsuarioGet), status=erroresHTTP.OK)
+    
     return JsonResponse(usuarios.getUser(r, idUsuarioGet), status=erroresHTTP.OK)
 
 @csrf_exempt

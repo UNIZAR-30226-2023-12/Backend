@@ -5,8 +5,8 @@ from django.middleware import csrf
 from django.http import HttpRequest
 
 
-ip = '127.0.0.1'
-port = '8000'
+ip = 'ec2-3-83-121-162.compute-1.amazonaws.com'
+port = '8081'
 
 # URL del endpoint SetSong
 url_set_song = 'http://'+ip+':'+port+'/SetSong/'
