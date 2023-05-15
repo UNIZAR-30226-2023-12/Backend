@@ -1573,6 +1573,7 @@ def GetNombreListaRep(request):
     
     return JsonResponse({constantes.CLAVE_NOMBRE_CARPETA : usuarios.getNombreListaRep(r, idLista)}, status=erroresHTTP.OK)
 
+@csrf_exempt
 def SetNombreListaRep(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
