@@ -1680,6 +1680,7 @@ def GetNombreCarpeta(request):
     
     return JsonResponse({constantes.CLAVE_NOMBRE_CARPETA : usuarios.getNombreCarpeta(r, idCarpeta)}, status=erroresHTTP.OK)
 
+@csrf_exempt
 def SetNombreCarpeta(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
