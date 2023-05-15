@@ -1,9 +1,6 @@
 # base image 
-FROM python:3.10
+FROM python:3.10-slim
 MAINTAINER melodia
-
-RUN apt-get update; \
-    apt-get install -y ffmpeg
 
 # setup environment variable  
 ENV DOCKERHOME=/usr/local/melodia/backend
