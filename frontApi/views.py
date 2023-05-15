@@ -149,6 +149,7 @@ def SetSong(request):
 
         # Añado la canción a la base de datos
         id = moduloAudios.anyadirCancion(r, json_data)
+        usuarios.anyadirNotificacionSubidaCancion(r, idUsuario, id)
         
 
         return JsonResponse({constantes.CLAVE_ID_AUDIO: id}, status=erroresHTTP.OK)
