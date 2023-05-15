@@ -12,6 +12,8 @@
 
 import redis
 import Configuracion.constantesPrefijosClaves as constantes
+import DAOS.daoUsuario as daoUsuario
+import DAOS.daoListas as daoListas
 
 
 #########################################################################################
@@ -56,7 +58,6 @@ def getReproducciones(r, id):
 
 # Funcion para guardar una cancion en la base de datos, modificada para trabajar con diccionarios
 def guardarCancion(r, cancionDic):
-    print("Guardando cancion")
     id = cancionDic['id']
     ficheroAltaCalidad = cancionDic['ficheroAltaCalidad']
     ficheroBajaCalidad = cancionDic['ficheroBajaCalidad']
@@ -65,6 +66,9 @@ def guardarCancion(r, cancionDic):
     del cancionDic['id']
     del cancionDic['ficheroAltaCalidad']
     del cancionDic['ficheroBajaCalidad']
+    
+    r.hset(id, 'nValoraciones', 0)
+    r.set('reproducciones:'+id, 0)
 
     r.hmset(id, cancionDic)
     r.hmset(id+":ficheros", {'ficheroAltaCalidad': ficheroAltaCalidad, 
@@ -96,7 +100,9 @@ def cambiarVecesreproducidasCancion(r, id, nVeces):
 
 # Funcion para cambiar la valoracion de una cancion
 def cambiarValCancion(r, id, val):
-    r.hset(id, 'val', val)
+    r.inc(id, 'nValoraciones')
+    r.inc(id, 'val', int(val))
+
     return 0
 
 # Funcion para cambiar el genero de una cancion
@@ -135,7 +141,8 @@ def setImagen(r, id, imagen):
 
 # Funcion para eliminar una cancion
 def eliminarCancion(r, id):
-    r.delete(id)     
+    r.delete(id)
+    r.srem(constantes.PREFIJO_LISTA_GLOBAL_CANCIONES, id)
     return 0
 
 def setLastSecondHeared(r, idUsuario, idAudio, second):
@@ -166,7 +173,7 @@ def obtenerDatosCanciones(r, ids):
 
     for id in ids:
         datos = obtenerDatosCancion(r, id)
-        datos['id'] = id
+        datos[constantes.CLAVE_ID_AUDIO] = id
         datosCanciones.append(datos)
 
     return datosCanciones
@@ -181,39 +188,68 @@ def obtenerTodasLasCanciones(r):
 def buscarAudios(r, query):
     canciones = obtenerTodasLasCanciones(r)
     podcasts = obtenerTodosLosPodcasts(r)
+    artistas = daoUsuario.obtenerTodosArtistas(r)
+    listas = daoListas.obtenerTodasLasListas(r)
+
     datosCanciones = obtenerDatosCanciones(r, canciones)
     datosPodcasts = obtenerDatosPodcasts(r, podcasts)
+    datosArtistas = daoUsuario.obtenerDatosArtistas(r, artistas)
+    datosListas = daoListas.obtenerDatosListas(r, listas)
     encontradas = []
-
-    for audio in datosCanciones:
-        if (query.lower() in audio['nombre'].lower() or 
-            query.lower() in audio['artista'].lower()):
-            encontradas.append(audio['id'])
-
-    for audio in datosCanciones:
-        if (query.lower() in audio['nombre'].lower() or 
-            query.lower() in audio['artista'].lower() or
-            query.lower() in audio['descripcion'].lower()):
-            encontradas.append(audio['id'])
-        
-
-    return encontradas
+    artistasEncontrados = []
+    listasEncontradas = []
 
 
-def getValoracion(r, idUsr, idAudio):
-    return r.hget(idUsr+':valoraciones', idAudio)
+    if len(datosCanciones) > 0:
+        for audio in datosCanciones:
+            if (query.lower() in audio[constantes.CLAVE_NOMBRE_AUDIO].lower() or 
+                query.lower() in audio[constantes.CLAVE_ARTISTA_AUDIO].lower() or 
+                query.lower() in constantes.obtenerNombreGenero(audio[constantes.CLAVE_GENEROS_AUDIO])):
+                encontradas.append(audio[constantes.CLAVE_ID_AUDIO])
 
-def setValoracion(r, idUsr, idAudio, val):
-    r.hset(idUsr+':valoraciones', idAudio, val)
-    
+    if len(datosPodcasts) > 0:
+        for audio in datosPodcasts:
+            if (query.lower() in audio[constantes.CLAVE_NOMBRE_AUDIO].lower() or 
+                query.lower() in audio[constantes.CLAVE_ARTISTA_AUDIO].lower() or
+                query.lower() in audio[constantes.CLAVE_DESCRIPCION_AUDIO].lower() or 
+                query.lower() in constantes.obtenerNombreGenero(audio[constantes.CLAVE_GENEROS_AUDIO])):
+                encontradas.append(audio[constantes.CLAVE_ID_AUDIO])
+
+    if len(datosArtistas) > 0:
+        for artista in datosArtistas:
+            if query.lower() in artista[constantes.CLAVE_ALIAS].lower():
+                artistasEncontrados.append(artista[constantes.CLAVE_ID_USUARIO])
+
+    if len(datosListas) > 0:
+        for lista in datosListas:
+            print (lista)
+            if query.lower() in lista[constantes.CLAVE_NOMBRE_LISTA].lower() and lista[constantes.CLAVE_PRIVACIDAD_LISTA] == constantes.LISTA_PUBLICA:
+                listasEncontradas.append(lista[constantes.CLAVE_ID_LISTA])
+            
+    return encontradas, artistasEncontrados, listasEncontradas
+
+
+def getValoracionUsuario(r, idUsr, idAudio):
+    valoracion =  r.get("valoraciones" + ":" + idUsr + ":" + idAudio)
+    if(valoracion == None):
+        valoracion = 0
+    return valoracion
+
+def setValoracionUsuario(r, idUsr, idAudio, val):
+    r.set("valoraciones" + ":" + idUsr + ":" + idAudio, val)
 
 # Funcion para obtener el num de veces que se ha escuchado una cancion
 def obtenerVecesreproducidasCancion(r, id):
     return r.hget(id, 'nVeces')
 
 # Funcion para obtener la valoracion de una cancion
-def obtenerValCancion(r, id):
-    return r.hget(id, 'val')
+def obtenerValMedia(r, id):
+    val = r.hget("valoracionMedia:" + id, "media")
+
+    if val == None:
+        val = 0
+
+    return val
 
 # Funcion para obtener el genero de una cancion
 def obtenerGeneroCancion(r, id):
@@ -253,6 +289,9 @@ def obtenerEsPodcast(r, id):
 
 def getImagenAudio(r, id):
     return r.hget(id, constantes.CLAVE_IMAGEN_AUDIO)
+
+def setImagenAudio(r, id, imagen):
+    return r.hset(id, constantes.CLAVE_IMAGEN_AUDIO, imagen)
 
 def getImagenDefaultAudio(r):
     return r.get(constantes.CLAVE_DEFAULT_AUDIO_IMAGE)
@@ -328,7 +367,9 @@ def cambiarVecesreproducidasPodcast(r, id, nVeces):
 
 # Funcion para cambiar la valoracion de un podcast
 def cambiarValPodcast(r, id, val):
-    r.hset(id, 'val', val)
+    r.inc(id, 'nValoraciones')
+    r.inc(id, 'val', int(val))
+
     return 0
 
 # Funcion para cambiar la descripcion de un podcast
@@ -364,6 +405,7 @@ def cambiarNumFavoritosPodcast(r, id, numFavoritos):
 # Funcion para eliminar un podcast
 def eliminarPodcast(r, id):
     r.delete(id)
+    r.srem(constantes.PREFIJO_LISTA_GLOBAL_PODCASTS, id)
     return 0
 
 #########################################################################################
@@ -394,7 +436,9 @@ def obtenerDatosPodcasts(r, ids):
     datosPodcasts = []
 
     for id in ids:
-        datosPodcasts.append(obtenerDatosPodcast(r, id))
+        datos = obtenerDatosPodcast(r, id)
+        datos[constantes.CLAVE_ID_AUDIO] = id
+        datosPodcasts.append(datos)
 
     return datosPodcasts
 
@@ -416,7 +460,7 @@ def obtenerVecesreproducidasPodcast(r, id):
 
 # Funcion para obtener la valoracion de un podcast
 def obtenerValPodcast(r, id):
-    return r.hget(id, 'val')
+    return int(r.hget(id, 'val')) / int(r.hget(id, 'nValoraciones'))
 
 # Funcion para obtener la descripcion de un podcast
 def obtenerDescPodcast(r, id):
@@ -441,3 +485,17 @@ def obtenerLongitudPodcast(r, id):
 # Funcion para obtener el numero de favoritos de un podcast
 def obtenerNumFavoritosPodcast(r, id):
     return r.hget(id, 'numFavoritos')
+
+def setValoracionMedia(r, idAudio, val):
+    valTotal = r.hget("valoracionMedia:" + idAudio, 'valTotal')
+    if valTotal == None:
+        valTotal = 0
+    nValoraciones = r.hget("valoracionMedia:" + idAudio, 'nValoraciones')
+    if nValoraciones == None:
+        nValoraciones = 1
+    r.hset("valoracionMedia:" + idAudio, 'valTotal', float(valTotal) + float(val))
+    r.hset("valoracionMedia:" + idAudio, 'nValoraciones', int(nValoraciones) + 1)
+
+    valoracion_media = float(r.hget("valoracionMedia:" + idAudio, 'valTotal')) / float(r.hget("valoracionMedia:" + idAudio, 'nValoraciones'))
+
+    r.hset("valoracionMedia:" + idAudio, 'media', valoracion_media)

@@ -10,7 +10,7 @@ from Audios import moduloAudios
 from Usuarios import usuarios
 
 from recomendador import generacion_datos as gen_datos
-#from recomendador import recomendador as rec
+from recomendador import recomendador as rec
 
 from Global import ModuloGlobal
 
@@ -24,11 +24,6 @@ from django.conf import settings
 import random
 
 r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
-
-@csrf_exempt
-def FlushDB(request):
-    r.flushdb()
-    return JsonResponse({'status': 'OK'})
 
 # echo request
 @csrf_exempt
@@ -91,14 +86,13 @@ def GetFicheroSong(request):
         elif calidadAlta == "False":
             fichero = moduloAudios.obtenerFicheroPodcast(r, id, 'baja')
 
-    if fichero == 419 or fichero == 424 or fichero == 430 or fichero == 425:
+    if fichero == 419 or fichero == 424 or fichero == 430 or fichero == 425 or fichero == 519 or fichero == 524:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=fichero)
     else:
         idUsr = request.GET.get('idUsr')
         if idUsr == None:
             return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
         
-        gen_datos.add_audio_prediction_temporal(r, idUsr, id)
         # Gets the serialized audio
         return JsonResponse({'fichero': fichero})
 
@@ -143,17 +137,19 @@ def SetSong(request):
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
     status = usuarios.ValidateUser(r, idUsuario, contrasenya)
+    json_data['artista'] = idUsuario
+
+    # Control de errores
+    if (usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ARTISTA and usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ADMINISTRADOR):
+       return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ARTISTA}, status=erroresHTTP.ERROR_USUARIO_NO_ARTISTA)
 
     if status == True:
 
         # Añado la canción a la base de datos
-        status = moduloAudios.anyadirCancion(r, json_data)
+        id = moduloAudios.anyadirCancion(r, json_data)
         
 
-        if status != 0:
-            return JsonResponse({'error': 'Ha ocurrido un problema'}, status=status)
-
-        return JsonResponse({'msg': 'Cancion añadida correctamente'}, status=erroresHTTP.OK)
+        return JsonResponse({constantes.CLAVE_ID_AUDIO: id}, status=erroresHTTP.OK)
     else:
         return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
 
@@ -166,19 +162,24 @@ def SetUser(request):
     json_data = json.loads(request.body)
     
     email = json_data[constantes.CLAVE_EMAIL]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    alias = json_data[constantes.CLAVE_ALIAS]
+    tipoUsuario = json_data[constantes.CLAVE_TIPO_USUARIO]
+
+    diccionarioUsuario = {constantes.CLAVE_EMAIL : email,
+                            constantes.CLAVE_CONTRASENYA : contrasenya,
+                            constantes.CLAVE_ALIAS : alias,
+                            constantes.CLAVE_TIPO_USUARIO : tipoUsuario}
 
     # Control de errores
     if(usuarios.existeUsuarioEmail(r, email)):
         return JsonResponse({'error': 'El email ya existe'}, status=erroresHTTP.ERROR_USUARIO_EMAIL_YA_EXISTE)
     
-    if(usuarios.correctoDiccionarioUsuario(json_data) == False):
-        return JsonResponse({'error': 'El diccionario no es correcto'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
-    
     if(usuarios.tipoUsuarioValido(json_data[constantes.CLAVE_TIPO_USUARIO]) == False):
         return JsonResponse({'error': 'El tipo de usuario no es valido'}, status=erroresHTTP.ERROR_USUARIO_TIPO_NO_VALIDO)
     
     # No error, so add the user
-    idUsuario = usuarios.setUser(r, json_data)
+    idUsuario = usuarios.setUser(r, diccionarioUsuario)
 
     diccionarioLista = {constantes.CLAVE_NOMBRE_LISTA : "Favoritos", 
                         constantes.CLAVE_PRIVACIDAD_LISTA : constantes.LISTA_PRIVADA, 
@@ -205,7 +206,7 @@ def GetUser(request):
     if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False and contrasenya != None):
         return JsonResponse({'error': 'La contraseña es incorrecta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeUsuario(r, idUsuarioGet) == False):
-        if(usuarios.isSubscribedToArtist(r, idUsuario, idUsuarioGet) == False):
+        if(usuarios.isSubscribedToArtist(r, idUsuario, idUsuarioGet)):
             usuarios.unsubscribeToArtist(r, idUsuario, idUsuarioGet)
         return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     
@@ -243,9 +244,14 @@ def SetLista(request):
     
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    diccionarioLista = json_data.copy()
-    # Quitamos la contrasenya del diccionario
-    del diccionarioLista[constantes.CLAVE_CONTRASENYA]
+    nombreLista = json_data[constantes.CLAVE_NOMBRE_LISTA]
+    privacidadLista = json_data[constantes.CLAVE_PRIVACIDAD_LISTA]
+    tipoLista = json_data[constantes.CLAVE_TIPO_LISTA]
+    diccionarioLista = {constantes.CLAVE_ID_USUARIO : idUsuario,
+                        constantes.CLAVE_NOMBRE_LISTA : nombreLista,
+                        constantes.CLAVE_PRIVACIDAD_LISTA : privacidadLista,
+                        constantes.CLAVE_TIPO_LISTA : tipoLista}
+
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -253,8 +259,6 @@ def SetLista(request):
     # Validates the user
     if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
         return JsonResponse({'error': 'Usuario o contraseña incorrectos'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
-    if (usuarios.correctoDiccionarioLista(diccionarioLista) == False):
-        return JsonResponse({'error': 'El diccionario no es correcto'}, status=erroresHTTP.ERROR_LISTA_PARAMETROS_INCORRECTOS)
     if (usuarios.isListaPrivacidadValida(diccionarioLista[constantes.CLAVE_PRIVACIDAD_LISTA]) == False):
         return JsonResponse({'error': 'La privacidad no es valida'}, status=erroresHTTP.ERROR_LISTA_PRIVACIDAD_INCORRECTA)
     if (usuarios.tipoListaValido(diccionarioLista[constantes.CLAVE_TIPO_LISTA]) == False):
@@ -289,7 +293,7 @@ def SetLastSecondHeared(request):
 @csrf_exempt
 def GetTopReproducciones(request):
 
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     # Parse the JSON data from the request body to extract idUsuario
@@ -315,7 +319,7 @@ def GetTopReproducciones(request):
 
     # pair the elements of the two lists
     pairs = list(zip(audios, reproducciones))
-
+    print(pairs)
     # sort the pairs based on the values in the second list (i.e. b)
     sorted_pairs = sorted(pairs, key=lambda x: x[1])
 
@@ -428,7 +432,7 @@ def GetListasUsr(request):
     if (usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
         return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeUsuario(r, idUsuarioGet) == False):
-        if(usuarios.isSubscribedToArtist(r, idUsuario, idUsuarioGet) == False):
+        if(usuarios.isSubscribedToArtist(r, idUsuario, idUsuarioGet)):
             usuarios.unsubscribeToArtist(r, idUsuario, idUsuarioGet)
         return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     
@@ -437,7 +441,7 @@ def GetListasUsr(request):
     return JsonResponse({constantes.CLAVE_LISTAS: usuarios.getListasUsr(r, idUsuario)}, status=erroresHTTP.OK)
 
 @csrf_exempt
-def RemoveListRepUsr(request):
+def RemoveListaRepUsr(request):
     if request.method != 'POST':
          # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -462,7 +466,8 @@ def RemoveListRepUsr(request):
         return JsonResponse({'status': erroresHTTP.ERROR_LISTA_ES_FAVORITOS}, status=erroresHTTP.ERROR_LISTA_ES_FAVORITOS)
 
     # No error, so remove the list
-    usuarios.removeLista(r, idLista)
+    usuarios.removeLista(r, idUsuario, idLista)
+    
     
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
@@ -533,6 +538,7 @@ def AskAdminToBeArtist(request):
     
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    mensajeNotificacion = json_data[constantes.CLAVE_MENSAJE_NOTIFICACION]
     
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -544,7 +550,7 @@ def AskAdminToBeArtist(request):
     if(usuarios.getTipoUsr(r, idUsuario) == constantes.USUARIO_ADMINISTRADOR):
         return JsonResponse({'status': erroresHTTP.FORBIDDEN}, status=erroresHTTP.FORBIDDEN)
 
-    usuarios.AskAdminToBeArtist(r, idUsuario)
+    usuarios.AskAdminToBeArtist(r, idUsuario, mensajeNotificacion)
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
@@ -624,6 +630,7 @@ def GetTotRepTime(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    weekday = json_data['dia']
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -635,7 +642,7 @@ def GetTotRepTime(request):
     if(usuarios.esAdministrador(r, idUsuario) == False):
         return JsonResponse({'error': 'No eres administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
     
-    segundos = ModuloGlobal.getTotalSegundosReproducidosAudio(r)
+    segundos = ModuloGlobal.getTotalSegundosReproducidosAudio(r, weekday)
 
 
     return JsonResponse({constantes.CLAVE_SECONDS: segundos}, status=erroresHTTP.OK)
@@ -665,23 +672,25 @@ def AddSecondsToSong(request):
     if (segundos < 0):
         return JsonResponse({'error': 'Los segundos no pueden ser negativos'}, status=erroresHTTP.ERROR_SEGUNDOS_NEGATIVOS)
 
-    status = ModuloGlobal.addSecondsToSong(r, idAudio, segundos)
+    ModuloGlobal.addSecondsToSong(r, idAudio, segundos)
 
-    return JsonResponse({'status': status}, status=status)
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 
+@csrf_exempt
 def GetSongSeconds(request):
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    # Parse the JSON data from the request bdoy to extract idUsuario
-    idAudio = request.GET.get(constantes.CLAVE_ID_AUDIO)
+    json_data = json.loads(request.body)
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+    weekday = json_data['dia']
 
     # Control de errores
     if(moduloAudios.existeCancion(r, idAudio) == False):
         return JsonResponse({'error': 'La canción no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
     
-    segundos = ModuloGlobal.getSongSeconds(r, idAudio)
+    segundos = ModuloGlobal.getSongSecondsDia(r, idAudio, weekday)
 
     return JsonResponse({constantes.CLAVE_SECONDS: segundos}, status=erroresHTTP.OK)
 
@@ -704,13 +713,11 @@ def SetFolder(request):
         return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
-    if(usuarios.correctoDiccionarioCarpeta(diccionarioCarpeta) == False):
-        return JsonResponse({'error': 'El diccionario de la carpeta no es correcto'}, status=erroresHTTP.ERROR_CARPETA_PARAMETROS_INCORRECTOS)
     if(usuarios.carpetaPrivacidadValida(privacidad) == False):
         return JsonResponse({'error': 'La privacidad no es correcta'}, status=erroresHTTP.ERROR_CARPETA_PRIVACIDAD_NO_VALIDA)
-    usuarios.setFolder(r, idUsuario, diccionarioCarpeta)
+    idFolder = usuarios.setFolder(r, idUsuario, diccionarioCarpeta)
 
-    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.CLAVE_ID_CARPETA : idFolder}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def AddListToFolder(request):
@@ -740,7 +747,7 @@ def AddListToFolder(request):
     if(usuarios.getTipoListaRep(r, idLista) == constantes.LISTA_TIPO_FAVORITOS):
         return JsonResponse({'error': 'La lista es de favoritos'}, status=erroresHTTP.ERROR_LISTA_ES_FAVORITOS)
     
-    usuarios.addListToFolder(r, idCarpeta, idLista)
+    usuarios.addListToFolder(r, idUsuario, idCarpeta, idLista)
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
@@ -825,7 +832,7 @@ def GetFolder(request):
 
 @csrf_exempt
 def GetListasFolder(request):
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     # Parse the JSON data from the request body to extract idUsuario
@@ -863,7 +870,7 @@ def GetFoldersUsr(request):
     if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False) and contrasenya != None:
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeUsuario(r, idUsuarioGet) == False):
-        if(usuarios.isSubscribedToArtist(r, idUsuario, idUsuarioGet) == False):
+        if(usuarios.isSubscribedToArtist(r, idUsuario, idUsuarioGet)):
             usuarios.unsubscribeToArtist(r, idUsuario, idUsuarioGet)
         return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     
@@ -1195,7 +1202,7 @@ def GetLinkAudio(request):
     json_data = json.loads(request.body)
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
-    idAudio = json_data[constantes.CLAVE_ID_LISTA]
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
 
     # Control de errores
     if(usuarios.existeUsuario(r, idUsuario) == False):
@@ -1264,6 +1271,8 @@ def GetSongsArtist(request):
     if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
         return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     if(usuarios.existeUsuario(r, idArtista) == False):
+        if(usuarios.isSubscribedToArtist(r, idUsuario, idArtista)):
+            usuarios.unsubscribeToArtist(r, idUsuario, idArtista)
         return JsonResponse({'error': 'El artista no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     if(usuarios.getTipoUsr(r, idArtista) != constantes.USUARIO_ARTISTA):
         return JsonResponse({'error': 'El usuario no es un artista'}, status=erroresHTTP.ERROR_USUARIO_NO_ARTISTA)
@@ -1510,7 +1519,7 @@ def GetImagenPerfilUsr(request):
         return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
     
 
-    return JsonResponse({constantes.CLAVE_IMAGEN_PERFIL : usuarios.getImagenPerfilUsr(r, idUsuario)}, status=erroresHTTP.OK)
+    return JsonResponse({constantes.CLAVE_IMAGEN_PERFIL : usuarios.getImagenPerfilUsr(r, idUsuarioImagen)}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def SetImagenPerfilUsr(request):
@@ -1564,6 +1573,7 @@ def GetNombreListaRep(request):
     
     return JsonResponse({constantes.CLAVE_NOMBRE_CARPETA : usuarios.getNombreListaRep(r, idLista)}, status=erroresHTTP.OK)
 
+@csrf_exempt
 def SetNombreListaRep(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -1670,6 +1680,7 @@ def GetNombreCarpeta(request):
     
     return JsonResponse({constantes.CLAVE_NOMBRE_CARPETA : usuarios.getNombreCarpeta(r, idCarpeta)}, status=erroresHTTP.OK)
 
+@csrf_exempt
 def SetNombreCarpeta(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -1796,19 +1807,43 @@ def GetImagenAudio(request):
     
     return JsonResponse({constantes.CLAVE_IMAGEN_AUDIO : moduloAudios.getImagenAudio(r, idAudio)}, status=erroresHTTP.OK)
 
+@csrf_exempt
+def SetImagenAudio(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    json_data = json.loads(request.body)
+    idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
+    contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+    imagenAudio = json_data[constantes.CLAVE_IMAGEN_AUDIO]
+
+    # Control de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'error': 'El usuario no existe'}, status=erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO)
+    if(usuarios.ValidateUser(r, idUsuario, contrasenya) == False):
+        return JsonResponse({'error': 'La contraseña no es correcta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
+
+    if(moduloAudios.existeCancion(r, idAudio) == False):
+        return JsonResponse({'error': 'El audio no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
+    
+    moduloAudios.setImagenAudio(r, idAudio, imagenAudio)
+
+    return JsonResponse({'status': 'OK'}, status=erroresHTTP.OK)
+
 
 @csrf_exempt
 def GlobalSearch(request):
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
-    query = request.GET.get(constantes.CLAVE_QUERY)
-    n = request.GET.get(constantes.CLAVE_N)    
+    json_data = json.loads(request.body)
+    query = json_data[constantes.CLAVE_QUERY]
+    n = json_data[constantes.CLAVE_N]
 
-    respuesta = moduloAudios.buscarCanciones(r, query, n)
+    audios, artistas, listas = moduloAudios.buscarGeneral(r, query, int(n))
 
     #return JsonResponse({'status': status}, status=status)
-    return JsonResponse({'datos': respuesta}, status=200)
+    return JsonResponse({'audios': audios, 'artistas': artistas, 'listas': listas}, status=200)
 
 
 @csrf_exempt
@@ -1843,8 +1878,8 @@ def GetRecomendedAudio(request):
     passwd = json_data[constantes.CLAVE_CONTRASENYA]
 
     status = usuarios.ValidateUser(r, idUsr, passwd)
-    if (status != erroresHTTP.OK):
-        return JsonResponse({'status': status}, status=status)
+    if (status == False):
+        return JsonResponse({'status': status}, status=533)
     
     canciones = list(moduloAudios.obtenerTodasLasCanciones(r))
     podcasts = list(moduloAudios.obtenerTodosLosPodcasts(r))
@@ -1876,13 +1911,16 @@ def entrenar_recomendador(request):
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
 
     status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
+    if status:
+        status = erroresHTTP.OK
+    else:
+        status = erroresHTTP.ERROR_CONTRASENYA_INCORRECTA
         return JsonResponse({'status': status}, status=status)
     
     if(usuarios.esAdministrador(r, idUsuario) == False):
         return JsonResponse({'error': 'No eres administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
     
-    status = rec.train_model(r, nuevo_modelo=True)
+    rec.train_model(r, nuevo_modelo=True)
 
     return JsonResponse({'status': status}, status=status)
 
@@ -1905,6 +1943,10 @@ def AlmacenarEjemplo(request):
     if valoracion == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
+    if not moduloAudios.existeCancion(r, idAudio) or not moduloAudios.existePodcast(r, idAudio):
+       return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_AUDIO_INEXISTENTE)
+
+
     valoracion = float(valoracion)
 
     gen_datos.store_training_example(r, idUsr, idAudio, valoracion)
@@ -1915,18 +1957,40 @@ def AlmacenarEjemplo(request):
 @csrf_exempt
 def GetValoracion(request):
     # Compruebo que el método sea GET
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    idUsr = request.GET.get('idUsr')
+    json_data = json.loads(request.body)
+    
+    idUsr = json_data[constantes.CLAVE_ID_USUARIO]
     if idUsr == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
-    idAudio = request.GET.get('idAudio')
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
     if idAudio == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
     valoracion = moduloAudios.getValoracion(r, idUsr, idAudio)
+
+    if valoracion == None:
+        valoracion = 0
+
+    return JsonResponse({'valoracion': valoracion}, status=erroresHTTP.OK)
+
+
+@csrf_exempt
+def GetValoracionMedia(request):
+    # Compruebo que el método sea GET
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    json_data = json.loads(request.body)
+    
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+    if idAudio == None:
+        return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+    
+    valoracion = moduloAudios.obtenerValMedia(r, idAudio)
 
     if valoracion == None:
         valoracion = 0
@@ -1940,21 +2004,25 @@ def SetValoracion(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    idUsr = request.POST.get('idUsr')
+    json_data = json.loads(request.body)
+    
+    idUsr = json_data[constantes.CLAVE_ID_USUARIO]
     if idUsr == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
-    idAudio = request.POST.get('idAudio')
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
     if idAudio == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
-    valoracion = request.POST.get('valoracion')
+    valoracion = json_data[constantes.CLAVE_VALORACION]
     if valoracion == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+    
     
     valoracion = float(valoracion)
 
     moduloAudios.setValoracion(r, idUsr, idAudio, valoracion)
+    #moduloAudios.cambiarValAudio(r, idAudio, valoracion)
 
     return JsonResponse({'msg': 'Valoración almacenada correctamente'}, status=erroresHTTP.OK)
 
@@ -1964,7 +2032,7 @@ def SetValoracion(request):
 @csrf_exempt
 def GenerateRandomCodeUsr(request):
     # Compruebo que el método sea GET
-    if request.method != 'GET':
+    if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     
@@ -2029,15 +2097,15 @@ def SetCalidadPorDefectoUsr(request):
     passwd = json_data[constantes.CLAVE_CONTRASENYA]
     calidad = json_data[constantes.CLAVE_CALIDAD_PREFERIDA]
 
-    status = usuarios.ValidateUser(r, idUsuario, passwd)
-    # Compruebo que el usuario existe
-    if(status == erroresHTTP.OK):
-        usuarios.setCalidadPorDefecto(r, idUsuario, calidad)
-        code = erroresHTTP.OK
-    else:
-        code = status
+    # Contrlo de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.OK)
+    if(usuarios.ValidateUser(r, idUsuario, passwd) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.OK)
+    
+    usuarios.setCalidadPorDefecto(r, idUsuario, calidad)
 
-    return JsonResponse({'code': code}, status=erroresHTTP.OK)
+    return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
 
 @csrf_exempt
@@ -2052,15 +2120,15 @@ def GetCalidadPorDefectoUsr(request):
     idUsuario = json_data[constantes.CLAVE_ID_USUARIO]
     passwd = json_data[constantes.CLAVE_CONTRASENYA]
 
-    status = usuarios.ValidateUser(r, idUsuario, passwd)
-    # Compruebo que el usuario existe
-    if(status == erroresHTTP.OK):
-        calidad = usuarios.getCalidadPorDefecto(r, idUsuario)
-        code = erroresHTTP.OK
-    else:
-        code = status
-
-    return JsonResponse({'code': code, 'calidad': calidad}, status=erroresHTTP.OK)
+    # Contrlo de errores
+    if(usuarios.existeUsuario(r, idUsuario) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ENCONTRADO}, status=erroresHTTP.OK)
+    if(usuarios.ValidateUser(r, idUsuario, passwd) == False):
+        return JsonResponse({'status': erroresHTTP.ERROR_CONTRASENYA_INCORRECTA}, status=erroresHTTP.OK)
+    
+    calidad = usuarios.getCalidadPorDefecto(r, idUsuario)
+        
+    return JsonResponse({'status': erroresHTTP.OK, 'calidad': calidad}, status=erroresHTTP.OK)
 
 @csrf_exempt
 def RecuperarContrasenya(request):

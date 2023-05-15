@@ -32,7 +32,10 @@ def existeLista(r, id):
 # Funcion para crear una playlist
 def setLista(r, listaDiccionario):
     id = listaDiccionario[constantes.CLAVE_ID_LISTA]
-    del listaDiccionario[constantes.CLAVE_ID_LISTA]    
+    del listaDiccionario[constantes.CLAVE_ID_LISTA]  
+
+    r.sadd(constantes.CLAVE_LISTAS, id)
+
     return r.hmset(id, listaDiccionario)
 
 # Funcion para cambiar el nombre de una playlist
@@ -88,6 +91,19 @@ def getTipoLista(r, id):
 
 def getIDUsuario(r, id):
     return r.hget(id, constantes.CLAVE_ID_USUARIO)
+
+def obtenerTodasLasListas(r):
+    return r.smembers(constantes.CLAVE_LISTAS)
+
+def obtenerDatosListas(r, listas):
+    datosListas = []
+
+    for id in listas:
+        datos = getLista(r, id)
+        datos[constantes.CLAVE_ID_LISTA] = id
+        datosListas.append(datos)
+
+    return datosListas
 
 # Funcion para obtener las canciones de una playlist
 def getAudiosLista(r, id):

@@ -9,6 +9,7 @@ import Configuracion.constantesPrefijosClaves as constantes
 import Configuracion.constantesErroresHTTP as erroresHTTP
 from cryptography.fernet import Fernet
 
+
 key = Fernet.generate_key()
 f = Fernet(key)
 ##############################################################################################################
@@ -123,7 +124,7 @@ def getCalidadPorDefecto(r, idUsuario):
 
 # Elimina el usuario de la base de datos, tener en cuenta 
 # que el usuario en caso de ser artista no se borra de sus suscriptores
-def removeUser(r, id, contrasenya):
+def removeUser(r, id):
     amigos = daoUsuario.getAmigos(r, id)
     # Eliminar usuario de la lista de amigos de sus amigos
     for amigo in amigos:
@@ -143,6 +144,8 @@ def removeUser(r, id, contrasenya):
     r.delete(constantes.PREFIJO_NOTIFICACIONES + id)
     r.delete(constantes.PREFIJO_CARPETAS + id)
 
+    daoUsuario.eliminarEmailId(r, daoUsuario.getEmail(r, id))
+
     #Si es administrador, eliminarlo de la lista de administradores
     if(daoUsuario.getTipoUsuario(r, id) == constantes.USUARIO_ADMINISTRADOR):
         daoUsuario.eliminarAdministrador(r, id)
@@ -150,14 +153,13 @@ def removeUser(r, id, contrasenya):
     daoUsuario.eliminarUsuario(r, id)
 
 # Función para solictiar ser artista a los administradores
-def AskAdminToBeArtist(r, idUsuario):
+def AskAdminToBeArtist(r, idUsuario, mensajeNotificacion):
     idNotificacion = daoNotificaciones.getIdContador(r)
     diccionarioNotificaciones = {constantes.CLAVE_ID_NOTIFICACION: idNotificacion, 
                                  constantes.CLAVE_ID_USUARIO_EMISIOR: idUsuario, 
                                  constantes.CLAVE_TIPO_NOTIFICACION: constantes.NOTIFICACION_TIPO_SOLICITUD_ARTISTA,
                                  constantes.CLAVE_TITULO_NOTIFICACION: constantes.TITULO_NOTIFICACION_ARTISTA,
-                                 constantes.CLAVE_MENSAJE_NOTIFICACION: daoUsuario.getAlias(r,idUsuario) + constantes.MENSAJE_NOTIFICACION_ARTISTA}
-    # Creamos la notificacíon tipo solicitud de artista
+                                 constantes.CLAVE_MENSAJE_NOTIFICACION: mensajeNotificacion}
     daoNotificaciones.setNotificacion(r, diccionarioNotificaciones)
     # Añadimos la notificación a todos los administradores
     for admin in  daoUsuario.getAdministradores(r):
@@ -417,17 +419,22 @@ def removeSongLista(r, idLista, idAudio):
 
 # Devuelve el link dado el id de una lista
 def getLinkAudio(r, id):
-    link = f.encrypt(str(id))
+    idBytes = bytes(id, 'utf-8')
+    link = f.encrypt(idBytes)
+    link = link.decode('utf-8')
     return link
 
 # Devuelve el id de una lista dado el link
 def getAudioFromLink(r, link):
+    link = bytes(link, 'utf-8')
     id = f.decrypt(link)
+    id = id.decode('utf-8')
     return id
 
 def removeLista(r, idUsuario, idLista):
     # Elimino la lista de canciones de la playlist
     r.delete(constantes.CLAVE_AUDIOS + ":" + idLista)
+    r.srem(constantes.CLAVE_LISTAS, idLista)
 
     # Elimino la infmoración de la lista
     daoListas.eliminarLista(r, idLista)
@@ -437,8 +444,9 @@ def removeLista(r, idUsuario, idLista):
         daoUsuario.eliminarLista(r, idUsuario, idLista)
     
     # Elimino el id de la lista de las carpetas del usuario
-    if(idLista in daoCarpetas.getListasCarpeta(r, idUsuario)):
-        daoCarpetas.eliminarListaCarpeta(r, idUsuario, idLista)
+    for idCarpeta in daoUsuario.getCarpetas(r, idUsuario):
+        if(idLista in daoCarpetas.getListasCarpeta(r,idCarpeta)):
+            daoCarpetas.eliminarListaCarpeta(r, idCarpeta, idLista)
 
 ##############################################################################################################
 ## Funciones carpetas
@@ -477,7 +485,7 @@ def setFolder(r, idUsuario, diccionarioCarpeta):
     diccionarioCarpeta[constantes.CLAVE_ID_CARPETA] = id
     daoCarpetas.setCarpeta(r, diccionarioCarpeta) 
     daoUsuario.anyadirCarpeta(r, idUsuario, id)
-    return erroresHTTP.OK
+    return id
 
 def getFolder(r, idCarpeta):
     return daoCarpetas.getCarpeta(r, idCarpeta)
@@ -507,7 +515,8 @@ def getPublicFoldersUser(r, idUsuario):
             folders.remove(folder)
     return folders
 
-def addListToFolder(r, idCarpeta, idLista):
+def addListToFolder(r, idUsuario, idCarpeta, idLista):
+    daoUsuario.eliminarLista(r, idUsuario, idLista)
     daoCarpetas.anyadirListaCarpeta(r, idCarpeta, idLista)
 
 def getListasFolder(r, idCarpeta):

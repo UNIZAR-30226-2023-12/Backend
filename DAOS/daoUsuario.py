@@ -21,6 +21,10 @@ def existeUsuario(r, idUsuario):
 def setUsuario(r, usuarioDiccionario):
     idUsuario = usuarioDiccionario[constantes.CLAVE_ID_USUARIO]
     del(usuarioDiccionario[constantes.CLAVE_ID_USUARIO])
+
+    if usuarioDiccionario[constantes.CLAVE_TIPO_USUARIO] == constantes.USUARIO_ARTISTA:
+        r.sadd('ListaGlobalArtistas', idUsuario)
+
     return r.hmset(idUsuario, usuarioDiccionario)
 
 def setEmail(r, idUsuario, email):
@@ -33,6 +37,10 @@ def setContrasenya(r, idUsuario, contrasenya):
     return r.hset(idUsuario, constantes.CLAVE_CONTRASENYA, contrasenya)
 
 def setTipoUsuario(r, idUsuario, tipoUsuario):
+
+    if tipoUsuario == constantes.USUARIO_ARTISTA:
+        r.sadd('ListaGlobalArtistas', idUsuario)
+
     return r.hset(idUsuario, constantes.CLAVE_TIPO_USUARIO, tipoUsuario)
 
 def setImagenPerfil(r, idUsuario, imagenPerfil):
@@ -140,6 +148,24 @@ def getRelaciones(r, idUsuario, prefijoRelacion):
     return relaciones
 
 
+
+def obtenerTodosArtistas(r):
+    return r.smembers('ListaGlobalArtistas')
+
+
+def obtenerDatosArtistas(r, artistas):
+    datosArtistas = []
+
+    for idArtista in artistas:
+        datos = r.hgetall(idArtista)
+        datos[constantes.CLAVE_ID_USUARIO] = idArtista
+        datosArtistas.append(datos)
+
+    return datosArtistas
+
+
+
+
 def setCalidadPorDefecto(r, idUsuario, calidad):
     return r.hset(idUsuario, constantes.CLAVE_CALIDAD_PREFERIDA, calidad)
 
@@ -179,13 +205,13 @@ def getAdministradores(r):
 
 # Funciones para crear set de ulimos Audios escuchados)
 def setSegundosAudio(r, idUsuario, idAudio, segundos):
-    return r.set(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio, segundos)
+    return r.hset(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario, idAudio, segundos)
 
 def getSegundosAudio(r, idUsuario, idAudio):
-    return r.get(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
+    return r.hget(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario, idAudio)
 
 def eliminarSegundosAudio(r, idUsuario, idAudio):
-    return r.delete(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario + ":" + idAudio)
+    return r.delete(constantes.PREFIJO_SEGUNDOS_AUDIOS + ":" + idUsuario,  idAudio)
 
 # Daos para crear tabla hash email | idUsuario para agilizar el inicio de sesion
 def setEmailId(r, email, idUsuario):

@@ -43,6 +43,7 @@ def anyadirCancion(r, dic):
     calidad = dic['calidad']
     nVeces = 0
     val = 0
+    nValoraciones = 0
     genero = dic['genero']
     longitud = dic['longitud']
     esPodcast = dic['esPodcast']
@@ -70,7 +71,7 @@ def anyadirCancion(r, dic):
                   'calidad': calidad, 'nVeces': nVeces, 'val': val, 
                   'generos': idGenero, 'ficheroAltaCalidad': ficheroAltaCalidad, 
                   'ficheroBajaCalidad': ficheroBajaCalidad, 'longitud': longitud, 
-                  'numFavoritos': 0, 'esPodcast': esPodcast}
+                  'numFavoritos': 0, 'esPodcast': esPodcast, 'nValoraciones': nValoraciones}
 
     #print("Cancion a almacenar: " + str(cancionDic))
     # Almaceno la canción
@@ -79,7 +80,7 @@ def anyadirCancion(r, dic):
     # Añado la canción a la lista de canciones del artista
     usuarios.anyadirCancionArtista(r, artista, id)
 
-    return errores.OK
+    return id
 
 # Función para eliminar una canción
 def eliminarCancion(r, id):
@@ -123,15 +124,26 @@ def obtenerTodosLosPodcasts(r):
 
 # Función de búsqueda de canciones
 def buscarCanciones(r, query, n):
-    respuesta = dao.buscarAudios(r, query)
+    respuesta, artistas = dao.buscarAudios(r, query)
 
     return respuesta[0:n]
 
 def getValoracion(r, idUsr, idAudio):
-    return dao.getValoracion(r, idUsr, idAudio)
+    return dao.getValoracionUsuario(r, idUsr, idAudio)
 
 def setValoracion(r, idUsr, idAudio, val):
-    return dao.setValoracion(r, idUsr, idAudio, val)
+    dao.setValoracionMedia(r, idAudio, val)
+    return dao.setValoracionUsuario(r, idUsr, idAudio, val)
+
+def buscarGeneral(r, query, n):
+    respuesta, artistas, listas = dao.buscarAudios(r, query)
+
+    return respuesta[0:n], artistas[0:n], listas[0:n]
+
+def obtenerValMedia(r, idAudio):
+    return dao.obtenerValMedia(r, idAudio)
+
+
 
 ##############################################################################################################
 #
@@ -194,6 +206,19 @@ def anyadirPodcast(r, dic):
 
     return 0
 
+def cambiarValAudio(r, id, val):
+    if controlAudios.obtenerEsPodcast(r, id):
+        return dao.cambiarValCancion(r, id, val)
+    else:
+        return dao.cambiarValPodcast(r, id, val)
+    
+def obtenerValAudio(r, id):
+    if controlAudios.obtenerEsPodcast(r, id):
+        return dao.obtenerValCancion(r, id)
+    else:
+        return dao.obtenerPodcast(r, id)
+    
+
 
 def setLastSecondHeared(r, idUsuario, idAudio, second):
     return dao.setLastSecondHeared(r, idUsuario, idAudio, second)
@@ -237,3 +262,6 @@ def obtenerDiccionarioPodcast(r, id):
 
 def getImagenAudio(r, id):
     return controlAudios.getImagenAudio(r, id)
+
+def setImagenAudio(r, id, imagen):
+    return controlAudios.setImagenAudio(r, id, imagen)
