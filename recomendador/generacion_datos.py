@@ -162,9 +162,8 @@ def get_audio_prediction_state(conn, id_usr, id_audio):
         n_favoritos = audios.obtenerFavoritosPodcast(conn, id_audio)                 # Número de favoritos del audio
         id_genero = audios.obtenerGenerosPodcast(conn, id_audio)                     # Genero del audio, un entero
         es_podcast = 1
-
     else:
-        valoracion_media = modAudios.obtenerValAudio(conn, id_audio)         # Valoración media del audio
+        valoracion_media = modAudios.obtenerValMedia(conn, id_audio)         # Valoración media del audio
         n_reproducciones = audios.obtenerVecesReproducidasCancion(conn, id_audio)  # Número de reproducciones del audio
         n_favoritos = audios.obtenerNumFavoritosCancion(conn, id_audio)            # Número de favoritos del audio
         id_genero = audios.obtenerGenCancion(conn, id_audio)                       # Genero del audio, un entero
