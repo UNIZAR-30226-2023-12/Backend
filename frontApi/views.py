@@ -652,7 +652,7 @@ def AddSecondsToSong(request):
     if(moduloAudios.existeCancion(r, idAudio) == False):
         return JsonResponse({'error': 'La canción no existe'}, status=erroresHTTP.ERROR_CANCION_NO_ENCONTRADA)
     
-    if (segundos < 0):
+    if (int(segundos) < 0):
         return JsonResponse({'error': 'Los segundos no pueden ser negativos'}, status=erroresHTTP.ERROR_SEGUNDOS_NEGATIVOS)
 
     ModuloGlobal.addSecondsToSong(r, idAudio, segundos)
