@@ -131,8 +131,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # VARIABLES DE CONFIGURACIÓN DE REDIS
 #REDIS_SERVER_IP = 'redis.eaftcfe0cbgebfgg.francecentral.azurecontainer.io' # azure
-#REDIS_SERVER_IP = 'redis' # docker
-REDIS_SERVER_IP = 'localhost' # normal
+REDIS_SERVER_IP = 'redis' # docker
+#REDIS_SERVER_IP = 'localhost' # normal
 REDIS_SERVER_PORT = 6379
 REDIS_DATABASE = 0
 REDIS_USER = 'melodia'
