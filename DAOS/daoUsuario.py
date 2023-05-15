@@ -158,7 +158,7 @@ def obtenerDatosArtistas(r, artistas):
 
     for idArtista in artistas:
         datos = r.hgetall(idArtista)
-        datos['id'] = idArtista
+        datos[constantes.CLAVE_ID_USUARIO] = idArtista
         datosArtistas.append(datos)
 
     return datosArtistas

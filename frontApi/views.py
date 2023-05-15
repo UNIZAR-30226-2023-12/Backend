@@ -10,8 +10,7 @@ from Audios import moduloAudios
 from Usuarios import usuarios
 
 from recomendador import generacion_datos as gen_datos
-import recomendador as rec
-#from recomendador import recomendador as rec
+from recomendador import recomendador as rec
 
 from Global import ModuloGlobal
 
@@ -87,14 +86,13 @@ def GetFicheroSong(request):
         elif calidadAlta == "False":
             fichero = moduloAudios.obtenerFicheroPodcast(r, id, 'baja')
 
-    if fichero == 419 or fichero == 424 or fichero == 430 or fichero == 425:
+    if fichero == 419 or fichero == 424 or fichero == 430 or fichero == 425 or fichero == 519 or fichero == 524:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=fichero)
     else:
         idUsr = request.GET.get('idUsr')
         if idUsr == None:
             return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
         
-        gen_datos.add_audio_prediction_temporal(r, idUsr, id)
         # Gets the serialized audio
         return JsonResponse({'fichero': fichero})
 
@@ -1575,6 +1573,7 @@ def GetNombreListaRep(request):
     
     return JsonResponse({constantes.CLAVE_NOMBRE_CARPETA : usuarios.getNombreListaRep(r, idLista)}, status=erroresHTTP.OK)
 
+@csrf_exempt
 def SetNombreListaRep(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -1972,6 +1971,26 @@ def GetValoracion(request):
 
 
 @csrf_exempt
+def GetValoracionMedia(request):
+    # Compruebo que el método sea GET
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    json_data = json.loads(request.body)
+    
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+    if idAudio == None:
+        return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+    
+    valoracion = moduloAudios.obtenerValAudio(r, idAudio)
+
+    if valoracion == None:
+        valoracion = 0
+
+    return JsonResponse({'valoracion': valoracion}, status=erroresHTTP.OK)
+
+
+@csrf_exempt
 def SetValoracion(request):
     # Compruebo que el método sea GET
     if request.method != 'POST':
@@ -1994,6 +2013,7 @@ def SetValoracion(request):
     valoracion = float(valoracion)
 
     moduloAudios.setValoracion(r, idUsr, idAudio, valoracion)
+    moduloAudios.cambiarValAudio(r, idAudio, valoracion)
 
     return JsonResponse({'msg': 'Valoración almacenada correctamente'}, status=erroresHTTP.OK)
 

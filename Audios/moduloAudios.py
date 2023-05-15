@@ -202,6 +202,21 @@ def anyadirPodcast(r, dic):
     return 0
 
 
+
+def cambiarValAudio(r, id, val):
+    if controlAudios.obtenerEsPodcast(r, id):
+        return dao.cambiarValCancion(r, id, val)
+    else:
+        return dao.cambiarValPodcast(r, id, val)
+    
+def obtenerValAudio(r, id):
+    if controlAudios.obtenerEsPodcast(r, id):
+        return dao.obtenerValCancion(r, id)
+    else:
+        return dao.obtenerPodcast(r, id)
+    
+
+
 def setLastSecondHeared(r, idUsuario, idAudio, second):
     return dao.setLastSecondHeared(r, idUsuario, idAudio, second)
 
