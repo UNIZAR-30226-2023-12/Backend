@@ -98,8 +98,8 @@ def cambiarVecesreproducidasCancion(r, id, nVeces):
 
 # Funcion para cambiar la valoracion de una cancion
 def cambiarValCancion(r, id, val):
-    r.inc(id, 'nValoraciones')
-    r.inc(id, 'val', val)
+    r.incr(id, 'nValoraciones')
+    r.incr(id, 'val', val)
     return 0
 
 # Funcion para cambiar el genero de una cancion
@@ -239,7 +239,7 @@ def obtenerVecesreproducidasCancion(r, id):
 
 # Funcion para obtener la valoracion de una cancion
 def obtenerValCancion(r, id):
-    return int(r.hget(id, 'val'))/int(r.get(id, 'nValoraciones'))
+    return int(r.hget(id, 'val'))/int(r.hget(id, 'nValoraciones'))
 
 # Funcion para obtener el genero de una cancion
 def obtenerGeneroCancion(r, id):
@@ -357,8 +357,8 @@ def cambiarVecesreproducidasPodcast(r, id, nVeces):
 
 # Funcion para cambiar la valoracion de un podcast
 def cambiarValPodcast(r, id, val):
-    r.inc(id, 'nValoraciones')
-    r.inc(id, 'val', val)
+    r.incr(id, 'nValoraciones')
+    r.incr(id, 'val', val)
     return 0
 
 # Funcion para cambiar la descripcion de un podcast

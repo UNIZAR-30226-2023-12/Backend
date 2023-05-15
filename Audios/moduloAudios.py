@@ -43,6 +43,7 @@ def anyadirCancion(r, dic):
     calidad = dic['calidad']
     nVeces = 0
     val = 0
+    nValoraciones = 0
     genero = dic['genero']
     longitud = dic['longitud']
     esPodcast = dic['esPodcast']
@@ -70,7 +71,7 @@ def anyadirCancion(r, dic):
                   'calidad': calidad, 'nVeces': nVeces, 'val': val, 
                   'generos': idGenero, 'ficheroAltaCalidad': ficheroAltaCalidad, 
                   'ficheroBajaCalidad': ficheroBajaCalidad, 'longitud': longitud, 
-                  'numFavoritos': 0, 'esPodcast': esPodcast}
+                  'numFavoritos': 0, 'esPodcast': esPodcast, 'nValoraciones': nValoraciones}
 
     #print("Cancion a almacenar: " + str(cancionDic))
     # Almaceno la canción
