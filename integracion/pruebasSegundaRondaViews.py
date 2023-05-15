@@ -54,6 +54,8 @@ urlGetSongsArtist = 'http://127.0.0.1:8081/GetSongsArtist/'
 urlRemoveListaRepUsr = 'http://127.0.0.1:8081/RemoveListaRepUsr/'
 urlGetLinkAudio = 'http://127.0.0.1:8081/GetLinkAudio/'
 urlGetAudioFromLink = 'http://127.0.0.1:8081/GetAudioFromLink/'
+urlSetValoracion = 'http://127.0.0.1:8081/SetValoracion/'
+urlGetValoracion = 'http://127.0.0.1:8081/GetValoracion/'
 
 
 setUser = {
@@ -194,4 +196,14 @@ link = respuesta.json()['linkAudio']
 # Pruebas GetAudioFromLink
 print('Pruebas GetAudioFromLink')   
 respuesta = requests.post(urlGetAudioFromLink, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'linkAudio' : link})
+print(str(respuesta.status_code) + ' ' + str(respuesta.json()))
+
+# Pruebas setValoracion
+print('Pruebas setValoracion')
+print(requests.post(urlSetValoracion, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idAudio' : 'audio:1', 'valoracion' : 5}).status_code)
+print(requests.post(urlSetValoracion, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idAudio' : 'audio:1', 'valoracion' : 10}).status_code)
+
+# Pruebas getValoracion
+print('Pruebas getValoracion')
+respuesta = requests.post(urlGetValoracion, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idAudio' : 'audio:1'})
 print(str(respuesta.status_code) + ' ' + str(respuesta.json()))

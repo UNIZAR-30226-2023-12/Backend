@@ -101,6 +101,7 @@ def cambiarVecesreproducidasCancion(r, id, nVeces):
 def cambiarValCancion(r, id, val):
     r.inc(id, 'nValoraciones')
     r.inc(id, 'val', int(val))
+
     return 0
 
 # Funcion para cambiar el genero de una cancion
@@ -227,20 +228,22 @@ def buscarAudios(r, query):
     return encontradas, artistasEncontrados, listasEncontradas
 
 
-def getValoracion(r, idUsr, idAudio):
-    return r.hget(idUsr+':valoraciones', idAudio)
+def getValoracionUsuario(r, idUsr, idAudio):
+    valoracion =  r.get("valoraciones" + ":" + idUsr + ":" + idAudio)
+    if(valoracion == None):
+        valoracion = 0
+    return valoracion
 
-def setValoracion(r, idUsr, idAudio, val):
-    r.hset(idUsr+':valoraciones', idAudio, val)
-    
+def setValoracionUsuario(r, idUsr, idAudio, val):
+    r.set("valoraciones" + ":" + idUsr + ":" + idAudio, val)
 
 # Funcion para obtener el num de veces que se ha escuchado una cancion
 def obtenerVecesreproducidasCancion(r, id):
     return r.hget(id, 'nVeces')
 
 # Funcion para obtener la valoracion de una cancion
-def obtenerValCancion(r, id):
-    return int(r.hget(id, 'val'))/int(r.hget(id, 'nValoraciones'))
+def obtenerValMedia(r, id):
+    return r.hget("valoracionMedia:" + id, "media")
 
 # Funcion para obtener el genero de una cancion
 def obtenerGeneroCancion(r, id):
@@ -360,6 +363,7 @@ def cambiarVecesreproducidasPodcast(r, id, nVeces):
 def cambiarValPodcast(r, id, val):
     r.inc(id, 'nValoraciones')
     r.inc(id, 'val', int(val))
+
     return 0
 
 # Funcion para cambiar la descripcion de un podcast
@@ -475,3 +479,14 @@ def obtenerLongitudPodcast(r, id):
 # Funcion para obtener el numero de favoritos de un podcast
 def obtenerNumFavoritosPodcast(r, id):
     return r.hget(id, 'numFavoritos')
+
+def setValoracionMedia(r, idAudio, val):
+    valTotal = r.hget("valoracionMedia:" + idAudio, 'valTotal')
+    if valTotal == None:
+        valTotal = 0
+    nValoraciones = r.hget("valoracionMedia:" + idAudio, 'nValoraciones')
+    if nValoraciones == None:
+        nValoraciones = 0
+    r.hset("valoracionMedia:" + idAudio, 'valTotal', float(valTotal) + float(val))
+    r.hset("valoracionMedia:" + idAudio, 'nValoraciones', int(nValoraciones) + 1)
+    r.hset("valoracionMedia:" + idAudio, 'media', float(r.hget("valoracionMedia:" + idAudio, 'valTotal')) / float(r.hget("valoracionMedia:" + idAudio, 'nValoraciones')))

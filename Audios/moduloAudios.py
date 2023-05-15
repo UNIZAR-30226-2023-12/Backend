@@ -43,6 +43,7 @@ def anyadirCancion(r, dic):
     calidad = dic['calidad']
     nVeces = 0
     val = 0
+    nValoraciones = 0
     genero = dic['genero']
     longitud = dic['longitud']
     esPodcast = dic['esPodcast']
@@ -70,7 +71,7 @@ def anyadirCancion(r, dic):
                   'calidad': calidad, 'nVeces': nVeces, 'val': val, 
                   'generos': idGenero, 'ficheroAltaCalidad': ficheroAltaCalidad, 
                   'ficheroBajaCalidad': ficheroBajaCalidad, 'longitud': longitud, 
-                  'numFavoritos': 0, 'esPodcast': esPodcast}
+                  'numFavoritos': 0, 'esPodcast': esPodcast, 'nValoraciones': nValoraciones}
 
     #print("Cancion a almacenar: " + str(cancionDic))
     # Almaceno la canción
@@ -128,15 +129,19 @@ def buscarCanciones(r, query, n):
     return respuesta[0:n]
 
 def getValoracion(r, idUsr, idAudio):
-    return dao.getValoracion(r, idUsr, idAudio)
+    return dao.getValoracionUsuario(r, idUsr, idAudio)
 
 def setValoracion(r, idUsr, idAudio, val):
-    return dao.setValoracion(r, idUsr, idAudio, val)
+    dao.setValoracionMedia(r, idAudio, val)
+    return dao.setValoracionUsuario(r, idUsr, idAudio, val)
 
 def buscarGeneral(r, query, n):
     respuesta, artistas, listas = dao.buscarAudios(r, query)
 
     return respuesta[0:n], artistas[0:n], listas[0:n]
+
+def obtenerValMedia(r, idAudio):
+    return dao.obtenerValMedia(r, idAudio)
 
 
 
@@ -200,8 +205,6 @@ def anyadirPodcast(r, dic):
     controlAudios.almacenarPodcast(r, podcastDic)
 
     return 0
-
-
 
 def cambiarValAudio(r, id, val):
     if controlAudios.obtenerEsPodcast(r, id):

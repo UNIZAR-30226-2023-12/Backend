@@ -1573,6 +1573,7 @@ def GetNombreListaRep(request):
     
     return JsonResponse({constantes.CLAVE_NOMBRE_CARPETA : usuarios.getNombreListaRep(r, idLista)}, status=erroresHTTP.OK)
 
+@csrf_exempt
 def SetNombreListaRep(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -1679,6 +1680,7 @@ def GetNombreCarpeta(request):
     
     return JsonResponse({constantes.CLAVE_NOMBRE_CARPETA : usuarios.getNombreCarpeta(r, idCarpeta)}, status=erroresHTTP.OK)
 
+@csrf_exempt
 def SetNombreCarpeta(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -1981,7 +1983,7 @@ def GetValoracionMedia(request):
     if idAudio == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
-    valoracion = moduloAudios.obtenerValAudio(r, idAudio)
+    valoracion = moduloAudios.obtenerValMedia(r, idAudio)
 
     if valoracion == None:
         valoracion = 0
@@ -2009,10 +2011,11 @@ def SetValoracion(request):
     if valoracion == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
+    
     valoracion = float(valoracion)
 
     moduloAudios.setValoracion(r, idUsr, idAudio, valoracion)
-    moduloAudios.cambiarValAudio(r, idAudio, valoracion)
+    #moduloAudios.cambiarValAudio(r, idAudio, valoracion)
 
     return JsonResponse({'msg': 'Valoración almacenada correctamente'}, status=erroresHTTP.OK)
 
