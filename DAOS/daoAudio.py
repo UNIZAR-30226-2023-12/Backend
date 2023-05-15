@@ -68,6 +68,7 @@ def guardarCancion(r, cancionDic):
     del cancionDic['ficheroBajaCalidad']
     
     r.hset(id, 'nValoraciones', 0)
+    r.set('reproducciones:'+id, 0)
 
     r.hmset(id, cancionDic)
     r.hmset(id+":ficheros", {'ficheroAltaCalidad': ficheroAltaCalidad, 
@@ -243,7 +244,12 @@ def obtenerVecesreproducidasCancion(r, id):
 
 # Funcion para obtener la valoracion de una cancion
 def obtenerValMedia(r, id):
-    return r.hget("valoracionMedia:" + id, "media")
+    val = r.hget("valoracionMedia:" + id, "media")
+
+    if val == None:
+        val = 0
+
+    return val
 
 # Funcion para obtener el genero de una cancion
 def obtenerGeneroCancion(r, id):
@@ -486,7 +492,10 @@ def setValoracionMedia(r, idAudio, val):
         valTotal = 0
     nValoraciones = r.hget("valoracionMedia:" + idAudio, 'nValoraciones')
     if nValoraciones == None:
-        nValoraciones = 0
+        nValoraciones = 1
     r.hset("valoracionMedia:" + idAudio, 'valTotal', float(valTotal) + float(val))
     r.hset("valoracionMedia:" + idAudio, 'nValoraciones', int(nValoraciones) + 1)
-    r.hset("valoracionMedia:" + idAudio, 'media', float(r.hget("valoracionMedia:" + idAudio, 'valTotal')) / float(r.hget("valoracionMedia:" + idAudio, 'nValoraciones')))
+
+    valoracion_media = float(r.hget("valoracionMedia:" + idAudio, 'valTotal')) / float(r.hget("valoracionMedia:" + idAudio, 'nValoraciones'))
+
+    r.hset("valoracionMedia:" + idAudio, 'media', valoracion_media)

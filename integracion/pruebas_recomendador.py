@@ -43,9 +43,9 @@ new_song_data = {
     'contrasenya': '1234',
     'artista': 'Starset',
     'calidad': 'baja',
-    'generos': 'Rock',
+    'genero': 'Rock',
     'esPodcast': 'False',
-    'ficheroBajaCalidad': "",
+    'audio': "",
     'longitud': 318
 }
 
@@ -94,26 +94,24 @@ get_audio_params = json.dumps(get_audio_params)
 train_data = json.dumps(train_data)
 get_reproducciones = json.dumps(get_reproducciones)
 
-response = requests.post(url_set_usr, data=new_user) # Añade ejemplos de entrenamiento
-print("set user: ", response.status_code)
+#response = requests.post(url_set_usr, data=new_user) # Añade ejemplos de entrenamiento
+#print("set user: ", response.status_code)
 
-response = requests.post(url_set_song, data=new_song_data) # Añade ejemplos de entrenamiento
-print("set song: ", response.status_code)
+#response = requests.post(url_set_song, data=new_song_data) # Añade ejemplos de entrenamiento
+#print("set song: ", response.status_code)
 
-#for i in range(1000):
-response = requests.post(url_add_examples, data=params_example) # Añade ejemplos de entrenamiento
+for i in range(20):
+    response = requests.post(url_add_examples, data=params_example) # Añade ejemplos de entrenamiento
 
 # Realizar la petición HTTP POST
 response = requests.post(url_train, data=train_data)    # Entrena al recomendador
 
 
-#for i in range(100):
-response = requests.get(url_get_song, data=get_audio_params) # Genera un estado de sesión del usuario
+for i in range(20):
+    response = requests.post(url_get_song, data=get_audio_params) # Genera un estado de sesión del usuario
 
 response = requests.post(url_recomend_song, data=train_data) # Obtiene una canción recomendada
 
-
-response = requests.get(url_get_reproducciones, data=get_reproducciones)
 print(response.json())
 
 # Get the headers from the response
