@@ -141,7 +141,7 @@ def buscarGeneral(r, query, n):
     return respuesta[0:n], artistas[0:n], listas[0:n]
 
 def obtenerValMedia(r, idAudio):
-    return dao.getValoracionAudio(r, idAudio)
+    return dao.obtenerValMedia(r, idAudio)
 
 
 
