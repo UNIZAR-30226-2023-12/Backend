@@ -19,11 +19,11 @@ def orderAudios(r, idUsr, audios):
         paquete_temporal = data_gen.get_audio_prediction_temporal(r, idUsr)
 
         input = [paquete_datos, paquete_temporal]
-        
+
         prediccion = recomendador.predict(input)
+
         predicciones.append(prediccion)
 
-    print(predicciones)
 
     ############## Ordenar los audios por valoración ##############
 
@@ -44,7 +44,6 @@ def train_model(conn, nuevo_modelo=False):
     # [información del audio actual, información de los audios anteriores]
     Xtr, Xtr_temporal, ytr = data_gen.get_training_data(conn)
 
-    
     ################  CREACIÓN DEL MODELO  ################
 
     if (nuevo_modelo):

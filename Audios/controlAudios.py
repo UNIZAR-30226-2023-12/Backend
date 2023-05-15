@@ -146,7 +146,7 @@ def obtenerValoracionCancion(r, id):
     if daoAudio.existeCancion(r, id) == False:
         return constantesErroresHTTP.ERROR_CANCION_NO_ENCONTRADA
     
-    return daoAudio.getValoracion(r, id)
+    return daoAudio.obtenerValMedia(r, id)
 
 # Función para obtener el genero de una canción
 def obtenerGenCancion(r, id):
@@ -374,7 +374,8 @@ def obtenerValoracionPodcast(r, id):
         return constantesErroresHTTP.ERROR_PODCAST_ELEMENTOS_VACIOS
     if daoAudio.existePodcast(r, id) == False:
         return constantesErroresHTTP.ERROR_PODCAST_NO_ENCONTRADO
-    return daoAudio.getValoracion(r, id)
+    
+    return daoAudio.obtenerValMedia(r, id)
 
 # Función para obtener la descripción de un podcast
 def obtenerDescPodcast(r, id):

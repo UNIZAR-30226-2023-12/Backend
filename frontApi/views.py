@@ -140,7 +140,7 @@ def SetSong(request):
     json_data['artista'] = idUsuario
 
     # Control de errores
-    if (usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ARTISTA):
+    if (usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ARTISTA and usuarios.getTipoUsr(r, idUsuario) != constantes.USUARIO_ADMINISTRADOR):
        return JsonResponse({'status': erroresHTTP.ERROR_USUARIO_NO_ARTISTA}, status=erroresHTTP.ERROR_USUARIO_NO_ARTISTA)
 
     if status == True:
@@ -299,7 +299,7 @@ def GetTopReproducciones(request):
 
     # pair the elements of the two lists
     pairs = list(zip(audios, reproducciones))
-
+    print(pairs)
     # sort the pairs based on the values in the second list (i.e. b)
     sorted_pairs = sorted(pairs, key=lambda x: x[1])
 
@@ -1660,6 +1660,7 @@ def GetNombreCarpeta(request):
     
     return JsonResponse({constantes.CLAVE_NOMBRE_CARPETA : usuarios.getNombreCarpeta(r, idCarpeta)}, status=erroresHTTP.OK)
 
+@csrf_exempt
 def SetNombreCarpeta(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -1890,13 +1891,16 @@ def entrenar_recomendador(request):
     contrasenya = json_data[constantes.CLAVE_CONTRASENYA]
 
     status = usuarios.ValidateUser(r, idUsuario, contrasenya)
-    if (status != erroresHTTP.OK):
+    if status:
+        status = erroresHTTP.OK
+    else:
+        status = erroresHTTP.ERROR_CONTRASENYA_INCORRECTA
         return JsonResponse({'status': status}, status=status)
     
     if(usuarios.esAdministrador(r, idUsuario) == False):
         return JsonResponse({'error': 'No eres administrador'}, status=erroresHTTP.ERROR_USUARIO_NO_ADMINISTRADOR)
     
-    status = rec.train_model(r, nuevo_modelo=True)
+    rec.train_model(r, nuevo_modelo=True)
 
     return JsonResponse({'status': status}, status=status)
 
@@ -1921,6 +1925,10 @@ def AlmacenarEjemplo(request):
     if valoracion == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
+    if not moduloAudios.existeCancion(r, idAudio) or not moduloAudios.existePodcast(r, idAudio):
+       return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_AUDIO_INEXISTENTE)
+
+
     valoracion = float(valoracion)
 
     gen_datos.store_training_example(r, idUsr, idAudio, valoracion)
