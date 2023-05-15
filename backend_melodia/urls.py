@@ -97,6 +97,7 @@ urlpatterns = [
     path('RecuperarContrasenya/', viewsApi.RecuperarContrasenya, name='RecuperarContrasenya'),
     path('GetTopReproducciones/', viewsApi.GetTopReproducciones, name='GetTopReproducciones'),
     path('GetValoracion/', viewsApi.GetValoracion, name='GetValoracion'),
+    path('GetValoracionMedia/', viewsApi.GetValoracionMedia, name='GetValoracionMedia'),
     path('SetValoracion/', viewsApi.SetValoracion, name='SetValoracion'),
     path('SetCalidadPorDefectoUsr/', viewsApi.SetCalidadPorDefectoUsr, name='SetCalidadPorDefectoUsr'),
     path('GetCalidadPorDefectoUsr/', viewsApi.GetCalidadPorDefectoUsr, name='GetCalidadPorDefectoUsr'),
