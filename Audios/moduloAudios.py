@@ -129,15 +129,19 @@ def buscarCanciones(r, query, n):
     return respuesta[0:n]
 
 def getValoracion(r, idUsr, idAudio):
-    return dao.getValoracion(r, idUsr, idAudio)
+    return dao.getValoracionUsuario(r, idUsr, idAudio)
 
 def setValoracion(r, idUsr, idAudio, val):
-    return dao.setValoracion(r, idUsr, idAudio, val)
+    dao.setValoracionMedia(r, idAudio, val)
+    return dao.setValoracionUsuario(r, idUsr, idAudio, val)
 
 def buscarGeneral(r, query, n):
     respuesta, artistas, listas = dao.buscarAudios(r, query)
 
     return respuesta[0:n], artistas[0:n], listas[0:n]
+
+def obtenerValMedia(r, idAudio):
+    return dao.getValoracionAudio(r, idAudio)
 
 
 

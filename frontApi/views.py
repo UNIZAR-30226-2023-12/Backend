@@ -1982,7 +1982,7 @@ def GetValoracionMedia(request):
     if idAudio == None:
         return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
     
-    valoracion = moduloAudios.obtenerValAudio(r, idAudio)
+    valoracion = moduloAudios.obtenerValMedia(r, idAudio)
 
     if valoracion == None:
         valoracion = 0
