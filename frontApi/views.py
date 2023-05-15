@@ -1972,6 +1972,26 @@ def GetValoracion(request):
 
 
 @csrf_exempt
+def GetValoracionMedia(request):
+    # Compruebo que el método sea GET
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    json_data = json.loads(request.body)
+    
+    idAudio = json_data[constantes.CLAVE_ID_AUDIO]
+    if idAudio == None:
+        return JsonResponse({'error': 'Ha ocurrido un problema'}, status=erroresHTTP.ERROR_USUARIO_PARAMETROS_INCORRECTOS)
+    
+    valoracion = moduloAudios.obtenerValAudio(r, idAudio)
+
+    if valoracion == None:
+        valoracion = 0
+
+    return JsonResponse({'valoracion': valoracion}, status=erroresHTTP.OK)
+
+
+@csrf_exempt
 def SetValoracion(request):
     # Compruebo que el método sea GET
     if request.method != 'POST':
@@ -1994,6 +2014,7 @@ def SetValoracion(request):
     valoracion = float(valoracion)
 
     moduloAudios.setValoracion(r, idUsr, idAudio, valoracion)
+    moduloAudios.cambiarValAudio(r, idAudio, valoracion)
 
     return JsonResponse({'msg': 'Valoración almacenada correctamente'}, status=erroresHTTP.OK)
 
