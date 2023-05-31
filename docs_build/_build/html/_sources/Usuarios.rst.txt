@@ -1,0 +1,21 @@
+Usuarios package
+================
+
+Submodules
+----------
+
+Usuarios.usuarios module
+------------------------
+
+.. automodule:: Usuarios.usuarios
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: Usuarios
+   :members:
+   :undoc-members:
+   :show-inheritance:
