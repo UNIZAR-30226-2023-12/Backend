@@ -1,0 +1,45 @@
+backend\_melodia package
+========================
+
+Submodules
+----------
+
+backend\_melodia.asgi module
+----------------------------
+
+.. automodule:: backend_melodia.asgi
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+backend\_melodia.settings module
+--------------------------------
+
+.. automodule:: backend_melodia.settings
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+backend\_melodia.urls module
+----------------------------
+
+.. automodule:: backend_melodia.urls
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+backend\_melodia.wsgi module
+----------------------------
+
+.. automodule:: backend_melodia.wsgi
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: backend_melodia
+   :members:
+   :undoc-members:
+   :show-inheritance:
