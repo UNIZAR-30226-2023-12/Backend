@@ -25,11 +25,16 @@ SECRET_KEY = 'django-insecure-9*gsxvxu__%h5x)_(--)yhi%+yf+68g88fe$=q=2p_%kd6n3q@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = ['10.0.2.2', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['*']
 
+# la peticion SetSong necesita esta memoria
+DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600 # 100MB
+
+# SECURITY WARNING: No se debe permitir intercambio cruzado para todas las IPs
+CORS_ORIGIN_ALLOW_ALL=True
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -47,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'backend_melodia.urls'
@@ -121,3 +128,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# VARIABLES DE CONFIGURACIÓN DE REDIS
+#REDIS_SERVER_IP = 'redis.eaftcfe0cbgebfgg.francecentral.azurecontainer.io' # azure
+REDIS_SERVER_IP = 'redis' # docker
+#REDIS_SERVER_IP = 'localhost' # normal
+REDIS_SERVER_PORT = 6379
+REDIS_DATABASE = 0
+REDIS_USER = 'melodia'
+REDIS_PASSWORD = 'melodia_Proyecto_Software_Grupo_12'

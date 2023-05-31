@@ -1,0 +1,61 @@
+DAOS package
+============
+
+Submodules
+----------
+
+DAOS.daoAudio module
+--------------------
+
+.. automodule:: DAOS.daoAudio
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DAOS.daoCarpetas module
+-----------------------
+
+.. automodule:: DAOS.daoCarpetas
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DAOS.daoGlobal module
+---------------------
+
+.. automodule:: DAOS.daoGlobal
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DAOS.daoListas module
+---------------------
+
+.. automodule:: DAOS.daoListas
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DAOS.daoNotificaciones module
+-----------------------------
+
+.. automodule:: DAOS.daoNotificaciones
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+DAOS.daoUsuario module
+----------------------
+
+.. automodule:: DAOS.daoUsuario
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: DAOS
+   :members:
+   :undoc-members:
+   :show-inheritance:

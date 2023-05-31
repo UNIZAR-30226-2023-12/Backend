@@ -1,1 +1,6 @@
 testPOSTGET.py
+tareasMario.txt
+*.tar
+__pycache__/
+*.mp3
+*.pyc

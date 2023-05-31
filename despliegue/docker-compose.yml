@@ -1,22 +1,13 @@
 version: '3.9'
-
 services:
   django:
-    build:
-      context: django
-      dockerfile: Dockerfile
     image: melodia/django:latest
-    container_name: django
     depends_on:
       - redis
     ports:
-      - 8081:8081
-    command: /start
-
+      - "8081:8081"
+    container_name: django
   redis:
-    build:
-      context: redis
-      dockerfile: Dockerfile
     image: melodia/redis:latest
     ports:
       - "6379:6379"

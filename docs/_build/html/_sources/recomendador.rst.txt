@@ -1,0 +1,29 @@
+recomendador package
+====================
+
+Submodules
+----------
+
+recomendador.generacion\_datos module
+-------------------------------------
+
+.. automodule:: recomendador.generacion_datos
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+recomendador.recomendador module
+--------------------------------
+
+.. automodule:: recomendador.recomendador
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: recomendador
+   :members:
+   :undoc-members:
+   :show-inheritance:

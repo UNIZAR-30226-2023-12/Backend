@@ -1,0 +1,10 @@
+frontApi.migrations package
+===========================
+
+Module contents
+---------------
+
+.. automodule:: frontApi.migrations
+   :members:
+   :undoc-members:
+   :show-inheritance:
