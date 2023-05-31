@@ -1,0 +1,29 @@
+Configuracion package
+=====================
+
+Submodules
+----------
+
+Configuracion.constantesErroresHTTP module
+------------------------------------------
+
+.. automodule:: Configuracion.constantesErroresHTTP
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Configuracion.constantesPrefijosClaves module
+---------------------------------------------
+
+.. automodule:: Configuracion.constantesPrefijosClaves
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: Configuracion
+   :members:
+   :undoc-members:
+   :show-inheritance:

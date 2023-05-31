@@ -23,7 +23,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import random
 
-r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
+r = redis.Redis(host='redis', port=6379, db=0, decode_responses=True, username='melodia', password='melodia_Proyecto_Software_Grupo_12')
 
 # echo request
 @csrf_exempt
@@ -40,6 +40,22 @@ def echo(request):
 # Create your views here.
 @csrf_exempt
 def GetSong(request):
+    """
+    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+
+    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+
+    Si el audio existe en la calidad requerida, devuelve un VO audio completo.
+
+    Si existe en otra calidad, la devuelve en esa calidad
+
+    Si el usuario no es tipo artista devuelve ERROR_USUARIO_NO_ARTISTA
+
+    Si no existe, devuelve código error 519 en el caso de canciones y 525 en el caso de podcast
+
+    Hay que enviar en la petición los siguientes argumentos: idAudio, idUsr, contrasenya
+
+    """
     # Compruebo que el método sea POST
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)

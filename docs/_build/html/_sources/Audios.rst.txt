@@ -1,0 +1,37 @@
+Audios package
+==============
+
+Submodules
+----------
+
+Audios.controlAudios module
+---------------------------
+
+.. automodule:: Audios.controlAudios
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Audios.controlCalidadAudios module
+----------------------------------
+
+.. automodule:: Audios.controlCalidadAudios
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Audios.moduloAudios module
+--------------------------
+
+.. automodule:: Audios.moduloAudios
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: Audios
+   :members:
+   :undoc-members:
+   :show-inheritance:
