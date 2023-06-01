@@ -68,14 +68,19 @@ for line in lines:
             while output[i].startswith('#'):
                 output.pop(i)
                 i -= 1
-
-            splitted_comment = comment.split('\n')
-            for comment_line in splitted_comment:
-                output.append("# "+comment_line)
-
-            output.append("# Sintaxis de la función: " + nombres_completos[function])            
+          
             output.append("@csrf_exempt")
             output.append(line.replace('\n', ''))
+
+            splitted_comment = comment.split('\n')
+
+            output.append("    \"\"\"")
+            for comment_line in splitted_comment:
+                output.append("    "+comment_line)
+
+            output.append("    Sintaxis de la función: " + nombres_completos[function]) 
+            output.append("    \"\"\"") 
+            output.append("")
 
         else:
             output.append("# La función " + function + " no está en la API")
