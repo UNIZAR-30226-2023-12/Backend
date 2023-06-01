@@ -1,0 +1,620 @@
+/*    Audios   	 */
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si el audio existe en la calidad requerida, devuelve un VO audio completo.
+# Si existe en otra calidad, la devuelve en esa calidad
+# Si el usuario no es tipo artista devuelve ERROR_USUARIO_NO_ARTISTA
+# Si no existe, devuelve código error 519 en el caso de canciones y 525 en el caso de podcast
+GetSong(String idUsr, String contrasenya, String idAudio) : Song
+
+# Como getSong, pero devuelve un bloque con varios audios
+GetSongs(String idUsr, List<String> idAudios, Bool calidadAlta, Bool esCancion) : Set<String>
+
+# Si el usuario no existe devuelve -2
+# En caso contrario:
+# Si el usuario no tiene permisos para crear audios devuelve -3
+# En caso contrario:
+# Almacena un audio y devuelve status 200
+# Song es de tipo diccionario definido anteriormente al principio del documento
+SetSong(String contrasenya, String idUsr, Song song) : int
+
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA
+# En caso contrario devuelve la imagen del audio
+GetImagenAudio(idUsr, contrasenya, idAudio): None
+
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA
+# En caso contrario guarda la imagen del audio
+SetImagenAudio(idUsr, contrasenya, idAudio, imagenAudio): None
+
+# Devuelve un entero con el número de reproducciones de una canción, 
+# o 0 si no existe
+GetReproducciones(String idAudio): int reproducciones
+
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA
+# En caso contrario devuelve un link del idAudio
+GetLinkAudio(String idUsr, String contrasenya, String idAudio) : string
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA
+# En caso contrario devuelve un id del audio dado el link
+GetAudioFromLink(String idUsr, String contrasenya, String linkAudio) : string
+
+
+# Devuelve un id del audio dado el link. Si el usuario o el audio no existen, devuelve 0
+GetValoracion(String idUsr, String idAudio): int valoracion
+
+# Almacena la valoración valoracion en el usuario idUsr para el audio idAudio
+SetValoracion(String idUsr, String idAudio, int valoracion): None
+
+
+/*    Folders    */
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la privacidad no es válida devuelve ERROR_CARPETA_PRIVACIDAD_NO_VALIDA
+# En caso contrario:
+# Crea una carpeta con los datos y devuelve OK
+SetFolder(String idUsr, String contrasenya, String nombreCarpeta, String privacidadCarpeta): None
+
+
+
+
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la lista no existe devuelve ERROR_LISTA_NO_ENCONTRADA
+# SI la carpeta no existe devuelve ERROR_CARPETA_NO_ENCONTRADA
+# Si la carpeta no pertenece al usuario devuelve ERROR_CARPETA_NOT_IN_USER
+# Si la carpeta es tipo favoritos devuelve ERROR_LISTA_ES_FAVORITOS
+# Si la lista no pertenece al usuario y no es pública devuelve FORBIDDEN
+# En caso contrario:
+# Añade la lista a la carpeta, quita la lista de las listas sin carpeta del usuario y devuelve OK
+AddListToFolder(String idUsr, String contrasenya, String idCarpeta, String idLista) : int
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la lista no existe devuelve ERROR_LISTA_NO_ENCONTRADA
+# SI la carpeta no existe devuelve ERROR_CARPETA_NO_ENCONTRADA
+# SI la lista no está en la carpeta devuelve ERROR_LISTA_NOT_IN_CARPETA
+# Si la carpeta no pertenece al usuario devuelve FORBIDDEN
+# En caso contrario:
+# Elimina la lista de reproducción de la carpeta
+RemoveListFromFolder(String idUsr, String contrasenya, String idCarpeta, String idLista): int
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la carpeta no existe devuelve ERROR_CARPETA_NO_ENCONTRADA
+# Si la carpeta no pertenece al usuario FORBIDDEN
+# En caso contrario:
+# Elimina la carpeta y las listas dentro de ella
+RemoveFolder(String idUsr, String contrasenya, String idCarpeta): int
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# SI la carpeta no existe devuelve ERROR_CARPETA_NO_ENCONTRADA
+# Si la carpeta no pertenece al usuario y es privada devuelve FORBIDDEN
+# En caso contrario:
+# Devuelve un diccionario con los datos de carpeta
+GetFolder(String idUsr, String contrasenya, String idCarpeta) : int
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# SI la carpeta no existe devuelve ERROR_CARPETA_NO_ENCONTRADA
+# Si la carpeta no pertenece al usuario y es privada devuelve FORBIDDEN
+# En caso contrario:
+# Devuelve un set con los ids de las listas
+GetListasFolder(String idUsr, String contrasenya, String idCarpeta): set<String>
+
+
+# Si uno  de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# En caso contrario:
+# Si son el mismo usuario devuelve un set con las ids de todas las carpetas del usuario
+# Si no devuelve un set con las ids de las carpetas públicas del usuario ‘Get’
+GetFoldersUsr(String idUsr, String contrasenya, String idUsrGet) : Set<String>
+
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la carpeta no existe devuelve ERROR_CARPETA_NO_ENCOTRADA
+# Si el usuario no le pertenece esa carpeta y no es administrador y no es una carpeta 
+# pública devuelve FORBIDDEN
+# En caso contrario devuelve el nombre de la carpeta
+GetNombreCarpeta(idUsr, contrasenya, idCarpeta): None
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la carpeta no existe devuelve ERROR_CARPETA_NO_ENCOTRADA
+# Si el usuario no le pertenece esa carpeta y no es administrador devuelve FORBIDDEN
+# En caso contrario cambia el nombre de la carpeta
+SetNombreCarpeta(idUsr, contrasenya, idCarpeta, nombreCarpeta): None
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la carpeta no existe devuelve ERROR_CARPETA_NO_ENCOTRADA
+# Si el usuario no le pertenece esa carpeta y no es administrador y no es una carpeta 
+# pública devuelve FORBIDDEN
+# En caso contrario devuelve el nombre de la carpeta
+GetPrivacidadCarpeta(idUsr, contrasenya, idCarpeta): None
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la carpeta no existe devuelve ERROR_CARPETA_NO_ENCOTRADA
+# Si la privacidad no es válida devuelve ERROR_CARPETA_PRIVACIDAD_NO_VALIDA
+# Si el usuario no le pertenece esa carpeta y no es administrador devuelve FORBIDDEN
+# En caso contrario cambia el nombre de la carpeta
+SetPrivacidadCarpeta(idUsr, contrasenya, idCarpeta, privada): None
+
+
+
+
+/*    ListasRep    */
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si el valor de la privacidad no es válido devuelve 
+# ERROR_LISTA_PRIVACIDAD_INCORRECTA
+# Si el valor del tipo de lista no es válido devuelve 
+# ERROR_LISTA_TIPO_INCORRECTO
+# En caso contrario crea una lista de reproducción con los atributos del diccionario lista, 
+# , la añadimos al usuario y devuelve OK y el idLista
+setLista(String idUsr, String contrasenya, nombreLista, privada, tipoLista): None
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la lista de reproducción existe, devuelve un diccionario con sus datos
+# Si no existe devuelve ERROR_LISTA_NO_ENCONTRADA
+# Si la lista no pertenece al usuario y es privada devuelve FORBIDDEN
+GetLista(String idUsr, String contrasenya, String idLista):int
+
+
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# En caso contrario:
+# Si la lista de reproducción existe, añade el audio y devuelve OK
+# Si no existe devuelve ERROR_LISTA_NO_ENCONTRADA
+# Si no existe el audio devuelve ERROR_AUDIO_NO_ENCONTRADO
+# Si la lista no pertenece al usuario devuelve FORBIDDEN
+SetSongLista(String idUsr, String contrasenya, String idLista, String idAudio): int	
+
+
+
+
+
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la lista no existe devuelve ERROR_LISTA_NO_ENCONTRADA
+# Si la carpeta es tipo favoritos devuelve ERROR_LISTA_ES_FAVORITOS
+# En caso contrario elimina la lista
+RemoveListaRepUsr(String idUsr, String contrasenya, String idLista): int
+
+
+# Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# En caso contrario:
+# Si son el mismo usuario devuelve un set con las ids de todas las listas de reproducción del # usuario que no están en una carpeta
+# Si no devuelve un set con las ids de las listas de reproducción públicas que no están en 
+# una carpeta
+GetListasUsr(String idUsr, String contrasenya, idUsrGet): Set<String>
+
+# Si el usuario no existe devuelve -2 
+# En caso contrario:
+# Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si el idUsrArtista no es artista devuelve ERROR_USUARIO_NO_ARTISTA
+# En caso contrario devuelve un set de ids de las canciones del artista
+GetSongsArtist(idUsr, contrasenya, idUsrArtista) : Set<String>
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la lista no pertenece al usuario y es privada devuelve FORBIDDEN
+# En caso contrario:
+# Devuelve un set con las ids de todas las canciones en la lista del usuario
+GetAudiosLista(String idUsr, String contrasenya, String idLista): Set<String>
+Cambiado nombre de la función, antes GetListasRepUsr -> GetAudiosLista
+
+
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si no existe la lista, devuelve ERROR_LISTA_NO_ENCOTRADA
+# Si no existe el audio, devuelve ERROR_AUDIO_NO_ENCONTRADO
+# Si el audio no pertenece a la lista, devuelve ERROR_AUDIO_NOT_IN_LISTA
+# Si la lista no pertenece al usuario devuelve FORBIDDEN
+# En caso contrario:
+# Si la lista existe, elimina el audio de la misma y devuelve OK
+RemoveSongLista(String idUsr, String contrasenya, String idLista, String idAudio): int
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la lista no existe devuelve ERROR_LISTA_NO_ENCOTRADA
+# Si el usuario no le pertenece esa lista devuelve FORBIDDEN
+# En caso contrario cambia el nombre de la lista y devuelve OK
+ChangeNameListRepUsr(String idUsr, String contrasenya, String idLista, String nombreLista): int
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la lista no existe devuelve ERROR_LISTA_NO_ENCOTRADA
+# Si el usuario no le pertenece esa lista y no es administrador y no es una lista 
+# pública devuelve FORBIDDEN
+# En caso contrario devuelve el nombre de la lista
+GetNombreListaRep(idUsr, contrasenya, idLista): None
+
+# Igual que ChangeNameListRepUsr, pero el administrador sí que puede cambiar el nombre
+SetNombreListaRep(idUsr, contrasenya, idLista , nombreLista): None
+
+
+
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la lista no existe devuelve ERROR_LISTA_NO_ENCOTRADA
+# Si el usuario no le pertenece esa lista y no es administrador y no es una lista 
+# pública devuelve FORBIDDEN
+# En caso contrario devuelve la privacidad de la lista
+GetPrivacidadListaRep(idUsr, contrasenya, idLista): None
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la lista no existe devuelve ERROR_LISTA_NO_ENCONTRADA
+# Si la lista no es del usuario y no es tipo administrador devuelve FORBIDDEN
+# Si privada no es válida devuelve ERROR_LISTA_PRIVACIDAD_INCORRECTA
+# En caso contrario cambia la privacidad de la lista
+SetPrivacidadListaRep(String idUsr, String contrasenya, String idLista, String privada) : int
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la lista no existe devuelve ERROR_LISTA_NO_ENCOTRADA
+# Si el usuario no le pertenece esa lista y no es administrador y no es una lista 
+# pública devuelve FORBIDDEN
+# En caso contrario devuelve el id del usuario al que le pertenece la lista
+GetUsuarioListaRep(idUsr, contrasenya, idLista): None
+
+
+
+/*    Notifications    */
+# Si el usuario o el artista no existen devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si el usuario ya está suscrito devuelve ERROR_USUARIO_YA_SUSCRITO
+# Si el usuario artista no es tipo artista devuelve ERROR_USUARI_NO_ARTISTA
+# En caso contrario:
+# Añade al artista a la lista de suscripciones del usuario
+SubscribeToArtist(String idUsr, String contrasenya, String idUsrArtista) : int
+
+
+# Si el usuario o el artista no existen devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si el usuario no está suscrito devuelve ERROR_USUARIO_NO_SUSCRITO
+# En caso contrario:
+# Quita al  artista a la lista de suscripciones del usuario
+UnSubscribeToArtist(String idUsr, String contrasenya, String idUsrArtista) : int
+
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA
+# En caso contrario devuelve un set de ids de los artistas a los que está suscrito
+GetSubscriptionsUsr(idUsr, contrasenya): None
+
+# Si el usuario o el artista no existen devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si el usuario idUsrArtista no es artista devuelve ERROR_USUARIO_NO_ARTISTA
+# En caso contrario devuelve 1 si está suscrito sino 0
+IsSubscribedToArtist(idUsr, contrasenya, idUsrArtista): None
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA
+# En caso contrario:
+# Devuelve un set con las ids de todas las notificaciones del usuario
+GetNotificationsUsr(String idUsr, String contrasenya) : Set<String>
+
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la notificación no existe devuelve ERROR_NOTIFIACION_NO_ENCONTRADA
+# Si la notificación no pertenece al usuario devuelve FORBIDDEN
+# En caso contrario: Devuelve un diccionario de la notificación
+GetNotification(String idUsr, String contrasenya, String idNotificacion): None
+
+
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si la notificación no existe devuelve ERROR_NOTIFIACION_NO_ENCONTRADA
+# Si la notificación no pertenece al usuario devuelve FORBIDDEN
+# En caso contrario:
+# Elimina la notificación del usuario
+RemoveNotification(String idUsr, String contrasenya, idNotificacion) : Set<String>
+
+
+
+/*    Friends    */
+# Si alguno de los dos usuarios no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si ya son amigos devuelve ERROR_USUARIO_YA_AMIGO
+# En caso contrario:
+# Envía una notificación de amistad a friend y devuelve OK
+AskFriend(String idUsr, String contrasenya, String idAmigo) : int
+
+# Si alguno de los dos usuarios no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si no existe la notificación devuelve ERROR_NOTIFICACIO_NO_ENCONTRADA
+# En caso contrario:
+# Si la notificación no es de amistad devuelve ERROR_NOTIFICACION_NO_AMIGO
+# Si no acepta la amistad, elimina la notificación y devuelve OK
+AcceptFriend(String idUsr, String contrasenya, String idNotifiacion): int
+
+# Si alguno de los dos usuarios no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si no existe la notificación devuelve ERROR_NOTIFICACIO_NO_ENCONTRADA
+# En caso contrario:
+# Si la notificación no es de amistad devuelve ERROR_NOTIFICACION_NO_AMIGO
+# Si no rechaza la amistad, elimina la notificación y devuelve OK
+RejectFriend(String idUsr, String contrasenya, String idNotifiacion): int
+
+# Si alguno de los dos usuarios no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si los usuarios no son amigos devuelve ERROR_USUARIO_NO_AMIGO
+# En caso contrario:
+# Ambos usuarios eliminan su amistad entre ellos y devuelve OK
+RemoveFriend(String idUsr, String contrasenya, String idAmigo): int
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# En caso contrario:
+# Devuelve el id de todos sus amigos
+GetFriends(String idUsr, String contrasenya): Set<String>
+
+
+
+
+
+/*    Statistics    */
+# Devuelve un set con los n audios con mayor número de reproducciones
+GetTopReproducciones(Int n, Bool esPodcast) : Set<String> topAudios
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si el usuario no es administrador devuelve ERROR_USUARIO_NO_ADMINISTRADOR
+# dia = int del 0 al 6, siendo 0 lunes, …, 6 domingo.
+# En caso contrario:
+# Devuelve el número total de segundos de audio reproducidos en ese dia
+GetTotRepTime(String idUsr, String contrasenya, int dia) : int
+
+# Si el audio no existe devuelve ERROR_CANCION_NO_ENCOTRADA
+# dia = int del 0 al 6, siendo 0 lunes, …, 6 domingo.
+# Devuelve el número total de segundos reproducidos del audio en ese dia
+GetSongSeconds(idAudio, dia): None
+
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si el audio no existe devuelve ERROR_CANCION_NO_ENCOTRADA
+# Si los segundos son negativos devuelve ERROR_SEGUNDOS_NEGATIVOS
+# En caso contrario:
+# Añade seconds segundos de reproducción al audio
+AddSecondsToSong(String idUsr, String contrasenya, String idSong, int seconds) : int
+
+
+
+
+
+
+/*    Users   	 */
+# Si todo va bien crea un usuario con los datos de usr, crea su lista favoritos y devuelve OK,
+# Si el email del usuario ya está siendo usado por algún usuario de la base de datos
+# devuelve ERROR_USUARIO_EMAIL_YA_EXISTE
+# Si el tipo de usuario no es válido devuelve ERROR_USUARIO_TIPO_NO_VALIDO
+SetUser(email, alias, contrasenya, tipoUsuario) : int
+
+# Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida y no nula para ese usuario devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# En caso contrario
+# Si son el mismo usuario devuelve toda la información del usuario 
+# Si no solo devuelve la información pública del usuario ‘Get’
+GetUser(Strting idUsr, String contrasenya, String idUsrGet): DiccUsr
+
+# Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida para ese usuario devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# Si el usuario ya es artista devuelve ERROR_USUARIO_YA_ES_ARTISTA
+# Si el usuario es admin devuelve FORBIDDEN
+# En caso contrario
+# Envía una petición al administrador para convertirse en artista y devuelve OK
+AskAdminToBeArtist(String idUsr, String contrasenya, String mensaje) : int
+
+
+# Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# Si los usuarios son distintos y idUsr no es tipo administrador devuelve FORBIDDEN
+# En caso contrario elimina el usuario
+RemoveUser(String idUsr, String contrasenya, String idUsrEliminar) : int
+
+# Si el usuario no existe, devuelve ERROR_USUARIO_NO_ENCONTRADO
+# En caso contrario:
+# Si la contraseña es correcta devuelve ERROR_CONTRASENYA_INCORRECTA
+# Si no, devuelve OK
+ValidateUser(String email, String contrasenya) : int
+
+# Hace lo mismo que ValidateUser, pero tiene como parámetro el email y no el id del usuario
+ValidateUserEmail(String email, String contrasenya) : int
+
+
+# Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida para ese usuario devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA
+# En caso contrario
+# Almacena el último segundo escuchado del audio
+SetLastSecondHeared(String idUsr, String contrasenya, String idAudio, int second) : int
+
+
+
+# Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida para ese usuario devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA
+# En caso contrario
+# Devuelve el último segundo escuchado del audio
+GetLastSecondHeared(String idUsr, String contrasenya, String idAudio) : int second
+
+# Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# En caso contrario devuelve el email de idUsr2
+GetEmailUsr(idUsr, contrasenya, idUsr2): None
+
+
+# Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# Si un usuario con ese email ya existe devuelve ERROR_USUARIO_EMAIL_YA_EXISTE
+# Si los usuarios no son los mismos y idUsr no es administrador devuelve FORBIDDEN
+# En caso contrario cambia el email de idUsr2
+SetEmailUsr(idUsr, contrasenya, idUsr2, email): None
+
+# Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# En caso contrario devuelve el alias de idUsr2
+GetAliasUsr(idUsr, contrasenya, idUsr2): None
+
+
+# Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# Si los usuarios no son los mismos y idUsr no es administrador devuelve FORBIDDEN
+# En caso contrario cambia el email de idUsr2
+SetAliasUsr(idUsr, contrasenya, idUsr2, alias): None
+
+# Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# En caso contrario devuelve la contrasenya de idUsr2
+GetContrasenyaUsr(idUsr, contrasenya, idUsr2): None
+
+# Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# Si los usuarios no son los mismos y idUsr no es administrador devuelve FORBIDDEN
+# En caso contrario cambia la contrasenya de idUsrContrasenya
+SetContrasenyaUsr(idUsr, contrasenya, idUsr2): None
+
+
+# Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# En caso contrario devuelve el tipo de usuario de idUsr2
+GetTipoUsr(idUsr, contrasenya, idUsr2): None
+
+# Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# Si tipoUsuario no es válido devuelve ERROR_USUARIO_TIPO_NO_VALIDO
+# Si los usuarios no son los mismos y idUsr no es administrador devuelve FORBIDDEN
+# En caso contrario cambia el tipoUsuario de idUsr2
+SetTipoUsr(idUsr, contrasenya, idUsr2, tipoUsuario): None
+
+# Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# En caso contrario devuelve la imagen de perfil de idUsr2
+GetImagenPerfilUsr(idUsr, contrasenya, idUsr2): None
+
+# Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida devuelve u
+# ERROR_CONTRASENYA_INCORRECTA
+# Si tipoUsuario no es válido devuelve ERROR_USUARIO_TIPO_NO_VALIDO
+# Si los usuarios no son los mismos y idUsr no es administrador devuelve FORBIDDEN
+# En caso contrario cambia la imagen de idUsr2
+SetImagenPerfilUsr(idUsr, contrasenya, idUsr2, imagen): None
+
+# Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida para ese usuario devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# calidadPreferida = “alta” o “baja”
+# Si todo va bien guarda en la calidad Preferida dado el usuario
+SetCalidadPorDefectoUsr(idUsr, contrasenya, calidadPreferida): None
+
+
+# Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si la contraseña no es válida para ese usuario devuelve 
+# ERROR_CONTRASENYA_INCORRECTA
+# Si todo va bien devuelve la calidad por defecto del usuario y OK
+GetCalidadPorDefectoUsr(idUsr, contrasenya): {‘status’ : status, ‘calidad’ : calidad}
+
+# Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# Si el codigo de recuperacion es incorrecto devuelve 
+# ERROR_USUARIO_CODIGO_RECUPERACION_INCORRECTO
+# En caso contrario cambia la contrasenya y devuelve OK
+RecuperarContrasenya(email, codigo, contrasenya): None
+
+# Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
+# En caso contrario manda un email al usuario con el código de recuperación
+# y devuelve OK
+GenerateRandomCodeUsr(email): None
+
+
+/*    Admin   	 */
+# Si existe una petición del usuario usr para convertirse en artista
+# Convierte a usr en artista y devuelve OK
+# Si no, devuelve ERROR_NOTIFICACION_NO_ENCOTRADA si la notificación no se ha 
+# encontrado, ERROR_TIPO_NOTIFICACION_NO_VALIDA si el tipo de notificación no es 
+# válida
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA 
+# Si el usuario no es administrador devuelve ERROR_USUARIO_NO_ADMINISTRADOR
+AcceptArtist(String contrasenya, String idUsr, String idNotificacion) : int
+
+# Si existe una petición del usuario usr para convertirse en artista
+# Elimina la notificacion y devuelve OK
+# Si no, devuelve ERROR_NOTIFICACION_NO_ENCOTRADA si la notificación no se ha 
+# encontrado, ERROR_TIPO_NOTIFICACION_NO_VALIDA si el tipo de notificación no es 
+# válida
+# Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO
+# Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA 
+# Si el usuario no es administrador devuelve ERROR_USUARIO_NO_ADMINISTRADOR
+RejectArtist(String contrasenya, String idUsr, String idNotificacion) : int
+
+
+
+/*    Errors   	 */
+# Devuelve un string con información sobre el error comprensible para humanos
+GetCauseError(int idError) : String
+
+
+/*    Recomendador    /*
+# Almacena un ejemplo para entrenar al recomendador
+# La valoración será 1 si le ha dado like o al botón de gustar recomendación
+# Si no le ha dado a ninguno de los dos botones:
+# Cuando se pase a otra canción, la valoración será el porcentaje de la duración que se
+# haya escuchado (tiempo escuchado/duracion total)
+AlmacenarEjemplo(String idUsr, String idAudio, float valoracion): errorHttp
+
+# Devuelve la id de un audio según el recomendador, de entre todos los audios existentes
+GetRecomendedAudio(String idUsr, String contrasenya): int idAudio
+
+
+/*    Search   	 */
+
+# Devuelve un set con n ids de audios recuperadas mediante una búsqueda global
+# (ver definición)
+GlobalSearch(String query, int n) : Set<String>
+
+# Devuelve un set con n ids de audios cuyo nombre contenga alguna de las palabras en # words
+ByWordSearch(Set<String> query, int n) : Set<String>
