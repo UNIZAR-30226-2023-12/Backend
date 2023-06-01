@@ -183,6 +183,14 @@ def eliminarCancion(r, idUsuario, idAudio):
 def getCanciones(r, id):
     return getRelaciones(r, id, constantes.CLAVE_CANCIONES)
 
+def getSubscriptores(r, id):
+    subscriptores = []
+    for idUsuario in r.keys(constantes.PREFIJO_ID_USUARIO + ":*"):
+        if(id in getArtistas(r, idUsuario)):
+            subscriptores.append(idUsuario)
+
+    return subscriptores
+
 # Función adicional de administrador
 def anyadirAdministrador(r, id):
     return r.sadd(constantes.CLAVE_ADMINISTRADORES, id)

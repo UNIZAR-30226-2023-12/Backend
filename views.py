@@ -23,10 +23,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import random
 
-r = redis.Redis(host='redis', port=6379, db=0, decode_responses=True, username='melodia', password='melodia_Proyecto_Software_Grupo_12')
+r = redis.Redis(host=settings.REDIS_SERVER_IP, port=settings.REDIS_SERVER_PORT, db=settings.REDIS_DATABASE, decode_responses=True, username=settings.REDIS_USER, password=settings.REDIS_PASSWORD)
 
 # echo request
-# La función echo no está en la API
 @csrf_exempt
 def echo(request):
     if request.method == 'POST':
@@ -40,22 +39,6 @@ def echo(request):
 
 @csrf_exempt
 def GetSong(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si el audio existe en la calidad requerida, devuelve un VO audio completo.
-
-    Si existe en otra calidad, la devuelve en esa calidad
-
-    Si el usuario no es tipo artista devuelve ERROR_USUARIO_NO_ARTISTA
-
-    Si no existe, devuelve código error 519 en el caso de canciones y 525 en el caso de podcast
-
-    Sintaxis de la función: GetSong(String idUsr, String contrasenya, String idAudio) : Song
-    """
-
     # Compruebo que el método sea POST
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -82,7 +65,6 @@ def GetSong(request):
 
     return JsonResponse({constantes.CLAVE_ID_AUDIO: audio}, status=erroresHTTP.OK)
     
-# La función GetFicheroSong no está en la API
 @csrf_exempt
 def GetFicheroSong(request):
     fichero = -1
@@ -116,14 +98,9 @@ def GetFicheroSong(request):
         return JsonResponse({'fichero': fichero})
 
 
+# View que devuelve una lista de canciones
 @csrf_exempt
 def GetSongs(request):
-    """
-    Como getSong, pero devuelve un bloque con varios audios.
-
-    Sintaxis de la función: GetSongs(String idUsr, List<String> idAudios, Bool calidadAlta, Bool esCancion) : Set<String>
-    """
-
     
     # Compruebo que el método sea GET
     if request.method != 'GET':
@@ -150,24 +127,9 @@ def GetSongs(request):
         # Gets the serialized audio
         return JsonResponse({'ficheros': ficheros})
 
+# View para añadir una canción a la base de datos
 @csrf_exempt
 def SetSong(request):
-    """
-    Si el usuario no existe devuelve -2
-
-    En caso contrario:
-
-    Si el usuario no tiene permisos para crear audios devuelve -3
-
-    En caso contrario:
-
-    Almacena un audio y devuelve status 200
-
-    Song es de tipo diccionario definido anteriormente al principio del documento
-
-    Sintaxis de la función: SetSong(String contrasenya, String idUsr, Song song) : int
-    """
-
     # Compruebo que el método sea POST
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -195,17 +157,6 @@ def SetSong(request):
 
 @csrf_exempt
 def SetUser(request):
-    """
-    Si todo va bien crea un usuario con los datos de usr, crea su lista favoritos y devuelve OK
-
-    Si el email del usuario ya está siendo usado por algún usuario de la base de datos
-    devuelve ERROR_USUARIO_EMAIL_YA_EXISTE
-
-    Si el tipo de usuario no es válido devuelve ERROR_USUARIO_TIPO_NO_VALIDO
-
-    Sintaxis de la función: SetUser(email, alias, contrasenya, tipoUsuario) : int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -242,21 +193,6 @@ def SetUser(request):
 
 @csrf_exempt
 def GetUser(request):
-    """
-    Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida y no nula para ese usuario devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    En caso contrario
-
-    Si son el mismo usuario devuelve toda la información del usuario 
-
-    Si no solo devuelve la información pública del usuario ‘Get’
-
-    Sintaxis de la función: GetUser(Strting idUsr, String contrasenya, String idUsrGet): DiccUsr
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -283,18 +219,6 @@ def GetUser(request):
 
 @csrf_exempt
 def ValidateUser(request):
-    """
-    Si el usuario no existe, devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    En caso contrario:
-
-    Si la contraseña es correcta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si no, devuelve OK
-
-    Sintaxis de la función: ValidateUser(String email, String contrasenya) : int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -311,8 +235,8 @@ def ValidateUser(request):
         return JsonResponse({'error': 'La contraseña es incorrecta'}, status=erroresHTTP.ERROR_CONTRASENYA_INCORRECTA)
     
     return JsonResponse({constantes.CLAVE_ID_USUARIO: idUsuario}, status=erroresHTTP.OK)
+
     
-# La función SetLista no está en la API
 @csrf_exempt
 def SetLista(request):
     if request.method != 'POST':
@@ -345,15 +269,12 @@ def SetLista(request):
 
     idLista = usuarios.setLista(r, idUsuario, diccionarioLista)
     return JsonResponse({constantes.CLAVE_ID_LISTA: idLista}, status=erroresHTTP.OK)
+    
+    
+
 
 @csrf_exempt
 def GetTopReproducciones(request):
-    """
-    Devuelve un set con los n audios con mayor número de reproducciones
-
-    Sintaxis de la función: GetTopReproducciones(Int n, Bool esPodcast) : Set<String> topAudios
-    """
-
 
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -392,20 +313,6 @@ def GetTopReproducciones(request):
 
 @csrf_exempt
 def ChangeNameListRepUsr(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la lista no existe devuelve ERROR_LISTA_NO_ENCOTRADA
-
-    Si el usuario no le pertenece esa lista devuelve FORBIDDEN
-
-    En caso contrario cambia el nombre de la lista y devuelve OK
-
-    Sintaxis de la función: ChangeNameListRepUsr(String idUsr, String contrasenya, String idLista, String nombreLista): int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -437,34 +344,6 @@ def ChangeNameListRepUsr(request):
 
 @csrf_exempt
 def SetSongLista(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la lista de reproducción existe, devuelve un diccionario con sus datos
-
-    Si no existe devuelve ERROR_LISTA_NO_ENCONTRADA
-
-    Si la lista no pertenece al usuario y es privada devuelve FORBIDDEN
-
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    En caso contrario:
-
-    Si la lista de reproducción existe, añade el audio y devuelve OK
-
-    Si no existe devuelve ERROR_LISTA_NO_ENCONTRADA
-
-    Si no existe el audio devuelve ERROR_AUDIO_NO_ENCONTRADO
-
-    Si la lista no pertenece al usuario devuelve FORBIDDEN
-
-    Sintaxis de la función: SetSongLista(String idUsr, String contrasenya, String idLista, String idAudio): int	
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     # Parse the JSON data from the request body
@@ -493,7 +372,6 @@ def SetSongLista(request):
     
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
-# La función GetLista no está en la API
 @csrf_exempt
 def GetLista(request):
     if request.method != 'POST':
@@ -520,21 +398,6 @@ def GetLista(request):
 
 @csrf_exempt
 def GetListasUsr(request):
-    """
-    Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    En caso contrario:
-
-    Si son el mismo usuario devuelve un set con las ids de todas las listas de reproducción del # usuario que no están en una carpeta
-
-    Si no devuelve un set con las ids de las listas de reproducción públicas que no están en 
-    una carpeta
-
-    Sintaxis de la función: GetListasUsr(String idUsr, String contrasenya, idUsrGet): Set<String>
-    """
-
     if request.method != 'POST':
          # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -562,20 +425,6 @@ def GetListasUsr(request):
 
 @csrf_exempt
 def RemoveListaRepUsr(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la lista no existe devuelve ERROR_LISTA_NO_ENCONTRADA
-
-    Si la carpeta es tipo favoritos devuelve ERROR_LISTA_ES_FAVORITOS
-
-    En caso contrario elimina la lista
-
-    Sintaxis de la función: RemoveListaRepUsr(String idUsr, String contrasenya, String idLista): int
-    """
-
     if request.method != 'POST':
          # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -606,22 +455,8 @@ def RemoveListaRepUsr(request):
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
        
-@csrf_exempt
+@csrf_exempt 
 def GetAudiosLista(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la lista no pertenece al usuario y es privada devuelve FORBIDDEN
-
-    En caso contrario:
-
-    Devuelve un set con las ids de todas las canciones en la lista del usuario
-
-    Sintaxis de la función: GetAudiosLista(String idUsr, String contrasenya, String idLista): Set<String>
-    """
-
     if request.method != 'POST':
          # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -645,25 +480,6 @@ def GetAudiosLista(request):
        
 @csrf_exempt
 def RemoveSongLista(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si no existe la lista, devuelve ERROR_LISTA_NO_ENCOTRADA
-
-    Si no existe el audio, devuelve ERROR_AUDIO_NO_ENCONTRADO
-
-    Si el audio no pertenece a la lista, devuelve ERROR_AUDIO_NOT_IN_LISTA
-
-    Si la lista no pertenece al usuario devuelve FORBIDDEN
-
-    En caso contrario:
-    Si la lista existe, elimina el audio de la misma y devuelve OK
-
-    Sintaxis de la función: RemoveSongLista(String idUsr, String contrasenya, String idLista, String idAudio): int
-    """
-
     if request.method == 'POST':
         # Parse the JSON data from the request body
         json_data = json.loads(request.body)
@@ -694,24 +510,9 @@ def RemoveSongLista(request):
         # Return a 405 Method Not Allowed response for other HTTP methods
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-@csrf_exempt
+# View para solicitar al administrador que un usuario sea artista
+@csrf_exempt    
 def AskAdminToBeArtist(request):
-    """
-    Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida para ese usuario devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    Si el usuario ya es artista devuelve ERROR_USUARIO_YA_ES_ARTISTA
-
-    Si el usuario es admin devuelve FORBIDDEN
-
-    En caso contrario
-    Envía una petición al administrador para convertirse en artista y devuelve OK
-
-    Sintaxis de la función: AskAdminToBeArtist(String idUsr, String contrasenya, String mensaje) : int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -736,25 +537,9 @@ def AskAdminToBeArtist(request):
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
+# View para aceptar a un usuario como artista
 @csrf_exempt
 def AcceptArtist(request):
-    """
-    Si existe una petición del usuario usr para convertirse en artista
-    convierte a usr en artista y devuelve OK
-
-    Si no, devuelve ERROR_NOTIFICACION_NO_ENCOTRADA si la notificación no se ha 
-    encontrado, ERROR_TIPO_NOTIFICACION_NO_VALIDA si el tipo de notificación no es 
-    válida
-
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA 
-
-    Si el usuario no es administrador devuelve ERROR_USUARIO_NO_ADMINISTRADOR
-
-    Sintaxis de la función: AcceptArtist(String contrasenya, String idUsr, String idNotificacion) : int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -784,7 +569,6 @@ def AcceptArtist(request):
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
-# La función RejectArtista no está en la API
 @csrf_exempt
 def RejectArtista(request):
     if request.method != 'POST':
@@ -818,30 +602,10 @@ def RejectArtista(request):
 
 @csrf_exempt
 def ValidateUserEmail(request):
-    """
-    Hace lo mismo que ValidateUser, pero tiene como parámetro el email y no el id del usuario
-
-    Sintaxis de la función: ValidateUserEmail(String email, String contrasenya) : int
-    """
-
     return ValidateUser(request)
 
 @csrf_exempt
 def GetTotRepTime(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si el usuario no es administrador devuelve ERROR_USUARIO_NO_ADMINISTRADOR
-
-    dia = int del 0 al 6, siendo 0 lunes, …, 6 domingo.
-    En caso contrario:
-    Devuelve el número total de segundos de audio reproducidos en ese dia
-
-    Sintaxis de la función: GetTotRepTime(String idUsr, String contrasenya, int dia) : int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -868,21 +632,6 @@ def GetTotRepTime(request):
 
 @csrf_exempt
 def AddSecondsToSong(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA
-
-    Si los segundos son negativos devuelve ERROR_SEGUNDOS_NEGATIVOS
-
-    En caso contrario:
-    Añade seconds segundos de reproducción al audio
-
-    Sintaxis de la función: AddSecondsToSong(String idUsr, String contrasenya, String idSong, int seconds) : int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -913,15 +662,6 @@ def AddSecondsToSong(request):
 
 @csrf_exempt
 def GetSongSeconds(request):
-    """
-    Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA
-
-    dia = int del 0 al 6, siendo 0 lunes, …, 6 domingo.
-    Devuelve el número total de segundos reproducidos del audio en ese dia
-
-    Sintaxis de la función: GetSongSeconds(idAudio, dia): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -939,19 +679,6 @@ def GetSongSeconds(request):
 
 @csrf_exempt
 def SetFolder(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la privacidad no es válida devuelve ERROR_CARPETA_PRIVACIDAD_NO_VALIDA
-
-    En caso contrario:
-    Crea una carpeta con los datos y devuelve OK
-
-    Sintaxis de la función: SetFolder(String idUsr, String contrasenya, String nombreCarpeta, String privacidadCarpeta): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -977,27 +704,6 @@ def SetFolder(request):
 
 @csrf_exempt
 def AddListToFolder(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la lista no existe devuelve ERROR_LISTA_NO_ENCONTRADA
-
-    SI la carpeta no existe devuelve ERROR_CARPETA_NO_ENCONTRADA
-
-    Si la carpeta no pertenece al usuario devuelve ERROR_CARPETA_NOT_IN_USER
-
-    Si la carpeta es tipo favoritos devuelve ERROR_LISTA_ES_FAVORITOS
-
-    Si la lista no pertenece al usuario y no es pública devuelve FORBIDDEN
-
-    En caso contrario:
-    Añade la lista a la carpeta, quita la lista de las listas sin carpeta del usuario y devuelve OK
-
-    Sintaxis de la función: AddListToFolder(String idUsr, String contrasenya, String idCarpeta, String idLista) : int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1030,25 +736,6 @@ def AddListToFolder(request):
 
 @csrf_exempt
 def RemoveListFromFolder(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la lista no existe devuelve ERROR_LISTA_NO_ENCONTRADA
-
-    SI la carpeta no existe devuelve ERROR_CARPETA_NO_ENCONTRADA
-
-    SI la lista no está en la carpeta devuelve ERROR_LISTA_NOT_IN_CARPETA
-
-    Si la carpeta no pertenece al usuario devuelve FORBIDDEN
-
-    En caso contrario:
-    Elimina la lista de reproducción de la carpeta
-
-    Sintaxis de la función: RemoveListFromFolder(String idUsr, String contrasenya, String idCarpeta, String idLista): int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1080,21 +767,6 @@ def RemoveListFromFolder(request):
 
 @csrf_exempt
 def RemoveFolder(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la carpeta no existe devuelve ERROR_CARPETA_NO_ENCONTRADA
-
-    Si la carpeta no pertenece al usuario FORBIDDEN
-
-    En caso contrario:
-    Elimina la carpeta y las listas dentro de ella
-
-    Sintaxis de la función: RemoveFolder(String idUsr, String contrasenya, String idCarpeta): int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1120,21 +792,6 @@ def RemoveFolder(request):
 
 @csrf_exempt
 def GetFolder(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    SI la carpeta no existe devuelve ERROR_CARPETA_NO_ENCONTRADA
-
-    Si la carpeta no pertenece al usuario y es privada devuelve FORBIDDEN
-
-    En caso contrario:
-    Devuelve un diccionario con los datos de carpeta
-
-    Sintaxis de la función: GetFolder(String idUsr, String contrasenya, String idCarpeta) : int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1158,21 +815,6 @@ def GetFolder(request):
 
 @csrf_exempt
 def GetListasFolder(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    SI la carpeta no existe devuelve ERROR_CARPETA_NO_ENCONTRADA
-
-    Si la carpeta no pertenece al usuario y es privada devuelve FORBIDDEN
-
-    En caso contrario:
-    Devuelve un set con los ids de las listas
-
-    Sintaxis de la función: GetListasFolder(String idUsr, String contrasenya, String idCarpeta): set<String>
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1196,18 +838,6 @@ def GetListasFolder(request):
 
 @csrf_exempt
 def GetFoldersUsr(request):
-    """
-    Si uno  de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    En caso contrario:
-    Si son el mismo usuario devuelve un set con las ids de todas las carpetas del usuario
-    Si no devuelve un set con las ids de las carpetas públicas del usuario ‘Get’
-
-    Sintaxis de la función: GetFoldersUsr(String idUsr, String contrasenya, String idUsrGet) : Set<String>
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1233,19 +863,6 @@ def GetFoldersUsr(request):
 
 @csrf_exempt
 def AskFriend(request):
-    """
-    Si alguno de los dos usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si ya son amigos devuelve ERROR_USUARIO_YA_AMIGO
-
-    En caso contrario:
-    Envía una notificación de amistad a friend y devuelve OK
-
-    Sintaxis de la función: AskFriend(String idUsr, String contrasenya, String idAmigo) : int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1271,20 +888,6 @@ def AskFriend(request):
 
 @csrf_exempt
 def AcceptFriend(request):
-    """
-    Si alguno de los dos usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si no existe la notificación devuelve ERROR_NOTIFICACION_NO_ENCONTRADA
-    
-    En caso contrario:
-    Si la notificación no es de amistad devuelve ERROR_NOTIFICACION_NO_AMIGO
-    Si no acepta la amistad, elimina la notificación y devuelve OK
-
-    Sintaxis de la función: AcceptFriend(String idUsr, String contrasenya, String idNotifiacion): int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1314,20 +917,6 @@ def AcceptFriend(request):
 
 @csrf_exempt
 def RejectFriend(request):
-    """
-    Si alguno de los dos usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si no existe la notificación devuelve ERROR_NOTIFICACION_NO_ENCONTRADA
-
-    En caso contrario:
-    Si la notificación no es de amistad devuelve ERROR_NOTIFICACION_NO_AMIGO
-    Si no rechaza la amistad, elimina la notificación y devuelve OK
-
-    Sintaxis de la función: RejectFriend(String idUsr, String contrasenya, String idNotifiacion): int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1359,19 +948,9 @@ def RejectFriend(request):
 #def GetDataSong(r, idAudio):
 
 
+# Devuelve un set con n ids de audios recuperadas mediante una búsqueda global
 @csrf_exempt
 def GetFriends(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    En caso contrario:
-    Devuelve el id de todos sus amigos
-
-    Sintaxis de la función: GetFriends(String idUsr, String contrasenya): Set<String>
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1390,19 +969,6 @@ def GetFriends(request):
 
 @csrf_exempt
 def RemoveFriend(request):
-    """
-    Si alguno de los dos usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si los usuarios no son amigos devuelve ERROR_USUARIO_NO_AMIGO
-
-    En caso contrario:
-    Ambos usuarios eliminan su amistad entre ellos y devuelve OK
-
-    Sintaxis de la función: RemoveFriend(String idUsr, String contrasenya, String idAmigo): int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1428,21 +994,6 @@ def RemoveFriend(request):
 
 @csrf_exempt
 def SubscribeToArtist(request):
-    """
-    Si el usuario o el artista no existen devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si el usuario ya está suscrito devuelve ERROR_USUARIO_YA_SUSCRITO
-
-    Si el usuario artista no es tipo artista devuelve ERROR_USUARI_NO_ARTISTA
-
-    En caso contrario:
-    Añade al artista a la lista de suscripciones del usuario
-
-    Sintaxis de la función: SubscribeToArtist(String idUsr, String contrasenya, String idUsrArtista) : int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1468,7 +1019,6 @@ def SubscribeToArtist(request):
 
     return JsonResponse({'status': erroresHTTP.OK}, status=erroresHTTP.OK)
 
-# La función UnsubscribeToArtist no está en la API
 @csrf_exempt
 def UnsubscribeToArtist(request):
     if request.method != 'POST':
@@ -1495,16 +1045,6 @@ def UnsubscribeToArtist(request):
 
 @csrf_exempt
 def GetSubscriptionsUsr(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    En caso contrario devuelve un set de ids de los artistas a los que está suscrito
-
-    Sintaxis de la función: GetSubscriptionsUsr(idUsr, contrasenya): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1523,18 +1063,6 @@ def GetSubscriptionsUsr(request):
 
 @csrf_exempt
 def IsSubscribedToArtist(request):
-    """
-    Si el usuario o el artista no existen devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si el usuario idUsrArtista no es artista devuelve ERROR_USUARIO_NO_ARTISTA
-
-    En caso contrario devuelve 1 si está suscrito sino 0
-
-    Sintaxis de la función: IsSubscribedToArtist(idUsr, contrasenya, idUsrArtista): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1558,17 +1086,6 @@ def IsSubscribedToArtist(request):
 
 @csrf_exempt
 def GetNotificationsUsr(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    En caso contrario:
-    Devuelve un set con las ids de todas las notificaciones del usuario
-
-    Sintaxis de la función: GetNotificationsUsr(String idUsr, String contrasenya) : Set<String>
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1587,20 +1104,6 @@ def GetNotificationsUsr(request):
 
 @csrf_exempt
 def GetNotification(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la notificación no existe devuelve ERROR_NOTIFIACION_NO_ENCONTRADA
-
-    Si la notificación no pertenece al usuario devuelve FORBIDDEN
-
-    En caso contrario: Devuelve un diccionario de la notificación
-
-    Sintaxis de la función: GetNotification(String idUsr, String contrasenya, String idNotificacion): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1624,21 +1127,6 @@ def GetNotification(request):
 
 @csrf_exempt
 def RemoveNotification(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la notificación no existe devuelve ERROR_NOTIFIACION_NO_ENCONTRADA
-
-    Si la notificación no pertenece al usuario devuelve FORBIDDEN
-
-    En caso contrario:
-    Elimina la notificación del usuario
-
-    Sintaxis de la función: RemoveNotification(String idUsr, String contrasenya, idNotificacion) : Set<String>
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1664,20 +1152,6 @@ def RemoveNotification(request):
 
 @csrf_exempt
 def SetLastSecondHeared(request):
-    """
-    Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida para ese usuario devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA
-
-    En caso contrario
-    Almacena el último segundo escuchado del audio
-
-    Sintaxis de la función: SetLastSecondHeared(String idUsr, String contrasenya, String idAudio, int second) : int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1704,19 +1178,6 @@ def SetLastSecondHeared(request):
 
 @csrf_exempt
 def GetLinkAudio(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA
-
-    En caso contrario devuelve un link del idAudio
-
-    Sintaxis de la función: GetLinkAudio(String idUsr, String contrasenya, String idAudio) : string
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1738,19 +1199,6 @@ def GetLinkAudio(request):
 
 @csrf_exempt
 def GetAudioFromLink(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA
-
-    En caso contrario devuelve un id del audio dado el link
-
-    Sintaxis de la función: GetAudioFromLink(String idUsr, String contrasenya, String linkAudio) : string
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1771,20 +1219,6 @@ def GetAudioFromLink(request):
 
 @csrf_exempt
 def GetLastSecondHeared(request):
-    """
-    Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida para ese usuario devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA
-
-    En caso contrario
-    Devuelve el último segundo escuchado del audio
-
-    Sintaxis de la función: GetLastSecondHeared(String idUsr, String contrasenya, String idAudio) : int second
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1806,22 +1240,6 @@ def GetLastSecondHeared(request):
 
 @csrf_exempt
 def GetSongsArtist(request):
-    """
-    Si el usuario no existe devuelve -2 
-
-    En caso contrario:
-
-    Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si el idUsrArtista no es artista devuelve ERROR_USUARIO_NO_ARTISTA
-
-    En caso contrario devuelve un set de ids de las canciones del artista
-
-    Sintaxis de la función: GetSongsArtist(idUsr, contrasenya, idUsrArtista) : Set<String>
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1846,19 +1264,6 @@ def GetSongsArtist(request):
 
 @csrf_exempt
 def RemoveUser(request):
-    """
-    Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    Si los usuarios son distintos y idUsr no es tipo administrador devuelve FORBIDDEN
-
-    En caso contrario elimina el usuario
-
-    Sintaxis de la función: RemoveUser(String idUsr, String contrasenya, String idUsrEliminar) : int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1883,12 +1288,6 @@ def RemoveUser(request):
 
 @csrf_exempt
 def GetCauseError(request):
-    """
-    Devuelve un string con información sobre el error comprensible para humanos
-
-    Sintaxis de la función: GetCauseError(int idError) : String
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1897,19 +1296,9 @@ def GetCauseError(request):
 
     return JsonResponse({'error': erroresHTTP.getError(idError)}, status=erroresHTTP.OK)
 
+# Gets y Sets User
 @csrf_exempt
 def GetEmailUsr(request):
-    """
-    Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    En caso contrario devuelve el email de idUsr2
-
-    Sintaxis de la función: GetEmailUsr(idUsr, contrasenya, idUsr2): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1930,21 +1319,6 @@ def GetEmailUsr(request):
 
 @csrf_exempt
 def SetEmailUsr(request):
-    """
-    Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    Si un usuario con ese email ya existe devuelve ERROR_USUARIO_EMAIL_YA_EXISTE
-
-    Si los usuarios no son los mismos y idUsr no es administrador devuelve FORBIDDEN
-
-    En caso contrario cambia el email de idUsr2
-
-    Sintaxis de la función: SetEmailUsr(idUsr, contrasenya, idUsr2, email): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -1972,17 +1346,6 @@ def SetEmailUsr(request):
 
 @csrf_exempt
 def GetAliasUsr(request):
-    """
-    Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    En caso contrario devuelve el alias de idUsr2
-
-    Sintaxis de la función: GetAliasUsr(idUsr, contrasenya, idUsr2): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2003,19 +1366,6 @@ def GetAliasUsr(request):
 
 @csrf_exempt
 def SetAliasUsr(request):
-    """
-    Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    Si los usuarios no son los mismos y idUsr no es administrador devuelve FORBIDDEN
-
-    En caso contrario cambia el email de idUsr2
-
-    Sintaxis de la función: SetAliasUsr(idUsr, contrasenya, idUsr2, alias): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2041,17 +1391,6 @@ def SetAliasUsr(request):
 
 @csrf_exempt
 def GetContrasenyaUsr(request):
-    """
-    Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    En caso contrario devuelve la contrasenya de idUsr2
-
-    Sintaxis de la función: GetContrasenyaUsr(idUsr, contrasenya, idUsr2): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2074,19 +1413,6 @@ def GetContrasenyaUsr(request):
 
 @csrf_exempt
 def SetContrasenyaUsr(request):
-    """
-    Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    Si los usuarios no son los mismos y idUsr no es administrador devuelve FORBIDDEN
-
-    En caso contrario cambia la contrasenya de idUsrContrasenya
-
-    Sintaxis de la función: SetContrasenyaUsr(idUsr, contrasenya, idUsr2): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2112,17 +1438,6 @@ def SetContrasenyaUsr(request):
 
 @csrf_exempt
 def GetTipoUsr(request):
-    """
-    Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    En caso contrario devuelve el tipo de usuario de idUsr2
-
-    Sintaxis de la función: GetTipoUsr(idUsr, contrasenya, idUsr2): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2143,21 +1458,6 @@ def GetTipoUsr(request):
 
 @csrf_exempt
 def SetTipoUsr(request):
-    """
-    Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    Si tipoUsuario no es válido devuelve ERROR_USUARIO_TIPO_NO_VALIDO
-
-    Si los usuarios no son los mismos y idUsr no es administrador devuelve FORBIDDEN
-
-    En caso contrario cambia el tipoUsuario de idUsr2
-
-    Sintaxis de la función: SetTipoUsr(idUsr, contrasenya, idUsr2, tipoUsuario): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2185,17 +1485,6 @@ def SetTipoUsr(request):
 
 @csrf_exempt
 def GetImagenPerfilUsr(request):
-    """
-    Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    En caso contrario devuelve la imagen de perfil de idUsr2
-
-    Sintaxis de la función: GetImagenPerfilUsr(idUsr, contrasenya, idUsr2): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2217,21 +1506,6 @@ def GetImagenPerfilUsr(request):
 
 @csrf_exempt
 def SetImagenPerfilUsr(request):
-    """
-    Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida devuelve
-    ERROR_CONTRASENYA_INCORRECTA
-
-    Si tipoUsuario no es válido devuelve ERROR_USUARIO_TIPO_NO_VALIDO
-
-    Si los usuarios no son los mismos y idUsr no es administrador devuelve FORBIDDEN
-
-    En caso contrario cambia la imagen de idUsr2
-
-    Sintaxis de la función: SetImagenPerfilUsr(idUsr, contrasenya, idUsr2, imagen): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2256,23 +1530,9 @@ def SetImagenPerfilUsr(request):
     return JsonResponse({'status': 'OK'}, status=erroresHTTP.OK)
 
 
+# Gets y Sets Lista
 @csrf_exempt
 def GetNombreListaRep(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la lista no existe devuelve ERROR_LISTA_NO_ENCOTRADA
-
-    Si el usuario no le pertenece esa lista y no es administrador y no es una lista 
-    pública devuelve FORBIDDEN
-
-    En caso contrario devuelve el nombre de la lista
-
-    Sintaxis de la función: GetNombreListaRep(idUsr, contrasenya, idLista): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2298,12 +1558,6 @@ def GetNombreListaRep(request):
 
 @csrf_exempt
 def SetNombreListaRep(request):
-    """
-    Igual que ChangeNameListRepUsr, pero el administrador sí que puede cambiar el nombre
-
-    Sintaxis de la función: SetNombreListaRep(idUsr, contrasenya, idLista , nombreLista): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2331,21 +1585,6 @@ def SetNombreListaRep(request):
 
 @csrf_exempt
 def GetPrivacidadListaRep(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la lista no existe devuelve ERROR_LISTA_NO_ENCOTRADA
-
-    Si el usuario no le pertenece esa lista y no es administrador y no es una lista 
-    pública devuelve FORBIDDEN
-
-    En caso contrario devuelve la privacidad de la lista
-
-    Sintaxis de la función: GetPrivacidadListaRep(idUsr, contrasenya, idLista): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2371,22 +1610,6 @@ def GetPrivacidadListaRep(request):
 
 @csrf_exempt
 def SetPrivacidadListaRep(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la lista no existe devuelve ERROR_LISTA_NO_ENCONTRADA
-
-    Si la lista no es del usuario y no es tipo administrador devuelve FORBIDDEN
-
-    Si privada no es válida devuelve ERROR_LISTA_PRIVACIDAD_INCORRECTA
-
-    En caso contrario cambia la privacidad de la lista
-
-    Sintaxis de la función: SetPrivacidadListaRep(String idUsr, String contrasenya, String idLista, String privada) : int
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2414,23 +1637,9 @@ def SetPrivacidadListaRep(request):
 
     return JsonResponse({'status': 'OK'}, status=erroresHTTP.OK)
 
+# Gets y Sets Carpeta
 @csrf_exempt
 def GetNombreCarpeta(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la carpeta no existe devuelve ERROR_CARPETA_NO_ENCOTRADA
-    
-    Si el usuario no le pertenece esa carpeta y no es administrador y no es una carpeta 
-    pública devuelve FORBIDDEN
-
-    En caso contrario devuelve el nombre de la carpeta
-
-    Sintaxis de la función: GetNombreCarpeta(idUsr, contrasenya, idCarpeta): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2456,20 +1665,6 @@ def GetNombreCarpeta(request):
 
 @csrf_exempt
 def SetNombreCarpeta(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la carpeta no existe devuelve ERROR_CARPETA_NO_ENCOTRADA
-
-    Si el usuario no le pertenece esa carpeta y no es administrador devuelve FORBIDDEN
-
-    En caso contrario cambia el nombre de la carpeta
-
-    Sintaxis de la función: SetNombreCarpeta(idUsr, contrasenya, idCarpeta, nombreCarpeta): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2497,21 +1692,6 @@ def SetNombreCarpeta(request):
 
 @csrf_exempt
 def GetPrivacidadCarpeta(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la carpeta no existe devuelve ERROR_CARPETA_NO_ENCOTRADA
-
-    Si el usuario no le pertenece esa carpeta y no es administrador y no es una carpeta 
-    pública devuelve FORBIDDEN
-
-    En caso contrario devuelve el nombre de la carpeta
-
-    Sintaxis de la función: GetPrivacidadCarpeta(idUsr, contrasenya, idCarpeta): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2537,22 +1717,6 @@ def GetPrivacidadCarpeta(request):
 
 @csrf_exempt
 def SetPrivacidadCarpeta(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la carpeta no existe devuelve ERROR_CARPETA_NO_ENCOTRADA
-
-    Si la privacidad no es válida devuelve ERROR_CARPETA_PRIVACIDAD_NO_VALIDA
-
-    Si el usuario no le pertenece esa carpeta y no es administrador devuelve FORBIDDEN
-
-    En caso contrario cambia el nombre de la carpeta
-
-    Sintaxis de la función: SetPrivacidadCarpeta(idUsr, contrasenya, idCarpeta, privada): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2582,20 +1746,6 @@ def SetPrivacidadCarpeta(request):
 
 @csrf_exempt
 def GetUsuarioListaRep(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA
-
-    Si la lista no existe devuelve ERROR_LISTA_NO_ENCOTRADA
-    Si el usuario no le pertenece esa lista y no es administrador y no es una lista 
-    pública devuelve FORBIDDEN
-
-    En caso contrario devuelve el id del usuario al que le pertenece la lista
-
-    Sintaxis de la función: GetUsuarioListaRep(idUsr, contrasenya, idLista): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2621,19 +1771,6 @@ def GetUsuarioListaRep(request):
 
 @csrf_exempt
 def GetImagenAudio(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA
-
-    En caso contrario devuelve la imagen del audio
-
-    Sintaxis de la función: GetImagenAudio(idUsr, contrasenya, idAudio): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2655,19 +1792,6 @@ def GetImagenAudio(request):
 
 @csrf_exempt
 def SetImagenAudio(request):
-    """
-    Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA
-
-    En caso contrario guarda la imagen del audio
-
-    Sintaxis de la función: SetImagenAudio(idUsr, contrasenya, idAudio, imagenAudio): None
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2693,13 +1817,6 @@ def SetImagenAudio(request):
 
 @csrf_exempt
 def GlobalSearch(request):
-    """
-    Devuelve un set con n ids de audios recuperadas mediante una búsqueda global
-    (ver definición)
-
-    Sintaxis de la función: GlobalSearch(String query, int n) : Set<String>
-    """
-
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     json_data = json.loads(request.body)
@@ -2714,12 +1831,6 @@ def GlobalSearch(request):
 
 @csrf_exempt
 def ByWordSearch(request):
-    """
-    Devuelve un set con n ids de audios cuyo nombre contenga alguna de las palabras en # words
-
-    Sintaxis de la función: ByWordSearch(Set<String> query, int n) : Set<String>
-    """
-
     if request.method != 'GET':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -2739,12 +1850,6 @@ def ByWordSearch(request):
 
 @csrf_exempt
 def GetRecomendedAudio(request):
-    """
-    Devuelve la id de un audio según el recomendador, de entre todos los audios existentes
-
-    Sintaxis de la función: GetRecomendedAudio(String idUsr, String contrasenya): int idAudio
-    """
-
 
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -2778,7 +1883,6 @@ def GetRecomendedAudio(request):
     return JsonResponse({'idAudio': idAudios[0]}, status=200)
 
 
-# La función entrenar_recomendador no está en la API
 @csrf_exempt
 def entrenar_recomendador(request):
     if request.method != 'POST':
@@ -2806,18 +1910,6 @@ def entrenar_recomendador(request):
 
 @csrf_exempt
 def AlmacenarEjemplo(request):
-    """
-    Almacena un ejemplo para entrenar al recomendador
-
-    La valoración será 1 si le ha dado like o al botón de gustar recomendación
-
-    Si no le ha dado a ninguno de los dos botones:
-    Cuando se pase a otra canción, la valoración será el porcentaje de la duración que se
-    haya escuchado (tiempo escuchado/duracion total)
-
-    Sintaxis de la función: AlmacenarEjemplo(String idUsr, String idAudio, float valoracion): errorHttp
-    """
-
     # Compruebo que el método sea GET
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -2849,12 +1941,6 @@ def AlmacenarEjemplo(request):
 
 @csrf_exempt
 def GetValoracion(request):
-    """
-    Devuelve un id del audio dado el link. Si el usuario o el audio no existen, devuelve 0
-
-    Sintaxis de la función: GetValoracion(String idUsr, String idAudio): int valoracion
-    """
-
     # Compruebo que el método sea GET
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -2877,7 +1963,6 @@ def GetValoracion(request):
     return JsonResponse({'valoracion': valoracion}, status=erroresHTTP.OK)
 
 
-# La función GetValoracionMedia no está en la API
 @csrf_exempt
 def GetValoracionMedia(request):
     # Compruebo que el método sea GET
@@ -2900,12 +1985,6 @@ def GetValoracionMedia(request):
 
 @csrf_exempt
 def SetValoracion(request):
-    """
-    Almacena la valoración valoracion en el usuario idUsr para el audio idAudio
-
-    Sintaxis de la función: SetValoracion(String idUsr, String idAudio, int valoracion): None
-    """
-
     # Compruebo que el método sea GET
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -2937,15 +2016,6 @@ def SetValoracion(request):
 
 @csrf_exempt
 def GenerateRandomCodeUsr(request):
-    """
-    Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    En caso contrario manda un email al usuario con el código de recuperación
-    y devuelve OK
-
-    Sintaxis de la función: GenerateRandomCodeUsr(email): None
-    """
-
     # Compruebo que el método sea GET
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -3001,19 +2071,6 @@ def GenerateRandomCodeUsr(request):
 
 @csrf_exempt
 def SetCalidadPorDefectoUsr(request):
-    """
-    Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida para ese usuario devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    calidadPreferida = “alta” o “baja”
-
-    Si todo va bien guarda en la calidad Preferida dado el usuario
-
-    Sintaxis de la función: SetCalidadPorDefectoUsr(idUsr, contrasenya, calidadPreferida): None
-    """
-
     # Compruebo que el método sea GET
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -3038,17 +2095,6 @@ def SetCalidadPorDefectoUsr(request):
 
 @csrf_exempt
 def GetCalidadPorDefectoUsr(request):
-    """
-    Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si la contraseña no es válida para ese usuario devuelve 
-    ERROR_CONTRASENYA_INCORRECTA
-
-    Si todo va bien devuelve la calidad por defecto del usuario y OK
-
-    Sintaxis de la función: GetCalidadPorDefectoUsr(idUsr, contrasenya): {‘status’ : status, ‘calidad’ : calidad}
-    """
-
     # Compruebo que el método sea GET
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -3071,17 +2117,6 @@ def GetCalidadPorDefectoUsr(request):
 
 @csrf_exempt
 def RecuperarContrasenya(request):
-    """
-    Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO
-
-    Si el codigo de recuperacion es incorrecto devuelve 
-    ERROR_USUARIO_CODIGO_RECUPERACION_INCORRECTO
-
-    En caso contrario cambia la contrasenya y devuelve OK
-    
-    Sintaxis de la función: RecuperarContrasenya(email, codigo, contrasenya): None
-    """
-
     # Compruebo que el método sea GET
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -3094,7 +2129,7 @@ def RecuperarContrasenya(request):
 
     # Compruebo que el usuario existe
     if(usuarios.existeUsuarioEmail(r, emailUsuario)):
-        # Compruebo que el código e s correcto
+        # Compruebo que el código es correcto
         if(usuarios.getCodigoRecuperacion(r, emailUsuario) == code):
 
             # Obtengo la id del usuario

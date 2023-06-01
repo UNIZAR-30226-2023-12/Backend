@@ -50,15 +50,819 @@
 <section id="module-frontApi.views">
 <span id="frontapi-views-module"></span><h2>frontApi.views module<a class="headerlink" href="#module-frontApi.views" title="Enlace permanente a este encabezado">¶</a></h2>
 <dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.AcceptArtist">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">AcceptArtist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.AcceptArtist" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si existe una petición del usuario usr para convertirse en artista
+convierte a usr en artista y devuelve OK</p>
+<p>Si no, devuelve ERROR_NOTIFICACION_NO_ENCOTRADA si la notificación no se ha 
+encontrado, ERROR_TIPO_NOTIFICACION_NO_VALIDA si el tipo de notificación no es 
+válida</p>
+<p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si el usuario no es administrador devuelve ERROR_USUARIO_NO_ADMINISTRADOR</p>
+<p>Sintaxis de la función: AcceptArtist(String contrasenya, String idUsr, String idNotificacion) : int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.AcceptFriend">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">AcceptFriend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.AcceptFriend" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si alguno de los dos usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si no existe la notificación devuelve ERROR_NOTIFICACION_NO_ENCONTRADA</p>
+<p>En caso contrario:
+Si la notificación no es de amistad devuelve ERROR_NOTIFICACION_NO_AMIGO
+Si no acepta la amistad, elimina la notificación y devuelve OK</p>
+<p>Sintaxis de la función: AcceptFriend(String idUsr, String contrasenya, String idNotifiacion): int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.AddListToFolder">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">AddListToFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.AddListToFolder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la lista no existe devuelve ERROR_LISTA_NO_ENCONTRADA</p>
+<p>SI la carpeta no existe devuelve ERROR_CARPETA_NO_ENCONTRADA</p>
+<p>Si la carpeta no pertenece al usuario devuelve ERROR_CARPETA_NOT_IN_USER</p>
+<p>Si la carpeta es tipo favoritos devuelve ERROR_LISTA_ES_FAVORITOS</p>
+<p>Si la lista no pertenece al usuario y no es pública devuelve FORBIDDEN</p>
+<p>En caso contrario:
+Añade la lista a la carpeta, quita la lista de las listas sin carpeta del usuario y devuelve OK</p>
+<p>Sintaxis de la función: AddListToFolder(String idUsr, String contrasenya, String idCarpeta, String idLista) : int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.AddSecondsToSong">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">AddSecondsToSong</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.AddSecondsToSong" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA</p>
+<p>Si los segundos son negativos devuelve ERROR_SEGUNDOS_NEGATIVOS</p>
+<p>En caso contrario:
+Añade seconds segundos de reproducción al audio</p>
+<p>Sintaxis de la función: AddSecondsToSong(String idUsr, String contrasenya, String idSong, int seconds) : int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.AlmacenarEjemplo">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">AlmacenarEjemplo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.AlmacenarEjemplo" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Almacena un ejemplo para entrenar al recomendador</p>
+<p>La valoración será 1 si le ha dado like o al botón de gustar recomendación</p>
+<p>Si no le ha dado a ninguno de los dos botones:
+Cuando se pase a otra canción, la valoración será el porcentaje de la duración que se
+haya escuchado (tiempo escuchado/duracion total)</p>
+<p>Sintaxis de la función: AlmacenarEjemplo(String idUsr, String idAudio, float valoracion): errorHttp</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.AskAdminToBeArtist">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">AskAdminToBeArtist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.AskAdminToBeArtist" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida para ese usuario devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si el usuario ya es artista devuelve ERROR_USUARIO_YA_ES_ARTISTA</p>
+<p>Si el usuario es admin devuelve FORBIDDEN</p>
+<p>En caso contrario
+Envía una petición al administrador para convertirse en artista y devuelve OK</p>
+<p>Sintaxis de la función: AskAdminToBeArtist(String idUsr, String contrasenya, String mensaje) : int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.AskFriend">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">AskFriend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.AskFriend" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si alguno de los dos usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si ya son amigos devuelve ERROR_USUARIO_YA_AMIGO</p>
+<p>En caso contrario:
+Envía una notificación de amistad a friend y devuelve OK</p>
+<p>Sintaxis de la función: AskFriend(String idUsr, String contrasenya, String idAmigo) : int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.ByWordSearch">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">ByWordSearch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.ByWordSearch" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Devuelve un set con n ids de audios cuyo nombre contenga alguna de las palabras en # words</p>
+<p>Sintaxis de la función: ByWordSearch(Set&lt;String&gt; query, int n) : Set&lt;String&gt;</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.ChangeNameListRepUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">ChangeNameListRepUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.ChangeNameListRepUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la lista no existe devuelve ERROR_LISTA_NO_ENCOTRADA</p>
+<p>Si el usuario no le pertenece esa lista devuelve FORBIDDEN</p>
+<p>En caso contrario cambia el nombre de la lista y devuelve OK</p>
+<p>Sintaxis de la función: ChangeNameListRepUsr(String idUsr, String contrasenya, String idLista, String nombreLista): int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GenerateRandomCodeUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GenerateRandomCodeUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GenerateRandomCodeUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>En caso contrario manda un email al usuario con el código de recuperación
+y devuelve OK</p>
+<p>Sintaxis de la función: GenerateRandomCodeUsr(email): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetAliasUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetAliasUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetAliasUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>En caso contrario devuelve el alias de idUsr2</p>
+<p>Sintaxis de la función: GetAliasUsr(idUsr, contrasenya, idUsr2): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetAudioFromLink">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetAudioFromLink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetAudioFromLink" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA</p>
+<p>En caso contrario devuelve un id del audio dado el link</p>
+<p>Sintaxis de la función: GetAudioFromLink(String idUsr, String contrasenya, String linkAudio) : string</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetAudiosLista">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetAudiosLista</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetAudiosLista" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la lista no pertenece al usuario y es privada devuelve FORBIDDEN</p>
+<p>En caso contrario:</p>
+<p>Devuelve un set con las ids de todas las canciones en la lista del usuario</p>
+<p>Sintaxis de la función: GetAudiosLista(String idUsr, String contrasenya, String idLista): Set&lt;String&gt;</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetCalidadPorDefectoUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetCalidadPorDefectoUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetCalidadPorDefectoUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida para ese usuario devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si todo va bien devuelve la calidad por defecto del usuario y OK</p>
+<p>Sintaxis de la función: GetCalidadPorDefectoUsr(idUsr, contrasenya): {‘status’ : status, ‘calidad’ : calidad}</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetCauseError">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetCauseError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetCauseError" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Devuelve un string con información sobre el error comprensible para humanos</p>
+<p>Sintaxis de la función: GetCauseError(int idError) : String</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetContrasenyaUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetContrasenyaUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetContrasenyaUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>En caso contrario devuelve la contrasenya de idUsr2</p>
+<p>Sintaxis de la función: GetContrasenyaUsr(idUsr, contrasenya, idUsr2): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetEmailUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetEmailUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetEmailUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>En caso contrario devuelve el email de idUsr2</p>
+<p>Sintaxis de la función: GetEmailUsr(idUsr, contrasenya, idUsr2): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetFolder">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetFolder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>SI la carpeta no existe devuelve ERROR_CARPETA_NO_ENCONTRADA</p>
+<p>Si la carpeta no pertenece al usuario y es privada devuelve FORBIDDEN</p>
+<p>En caso contrario:
+Devuelve un diccionario con los datos de carpeta</p>
+<p>Sintaxis de la función: GetFolder(String idUsr, String contrasenya, String idCarpeta) : int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetFoldersUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetFoldersUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetFoldersUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si uno  de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>En caso contrario:
+Si son el mismo usuario devuelve un set con las ids de todas las carpetas del usuario
+Si no devuelve un set con las ids de las carpetas públicas del usuario ‘Get’</p>
+<p>Sintaxis de la función: GetFoldersUsr(String idUsr, String contrasenya, String idUsrGet) : Set&lt;String&gt;</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetFriends">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetFriends</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetFriends" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>En caso contrario:
+Devuelve el id de todos sus amigos</p>
+<p>Sintaxis de la función: GetFriends(String idUsr, String contrasenya): Set&lt;String&gt;</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetImagenAudio">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetImagenAudio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetImagenAudio" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA</p>
+<p>En caso contrario devuelve la imagen del audio</p>
+<p>Sintaxis de la función: GetImagenAudio(idUsr, contrasenya, idAudio): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetImagenPerfilUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetImagenPerfilUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetImagenPerfilUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>En caso contrario devuelve la imagen de perfil de idUsr2</p>
+<p>Sintaxis de la función: GetImagenPerfilUsr(idUsr, contrasenya, idUsr2): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetLastSecondHeared">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetLastSecondHeared</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetLastSecondHeared" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida para ese usuario devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA</p>
+<p>En caso contrario
+Devuelve el último segundo escuchado del audio</p>
+<p>Sintaxis de la función: GetLastSecondHeared(String idUsr, String contrasenya, String idAudio) : int second</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetLinkAudio">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetLinkAudio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetLinkAudio" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA</p>
+<p>En caso contrario devuelve un link del idAudio</p>
+<p>Sintaxis de la función: GetLinkAudio(String idUsr, String contrasenya, String idAudio) : string</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetListasFolder">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetListasFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetListasFolder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>SI la carpeta no existe devuelve ERROR_CARPETA_NO_ENCONTRADA</p>
+<p>Si la carpeta no pertenece al usuario y es privada devuelve FORBIDDEN</p>
+<p>En caso contrario:
+Devuelve un set con los ids de las listas</p>
+<p>Sintaxis de la función: GetListasFolder(String idUsr, String contrasenya, String idCarpeta): set&lt;String&gt;</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetListasUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetListasUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetListasUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>En caso contrario:</p>
+<p>Si son el mismo usuario devuelve un set con las ids de todas las listas de reproducción del # usuario que no están en una carpeta</p>
+<p>Si no devuelve un set con las ids de las listas de reproducción públicas que no están en 
+una carpeta</p>
+<p>Sintaxis de la función: GetListasUsr(String idUsr, String contrasenya, idUsrGet): Set&lt;String&gt;</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetNombreCarpeta">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetNombreCarpeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetNombreCarpeta" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la carpeta no existe devuelve ERROR_CARPETA_NO_ENCOTRADA</p>
+<p>Si el usuario no le pertenece esa carpeta y no es administrador y no es una carpeta 
+pública devuelve FORBIDDEN</p>
+<p>En caso contrario devuelve el nombre de la carpeta</p>
+<p>Sintaxis de la función: GetNombreCarpeta(idUsr, contrasenya, idCarpeta): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetNombreListaRep">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetNombreListaRep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetNombreListaRep" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la lista no existe devuelve ERROR_LISTA_NO_ENCOTRADA</p>
+<p>Si el usuario no le pertenece esa lista y no es administrador y no es una lista 
+pública devuelve FORBIDDEN</p>
+<p>En caso contrario devuelve el nombre de la lista</p>
+<p>Sintaxis de la función: GetNombreListaRep(idUsr, contrasenya, idLista): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetNotification">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetNotification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetNotification" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la notificación no existe devuelve ERROR_NOTIFIACION_NO_ENCONTRADA</p>
+<p>Si la notificación no pertenece al usuario devuelve FORBIDDEN</p>
+<p>En caso contrario: Devuelve un diccionario de la notificación</p>
+<p>Sintaxis de la función: GetNotification(String idUsr, String contrasenya, String idNotificacion): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetNotificationsUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetNotificationsUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetNotificationsUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>En caso contrario:
+Devuelve un set con las ids de todas las notificaciones del usuario</p>
+<p>Sintaxis de la función: GetNotificationsUsr(String idUsr, String contrasenya) : Set&lt;String&gt;</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetPrivacidadCarpeta">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetPrivacidadCarpeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetPrivacidadCarpeta" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la carpeta no existe devuelve ERROR_CARPETA_NO_ENCOTRADA</p>
+<p>Si el usuario no le pertenece esa carpeta y no es administrador y no es una carpeta 
+pública devuelve FORBIDDEN</p>
+<p>En caso contrario devuelve el nombre de la carpeta</p>
+<p>Sintaxis de la función: GetPrivacidadCarpeta(idUsr, contrasenya, idCarpeta): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetPrivacidadListaRep">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetPrivacidadListaRep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetPrivacidadListaRep" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la lista no existe devuelve ERROR_LISTA_NO_ENCOTRADA</p>
+<p>Si el usuario no le pertenece esa lista y no es administrador y no es una lista 
+pública devuelve FORBIDDEN</p>
+<p>En caso contrario devuelve la privacidad de la lista</p>
+<p>Sintaxis de la función: GetPrivacidadListaRep(idUsr, contrasenya, idLista): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetRecomendedAudio">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetRecomendedAudio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetRecomendedAudio" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Devuelve la id de un audio según el recomendador, de entre todos los audios existentes</p>
+<p>Sintaxis de la función: GetRecomendedAudio(String idUsr, String contrasenya): int idAudio</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="frontApi.views.GetSong">
 <span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetSong</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetSong" title="Enlazar permanentemente con esta definición">¶</a></dt>
-<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCOTRADO</p>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
 <p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
 <p>Si el audio existe en la calidad requerida, devuelve un VO audio completo.</p>
 <p>Si existe en otra calidad, la devuelve en esa calidad</p>
 <p>Si el usuario no es tipo artista devuelve ERROR_USUARIO_NO_ARTISTA</p>
 <p>Si no existe, devuelve código error 519 en el caso de canciones y 525 en el caso de podcast</p>
-<p>Hay que enviar en la petición los siguientes argumentos: idAudio, idUsr, contrasenya</p>
+<p>Sintaxis de la función: GetSong(String idUsr, String contrasenya, String idAudio) : Song</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetSongSeconds">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetSongSeconds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetSongSeconds" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA</p>
+<p>dia = int del 0 al 6, siendo 0 lunes, …, 6 domingo.
+Devuelve el número total de segundos reproducidos del audio en ese dia</p>
+<p>Sintaxis de la función: GetSongSeconds(idAudio, dia): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetSongs">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetSongs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetSongs" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Como getSong, pero devuelve un bloque con varios audios.</p>
+<p>Sintaxis de la función: GetSongs(String idUsr, List&lt;String&gt; idAudios, Bool calidadAlta, Bool esCancion) : Set&lt;String&gt;</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetSongsArtist">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetSongsArtist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetSongsArtist" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve -2</p>
+<p>En caso contrario:</p>
+<p>Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si el idUsrArtista no es artista devuelve ERROR_USUARIO_NO_ARTISTA</p>
+<p>En caso contrario devuelve un set de ids de las canciones del artista</p>
+<p>Sintaxis de la función: GetSongsArtist(idUsr, contrasenya, idUsrArtista) : Set&lt;String&gt;</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetSubscriptionsUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetSubscriptionsUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetSubscriptionsUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>En caso contrario devuelve un set de ids de los artistas a los que está suscrito</p>
+<p>Sintaxis de la función: GetSubscriptionsUsr(idUsr, contrasenya): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetTipoUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetTipoUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetTipoUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>En caso contrario devuelve el tipo de usuario de idUsr2</p>
+<p>Sintaxis de la función: GetTipoUsr(idUsr, contrasenya, idUsr2): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetTopReproducciones">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetTopReproducciones</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetTopReproducciones" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Devuelve un set con los n audios con mayor número de reproducciones</p>
+<p>Sintaxis de la función: GetTopReproducciones(Int n, Bool esPodcast) : Set&lt;String&gt; topAudios</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetTotRepTime">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetTotRepTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetTotRepTime" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si el usuario no es administrador devuelve ERROR_USUARIO_NO_ADMINISTRADOR</p>
+<p>dia = int del 0 al 6, siendo 0 lunes, …, 6 domingo.
+En caso contrario:
+Devuelve el número total de segundos de audio reproducidos en ese dia</p>
+<p>Sintaxis de la función: GetTotRepTime(String idUsr, String contrasenya, int dia) : int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetUser">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetUser" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida y no nula para ese usuario devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>En caso contrario</p>
+<p>Si son el mismo usuario devuelve toda la información del usuario</p>
+<p>Si no solo devuelve la información pública del usuario ‘Get’</p>
+<p>Sintaxis de la función: GetUser(Strting idUsr, String contrasenya, String idUsrGet): DiccUsr</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetUsuarioListaRep">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetUsuarioListaRep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetUsuarioListaRep" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la lista no existe devuelve ERROR_LISTA_NO_ENCOTRADA
+Si el usuario no le pertenece esa lista y no es administrador y no es una lista 
+pública devuelve FORBIDDEN</p>
+<p>En caso contrario devuelve el id del usuario al que le pertenece la lista</p>
+<p>Sintaxis de la función: GetUsuarioListaRep(idUsr, contrasenya, idLista): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GetValoracion">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GetValoracion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GetValoracion" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Devuelve un id del audio dado el link. Si el usuario o el audio no existen, devuelve 0</p>
+<p>Sintaxis de la función: GetValoracion(String idUsr, String idAudio): int valoracion</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.GlobalSearch">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">GlobalSearch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.GlobalSearch" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Devuelve un set con n ids de audios recuperadas mediante una búsqueda global
+(ver definición)</p>
+<p>Sintaxis de la función: GlobalSearch(String query, int n) : Set&lt;String&gt;</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.IsSubscribedToArtist">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">IsSubscribedToArtist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.IsSubscribedToArtist" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario o el artista no existen devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si el usuario idUsrArtista no es artista devuelve ERROR_USUARIO_NO_ARTISTA</p>
+<p>En caso contrario devuelve 1 si está suscrito sino 0</p>
+<p>Sintaxis de la función: IsSubscribedToArtist(idUsr, contrasenya, idUsrArtista): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.RecuperarContrasenya">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">RecuperarContrasenya</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.RecuperarContrasenya" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si el codigo de recuperacion es incorrecto devuelve 
+ERROR_USUARIO_CODIGO_RECUPERACION_INCORRECTO</p>
+<p>En caso contrario cambia la contrasenya y devuelve OK</p>
+<p>Sintaxis de la función: RecuperarContrasenya(email, codigo, contrasenya): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.RejectFriend">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">RejectFriend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.RejectFriend" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si alguno de los dos usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si no existe la notificación devuelve ERROR_NOTIFICACION_NO_ENCONTRADA</p>
+<p>En caso contrario:
+Si la notificación no es de amistad devuelve ERROR_NOTIFICACION_NO_AMIGO
+Si no rechaza la amistad, elimina la notificación y devuelve OK</p>
+<p>Sintaxis de la función: RejectFriend(String idUsr, String contrasenya, String idNotifiacion): int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.RemoveFolder">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">RemoveFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.RemoveFolder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la carpeta no existe devuelve ERROR_CARPETA_NO_ENCONTRADA</p>
+<p>Si la carpeta no pertenece al usuario FORBIDDEN</p>
+<p>En caso contrario:
+Elimina la carpeta y las listas dentro de ella</p>
+<p>Sintaxis de la función: RemoveFolder(String idUsr, String contrasenya, String idCarpeta): int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.RemoveFriend">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">RemoveFriend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.RemoveFriend" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si alguno de los dos usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si los usuarios no son amigos devuelve ERROR_USUARIO_NO_AMIGO</p>
+<p>En caso contrario:
+Ambos usuarios eliminan su amistad entre ellos y devuelve OK</p>
+<p>Sintaxis de la función: RemoveFriend(String idUsr, String contrasenya, String idAmigo): int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.RemoveListFromFolder">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">RemoveListFromFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.RemoveListFromFolder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la lista no existe devuelve ERROR_LISTA_NO_ENCONTRADA</p>
+<p>SI la carpeta no existe devuelve ERROR_CARPETA_NO_ENCONTRADA</p>
+<p>SI la lista no está en la carpeta devuelve ERROR_LISTA_NOT_IN_CARPETA</p>
+<p>Si la carpeta no pertenece al usuario devuelve FORBIDDEN</p>
+<p>En caso contrario:
+Elimina la lista de reproducción de la carpeta</p>
+<p>Sintaxis de la función: RemoveListFromFolder(String idUsr, String contrasenya, String idCarpeta, String idLista): int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.RemoveListaRepUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">RemoveListaRepUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.RemoveListaRepUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la lista no existe devuelve ERROR_LISTA_NO_ENCONTRADA</p>
+<p>Si la carpeta es tipo favoritos devuelve ERROR_LISTA_ES_FAVORITOS</p>
+<p>En caso contrario elimina la lista</p>
+<p>Sintaxis de la función: RemoveListaRepUsr(String idUsr, String contrasenya, String idLista): int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.RemoveNotification">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">RemoveNotification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.RemoveNotification" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la notificación no existe devuelve ERROR_NOTIFIACION_NO_ENCONTRADA</p>
+<p>Si la notificación no pertenece al usuario devuelve FORBIDDEN</p>
+<p>En caso contrario:
+Elimina la notificación del usuario</p>
+<p>Sintaxis de la función: RemoveNotification(String idUsr, String contrasenya, idNotificacion) : Set&lt;String&gt;</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.RemoveSongLista">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">RemoveSongLista</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.RemoveSongLista" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si no existe la lista, devuelve ERROR_LISTA_NO_ENCOTRADA</p>
+<p>Si no existe el audio, devuelve ERROR_AUDIO_NO_ENCONTRADO</p>
+<p>Si el audio no pertenece a la lista, devuelve ERROR_AUDIO_NOT_IN_LISTA</p>
+<p>Si la lista no pertenece al usuario devuelve FORBIDDEN</p>
+<p>En caso contrario:
+Si la lista existe, elimina el audio de la misma y devuelve OK</p>
+<p>Sintaxis de la función: RemoveSongLista(String idUsr, String contrasenya, String idLista, String idAudio): int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.RemoveUser">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">RemoveUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.RemoveUser" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si los usuarios son distintos y idUsr no es tipo administrador devuelve FORBIDDEN</p>
+<p>En caso contrario elimina el usuario</p>
+<p>Sintaxis de la función: RemoveUser(String idUsr, String contrasenya, String idUsrEliminar) : int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetAliasUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetAliasUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetAliasUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si los usuarios no son los mismos y idUsr no es administrador devuelve FORBIDDEN</p>
+<p>En caso contrario cambia el email de idUsr2</p>
+<p>Sintaxis de la función: SetAliasUsr(idUsr, contrasenya, idUsr2, alias): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetCalidadPorDefectoUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetCalidadPorDefectoUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetCalidadPorDefectoUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida para ese usuario devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>calidadPreferida = “alta” o “baja”</p>
+<p>Si todo va bien guarda en la calidad Preferida dado el usuario</p>
+<p>Sintaxis de la función: SetCalidadPorDefectoUsr(idUsr, contrasenya, calidadPreferida): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetContrasenyaUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetContrasenyaUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetContrasenyaUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si los usuarios no son los mismos y idUsr no es administrador devuelve FORBIDDEN</p>
+<p>En caso contrario cambia la contrasenya de idUsrContrasenya</p>
+<p>Sintaxis de la función: SetContrasenyaUsr(idUsr, contrasenya, idUsr2): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetEmailUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetEmailUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetEmailUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si un usuario con ese email ya existe devuelve ERROR_USUARIO_EMAIL_YA_EXISTE</p>
+<p>Si los usuarios no son los mismos y idUsr no es administrador devuelve FORBIDDEN</p>
+<p>En caso contrario cambia el email de idUsr2</p>
+<p>Sintaxis de la función: SetEmailUsr(idUsr, contrasenya, idUsr2, email): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetFolder">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetFolder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetFolder" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la privacidad no es válida devuelve ERROR_CARPETA_PRIVACIDAD_NO_VALIDA</p>
+<p>En caso contrario:
+Crea una carpeta con los datos y devuelve OK</p>
+<p>Sintaxis de la función: SetFolder(String idUsr, String contrasenya, String nombreCarpeta, String privacidadCarpeta): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetImagenAudio">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetImagenAudio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetImagenAudio" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA</p>
+<p>En caso contrario guarda la imagen del audio</p>
+<p>Sintaxis de la función: SetImagenAudio(idUsr, contrasenya, idAudio, imagenAudio): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetImagenPerfilUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetImagenPerfilUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetImagenPerfilUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida devuelve
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si tipoUsuario no es válido devuelve ERROR_USUARIO_TIPO_NO_VALIDO</p>
+<p>Si los usuarios no son los mismos y idUsr no es administrador devuelve FORBIDDEN</p>
+<p>En caso contrario cambia la imagen de idUsr2</p>
+<p>Sintaxis de la función: SetImagenPerfilUsr(idUsr, contrasenya, idUsr2, imagen): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetLastSecondHeared">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetLastSecondHeared</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetLastSecondHeared" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida para ese usuario devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si el audio no existe devuelve ERROR_CANCION_NO_ENCONTRADA</p>
+<p>En caso contrario
+Almacena el último segundo escuchado del audio</p>
+<p>Sintaxis de la función: SetLastSecondHeared(String idUsr, String contrasenya, String idAudio, int second) : int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetNombreCarpeta">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetNombreCarpeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetNombreCarpeta" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la carpeta no existe devuelve ERROR_CARPETA_NO_ENCOTRADA</p>
+<p>Si el usuario no le pertenece esa carpeta y no es administrador devuelve FORBIDDEN</p>
+<p>En caso contrario cambia el nombre de la carpeta</p>
+<p>Sintaxis de la función: SetNombreCarpeta(idUsr, contrasenya, idCarpeta, nombreCarpeta): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetNombreListaRep">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetNombreListaRep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetNombreListaRep" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Igual que ChangeNameListRepUsr, pero el administrador sí que puede cambiar el nombre</p>
+<p>Sintaxis de la función: SetNombreListaRep(idUsr, contrasenya, idLista , nombreLista): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetPrivacidadCarpeta">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetPrivacidadCarpeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetPrivacidadCarpeta" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la carpeta no existe devuelve ERROR_CARPETA_NO_ENCOTRADA</p>
+<p>Si la privacidad no es válida devuelve ERROR_CARPETA_PRIVACIDAD_NO_VALIDA</p>
+<p>Si el usuario no le pertenece esa carpeta y no es administrador devuelve FORBIDDEN</p>
+<p>En caso contrario cambia el nombre de la carpeta</p>
+<p>Sintaxis de la función: SetPrivacidadCarpeta(idUsr, contrasenya, idCarpeta, privada): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetPrivacidadListaRep">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetPrivacidadListaRep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetPrivacidadListaRep" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la lista no existe devuelve ERROR_LISTA_NO_ENCONTRADA</p>
+<p>Si la lista no es del usuario y no es tipo administrador devuelve FORBIDDEN</p>
+<p>Si privada no es válida devuelve ERROR_LISTA_PRIVACIDAD_INCORRECTA</p>
+<p>En caso contrario cambia la privacidad de la lista</p>
+<p>Sintaxis de la función: SetPrivacidadListaRep(String idUsr, String contrasenya, String idLista, String privada) : int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetSong">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetSong</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetSong" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve -2</p>
+<p>En caso contrario:</p>
+<p>Si el usuario no tiene permisos para crear audios devuelve -3</p>
+<p>En caso contrario:</p>
+<p>Almacena un audio y devuelve status 200</p>
+<p>Song es de tipo diccionario definido anteriormente al principio del documento</p>
+<p>Sintaxis de la función: SetSong(String contrasenya, String idUsr, Song song) : int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetSongLista">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetSongLista</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetSongLista" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si la lista de reproducción existe, devuelve un diccionario con sus datos</p>
+<p>Si no existe devuelve ERROR_LISTA_NO_ENCONTRADA</p>
+<p>Si la lista no pertenece al usuario y es privada devuelve FORBIDDEN</p>
+<p>Si el usuario no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña es incorrecta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>En caso contrario:</p>
+<p>Si la lista de reproducción existe, añade el audio y devuelve OK</p>
+<p>Si no existe devuelve ERROR_LISTA_NO_ENCONTRADA</p>
+<p>Si no existe el audio devuelve ERROR_AUDIO_NO_ENCONTRADO</p>
+<p>Si la lista no pertenece al usuario devuelve FORBIDDEN</p>
+<p>Sintaxis de la función: SetSongLista(String idUsr, String contrasenya, String idLista, String idAudio): int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetTipoUsr">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetTipoUsr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetTipoUsr" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si uno de los usuarios no existe devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es válida devuelve 
+ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si tipoUsuario no es válido devuelve ERROR_USUARIO_TIPO_NO_VALIDO</p>
+<p>Si los usuarios no son los mismos y idUsr no es administrador devuelve FORBIDDEN</p>
+<p>En caso contrario cambia el tipoUsuario de idUsr2</p>
+<p>Sintaxis de la función: SetTipoUsr(idUsr, contrasenya, idUsr2, tipoUsuario): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetUser">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetUser" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si todo va bien crea un usuario con los datos de usr, crea su lista favoritos y devuelve OK</p>
+<p>Si el email del usuario ya está siendo usado por algún usuario de la base de datos
+devuelve ERROR_USUARIO_EMAIL_YA_EXISTE</p>
+<p>Si el tipo de usuario no es válido devuelve ERROR_USUARIO_TIPO_NO_VALIDO</p>
+<p>Sintaxis de la función: SetUser(email, alias, contrasenya, tipoUsuario) : int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SetValoracion">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SetValoracion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SetValoracion" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Almacena la valoración valoracion en el usuario idUsr para el audio idAudio</p>
+<p>Sintaxis de la función: SetValoracion(String idUsr, String idAudio, int valoracion): None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.SubscribeToArtist">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">SubscribeToArtist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.SubscribeToArtist" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario o el artista no existen devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>Si la contraseña no es correcta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si el usuario ya está suscrito devuelve ERROR_USUARIO_YA_SUSCRITO</p>
+<p>Si el usuario artista no es tipo artista devuelve ERROR_USUARI_NO_ARTISTA</p>
+<p>En caso contrario:
+Añade al artista a la lista de suscripciones del usuario</p>
+<p>Sintaxis de la función: SubscribeToArtist(String idUsr, String contrasenya, String idUsrArtista) : int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.ValidateUser">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">ValidateUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.ValidateUser" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Si el usuario no existe, devuelve ERROR_USUARIO_NO_ENCONTRADO</p>
+<p>En caso contrario:</p>
+<p>Si la contraseña es correcta devuelve ERROR_CONTRASENYA_INCORRECTA</p>
+<p>Si no, devuelve OK</p>
+<p>Sintaxis de la función: ValidateUser(String email, String contrasenya) : int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="frontApi.views.ValidateUserEmail">
+<span class="sig-prename descclassname"><span class="pre">frontApi.views.</span></span><span class="sig-name descname"><span class="pre">ValidateUserEmail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#frontApi.views.ValidateUserEmail" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Hace lo mismo que ValidateUser, pero tiene como parámetro el email y no el id del usuario</p>
+<p>Sintaxis de la función: ValidateUserEmail(String email, String contrasenya) : int</p>
 </dd></dl>
 
 </section>
@@ -80,7 +884,81 @@
 <li><a class="reference internal" href="#">frontApi package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-frontApi.views">frontApi.views module</a><ul>
+<li><a class="reference internal" href="#frontApi.views.AcceptArtist"><code class="docutils literal notranslate"><span class="pre">AcceptArtist()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.AcceptFriend"><code class="docutils literal notranslate"><span class="pre">AcceptFriend()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.AddListToFolder"><code class="docutils literal notranslate"><span class="pre">AddListToFolder()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.AddSecondsToSong"><code class="docutils literal notranslate"><span class="pre">AddSecondsToSong()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.AlmacenarEjemplo"><code class="docutils literal notranslate"><span class="pre">AlmacenarEjemplo()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.AskAdminToBeArtist"><code class="docutils literal notranslate"><span class="pre">AskAdminToBeArtist()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.AskFriend"><code class="docutils literal notranslate"><span class="pre">AskFriend()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.ByWordSearch"><code class="docutils literal notranslate"><span class="pre">ByWordSearch()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.ChangeNameListRepUsr"><code class="docutils literal notranslate"><span class="pre">ChangeNameListRepUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GenerateRandomCodeUsr"><code class="docutils literal notranslate"><span class="pre">GenerateRandomCodeUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetAliasUsr"><code class="docutils literal notranslate"><span class="pre">GetAliasUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetAudioFromLink"><code class="docutils literal notranslate"><span class="pre">GetAudioFromLink()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetAudiosLista"><code class="docutils literal notranslate"><span class="pre">GetAudiosLista()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetCalidadPorDefectoUsr"><code class="docutils literal notranslate"><span class="pre">GetCalidadPorDefectoUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetCauseError"><code class="docutils literal notranslate"><span class="pre">GetCauseError()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetContrasenyaUsr"><code class="docutils literal notranslate"><span class="pre">GetContrasenyaUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetEmailUsr"><code class="docutils literal notranslate"><span class="pre">GetEmailUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetFolder"><code class="docutils literal notranslate"><span class="pre">GetFolder()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetFoldersUsr"><code class="docutils literal notranslate"><span class="pre">GetFoldersUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetFriends"><code class="docutils literal notranslate"><span class="pre">GetFriends()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetImagenAudio"><code class="docutils literal notranslate"><span class="pre">GetImagenAudio()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetImagenPerfilUsr"><code class="docutils literal notranslate"><span class="pre">GetImagenPerfilUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetLastSecondHeared"><code class="docutils literal notranslate"><span class="pre">GetLastSecondHeared()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetLinkAudio"><code class="docutils literal notranslate"><span class="pre">GetLinkAudio()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetListasFolder"><code class="docutils literal notranslate"><span class="pre">GetListasFolder()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetListasUsr"><code class="docutils literal notranslate"><span class="pre">GetListasUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetNombreCarpeta"><code class="docutils literal notranslate"><span class="pre">GetNombreCarpeta()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetNombreListaRep"><code class="docutils literal notranslate"><span class="pre">GetNombreListaRep()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetNotification"><code class="docutils literal notranslate"><span class="pre">GetNotification()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetNotificationsUsr"><code class="docutils literal notranslate"><span class="pre">GetNotificationsUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetPrivacidadCarpeta"><code class="docutils literal notranslate"><span class="pre">GetPrivacidadCarpeta()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetPrivacidadListaRep"><code class="docutils literal notranslate"><span class="pre">GetPrivacidadListaRep()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetRecomendedAudio"><code class="docutils literal notranslate"><span class="pre">GetRecomendedAudio()</span></code></a></li>
 <li><a class="reference internal" href="#frontApi.views.GetSong"><code class="docutils literal notranslate"><span class="pre">GetSong()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetSongSeconds"><code class="docutils literal notranslate"><span class="pre">GetSongSeconds()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetSongs"><code class="docutils literal notranslate"><span class="pre">GetSongs()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetSongsArtist"><code class="docutils literal notranslate"><span class="pre">GetSongsArtist()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetSubscriptionsUsr"><code class="docutils literal notranslate"><span class="pre">GetSubscriptionsUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetTipoUsr"><code class="docutils literal notranslate"><span class="pre">GetTipoUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetTopReproducciones"><code class="docutils literal notranslate"><span class="pre">GetTopReproducciones()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetTotRepTime"><code class="docutils literal notranslate"><span class="pre">GetTotRepTime()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetUser"><code class="docutils literal notranslate"><span class="pre">GetUser()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetUsuarioListaRep"><code class="docutils literal notranslate"><span class="pre">GetUsuarioListaRep()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GetValoracion"><code class="docutils literal notranslate"><span class="pre">GetValoracion()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.GlobalSearch"><code class="docutils literal notranslate"><span class="pre">GlobalSearch()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.IsSubscribedToArtist"><code class="docutils literal notranslate"><span class="pre">IsSubscribedToArtist()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.RecuperarContrasenya"><code class="docutils literal notranslate"><span class="pre">RecuperarContrasenya()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.RejectFriend"><code class="docutils literal notranslate"><span class="pre">RejectFriend()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.RemoveFolder"><code class="docutils literal notranslate"><span class="pre">RemoveFolder()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.RemoveFriend"><code class="docutils literal notranslate"><span class="pre">RemoveFriend()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.RemoveListFromFolder"><code class="docutils literal notranslate"><span class="pre">RemoveListFromFolder()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.RemoveListaRepUsr"><code class="docutils literal notranslate"><span class="pre">RemoveListaRepUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.RemoveNotification"><code class="docutils literal notranslate"><span class="pre">RemoveNotification()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.RemoveSongLista"><code class="docutils literal notranslate"><span class="pre">RemoveSongLista()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.RemoveUser"><code class="docutils literal notranslate"><span class="pre">RemoveUser()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetAliasUsr"><code class="docutils literal notranslate"><span class="pre">SetAliasUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetCalidadPorDefectoUsr"><code class="docutils literal notranslate"><span class="pre">SetCalidadPorDefectoUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetContrasenyaUsr"><code class="docutils literal notranslate"><span class="pre">SetContrasenyaUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetEmailUsr"><code class="docutils literal notranslate"><span class="pre">SetEmailUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetFolder"><code class="docutils literal notranslate"><span class="pre">SetFolder()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetImagenAudio"><code class="docutils literal notranslate"><span class="pre">SetImagenAudio()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetImagenPerfilUsr"><code class="docutils literal notranslate"><span class="pre">SetImagenPerfilUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetLastSecondHeared"><code class="docutils literal notranslate"><span class="pre">SetLastSecondHeared()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetNombreCarpeta"><code class="docutils literal notranslate"><span class="pre">SetNombreCarpeta()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetNombreListaRep"><code class="docutils literal notranslate"><span class="pre">SetNombreListaRep()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetPrivacidadCarpeta"><code class="docutils literal notranslate"><span class="pre">SetPrivacidadCarpeta()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetPrivacidadListaRep"><code class="docutils literal notranslate"><span class="pre">SetPrivacidadListaRep()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetSong"><code class="docutils literal notranslate"><span class="pre">SetSong()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetSongLista"><code class="docutils literal notranslate"><span class="pre">SetSongLista()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetTipoUsr"><code class="docutils literal notranslate"><span class="pre">SetTipoUsr()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetUser"><code class="docutils literal notranslate"><span class="pre">SetUser()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SetValoracion"><code class="docutils literal notranslate"><span class="pre">SetValoracion()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.SubscribeToArtist"><code class="docutils literal notranslate"><span class="pre">SubscribeToArtist()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.ValidateUser"><code class="docutils literal notranslate"><span class="pre">ValidateUser()</span></code></a></li>
+<li><a class="reference internal" href="#frontApi.views.ValidateUserEmail"><code class="docutils literal notranslate"><span class="pre">ValidateUserEmail()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-frontApi">Module contents</a></li>
