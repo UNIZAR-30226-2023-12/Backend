@@ -291,6 +291,20 @@ def isNotificactionFromUser(r, idUsuario, idNotificacion):
         return False
     return True
 
+def anyadirNotificacionSubidaCancion(r, idArtista, idCancion):
+    subs = daoUsuario.getSubscriptores(r, idArtista)
+    idNotificacion = daoNotificaciones.getIdContador(r)
+    for sub in subs:
+        diccionarioNotificacion = {constantes.CLAVE_ID_NOTIFICACION: idNotificacion,
+                                   constantes.CLAVE_TIPO_NOTIFICACION: constantes.NOTIFCACION_TIPO_NORMAL,
+                                   constantes.CLAVE_ID_USUARIO_EMISIOR: idArtista,
+                                   constantes.CLAVE_TITULO_NOTIFICACION: "Nueva canción del artista ", 
+                                   constantes.CLAVE_MENSAJE_NOTIFICACION : "La cancion del aritsta "+ daoUsuario.getAlias(r, idArtista) + 
+                                   " llamada" + daoAudios.obtenerNombreCancion(r, idCancion) + " ha sido subida"}
+        daoNotificaciones.setNotificacion(r, diccionarioNotificacion)
+        daoUsuario.anyadirNotificacion(r, sub, idNotificacion)
+        
+
 ##############################################################################################################
 ## Funciones Listas
 ##############################################################################################################

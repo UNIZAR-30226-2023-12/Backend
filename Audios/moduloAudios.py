@@ -216,7 +216,7 @@ def obtenerValAudio(r, id):
     if controlAudios.obtenerEsPodcast(r, id):
         return dao.obtenerValCancion(r, id)
     else:
-        return dao.obtenerPodcast(r, id)
+        return dao.obtenerValPodcast(r, id)
     
 
 

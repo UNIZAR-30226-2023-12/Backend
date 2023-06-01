@@ -168,6 +168,8 @@ print(str(respuesta.status_code) + ' ' + str(respuesta.json()))
 respuesta = requests.post(urlGetImagenAudio, json={'idUsr': 'usuario:1','contrasenya': '1234', 'idAudio' : 'audio:2'})
 print(str(respuesta.status_code) + ' ' + str(respuesta.json()))
 
+requests.post(urlSubscribeToArtist, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idUsrArtista' : 'usuario:5'})
+
 # Pruebas GetSongsArtist
 print('Pruebas GetSongsArtist')
 respuesta = requests.post(urlGetSongsArtist, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idUsrArtista' : 'usuario:5'})
@@ -176,6 +178,10 @@ respuesta = requests.post(urlSetSong, json={'idUsr': 'usuario:5', 'contrasenya':
 print(str(respuesta.status_code) + ' ' + str(respuesta.json()))
 respuesta = requests.post(urlGetSongsArtist, json={'idUsr': 'usuario:1', 'contrasenya': '1234', 'idUsrArtista' : 'usuario:5'})
 print(str(respuesta.status_code) + ' ' + str(respuesta.json()))
+
+respuesta = requests.post(urlGetNotificationsUsr, json={'idUsr': 'usuario:1', 'contrasenya': '1234'})
+print(str(respuesta.status_code) + ' ' + str(respuesta.json()))
+exit()
 
 # Pruebas RemoveListaRepUsr
 print('Pruebas RemoveListaRepUsr')
